@@ -1,0 +1,4826 @@
+{
+    "Reses 1": {
+        "type": "bku_reses",
+        "sidang": 1,
+        "meta": {
+            "skpd": ": SETWAN KABUPATEN BANYUMAS",
+            "pa_kpa": ": SUMARDI, S.H., M.Hum.",
+            "bendahara": ": INDAH SETIOWATI",
+            "bulan": ": FEBRUARI 2026"
+        },
+        "rows": [
+            {
+                "id": "reses_1_12",
+                "no": "1",
+                "tanggal": "2\/2\/2026",
+                "uraian": "SP2D TU",
+                "penerimaan": 465700000,
+                "pengeluaran": 0,
+                "saldo": 465700000
+            },
+            {
+                "id": "reses_1_13",
+                "no": "2",
+                "tanggal": "2\/5\/2026",
+                "uraian": "Sewa tempat Reses",
+                "penerimaan": 0,
+                "pengeluaran": 72030000,
+                "saldo": 393670000
+            },
+            {
+                "id": "reses_1_14",
+                "no": "3",
+                "tanggal": "2\/6\/2026",
+                "uraian": "ATK DLL",
+                "penerimaan": 0,
+                "pengeluaran": 2650000,
+                "saldo": 391020000
+            },
+            {
+                "id": "reses_1_15",
+                "no": "4",
+                "tanggal": "2\/6\/2026",
+                "uraian": "Makan minum",
+                "penerimaan": 0,
+                "pengeluaran": 0,
+                "saldo": 391020000
+            }
+        ],
+        "rekap_kasda": [
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 0
+            },
+            {
+                "kategori": "ATK",
+                "sp2d": 1850000,
+                "spj": 1838000,
+                "kasda": 12000
+            },
+            {
+                "kategori": "MATERAI",
+                "sp2d": 800000,
+                "spj": 800000,
+                "kasda": 0
+            },
+            {
+                "kategori": "Mamn ",
+                "sp2d": 389550000,
+                "spj": 378950000,
+                "kasda": 10600000
+            },
+            {
+                "kategori": "Sewa",
+                "sp2d": 73500000,
+                "spj": 72000000,
+                "kasda": 1500000
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 12112000
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 10630000
+            },
+            {
+                "kategori": "SETOR KASDA RESES",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 12112000
+            },
+            {
+                "kategori": "TUNAI",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 1482000
+            },
+            {
+                "kategori": "PENARIKAN",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 10630000
+            }
+        ],
+        "summary": {
+            "total_penerimaan": 465700000,
+            "total_pengeluaran": 74680000,
+            "saldo_akhir": 391020000
+        }
+    },
+    "Reses2": {
+        "type": "bku_reses",
+        "sidang": 2,
+        "meta": {
+            "skpd": ": SETWAN KABUPATEN BANYUMAS",
+            "pa_kpa": ": SUMARDI, S.H., M.Hum.",
+            "bendahara": ": INDAH SETIOWATI",
+            "bulan": ": JUNI 2026"
+        },
+        "rows": [
+            {
+                "id": "reses_2_12",
+                "no": "1",
+                "tanggal": "2\/2\/2026",
+                "uraian": "SP2D TU",
+                "penerimaan": 465240000,
+                "pengeluaran": 0,
+                "saldo": 465240000
+            },
+            {
+                "id": "reses_2_13",
+                "no": "2",
+                "tanggal": "2\/5\/2026",
+                "uraian": "Sewa tempat Reses",
+                "penerimaan": 0,
+                "pengeluaran": 70560000,
+                "saldo": 394680000
+            },
+            {
+                "id": "reses_2_14",
+                "no": "3",
+                "tanggal": "2\/6\/2026",
+                "uraian": "ATK DLL",
+                "penerimaan": 0,
+                "pengeluaran": 2190000,
+                "saldo": 392490000
+            },
+            {
+                "id": "reses_2_15",
+                "no": "4",
+                "tanggal": "2\/6\/2026",
+                "uraian": "Makan minum",
+                "penerimaan": 0,
+                "pengeluaran": 0,
+                "saldo": 392490000
+            },
+            {
+                "id": "reses_2_17",
+                "no": "6",
+                "tanggal": "6\/7\/2026",
+                "uraian": "Tunjangan reses",
+                "penerimaan": 499153750,
+                "pengeluaran": 0,
+                "saldo": 499153750
+            },
+            {
+                "id": "reses_2_18",
+                "no": "7",
+                "tanggal": "6\/7\/2026",
+                "uraian": "Tunjangan reses",
+                "penerimaan": 0,
+                "pengeluaran": 499153750,
+                "saldo": 0
+            }
+        ],
+        "rekap_kasda": [
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 0
+            },
+            {
+                "kategori": "ATK",
+                "sp2d": 1590000,
+                "spj": 1590000,
+                "kasda": 0
+            },
+            {
+                "kategori": "MATERAI",
+                "sp2d": 600000,
+                "spj": 600000,
+                "kasda": 0
+            },
+            {
+                "kategori": "Mamin",
+                "sp2d": 389550000,
+                "spj": 373650000,
+                "kasda": 15900000
+            },
+            {
+                "kategori": "Sewa",
+                "sp2d": 73500000,
+                "spj": 70000000,
+                "kasda": 3500000
+            },
+            {
+                "kategori": "",
+                "sp2d": 465240000,
+                "spj": 445840000,
+                "kasda": 19400000
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 0
+            }
+        ],
+        "summary": {
+            "total_penerimaan": 964393750,
+            "total_pengeluaran": 571903750,
+            "saldo_akhir": 392490000
+        }
+    },
+    "Reses3": {
+        "type": "bku_reses",
+        "sidang": 3,
+        "meta": {
+            "skpd": ": SETWAN KABUPATEN BANYUMAS",
+            "pa_kpa": ": SUMARDI, S.H., M.Hum.",
+            "bendahara": ": INDAH SETIOWATI",
+            "bulan": ": OKTOBER 2026"
+        },
+        "rows": [
+            {
+                "id": "reses_3_12",
+                "no": "1",
+                "tanggal": "2\/2\/2026",
+                "uraian": "SP2D TU",
+                "penerimaan": 465225000,
+                "pengeluaran": 0,
+                "saldo": 465225000
+            },
+            {
+                "id": "reses_3_13",
+                "no": "2",
+                "tanggal": "2\/5\/2026",
+                "uraian": "Sewa tempat Reses",
+                "penerimaan": 0,
+                "pengeluaran": 0,
+                "saldo": 465225000
+            },
+            {
+                "id": "reses_3_14",
+                "no": "3",
+                "tanggal": "2\/6\/2026",
+                "uraian": "ATK DLL",
+                "penerimaan": 0,
+                "pengeluaran": 0,
+                "saldo": 465225000
+            },
+            {
+                "id": "reses_3_15",
+                "no": "4",
+                "tanggal": "2\/6\/2026",
+                "uraian": "Makan minum",
+                "penerimaan": 0,
+                "pengeluaran": 0,
+                "saldo": 465225000
+            },
+            {
+                "id": "reses_3_17",
+                "no": "6",
+                "tanggal": "6\/7\/2026",
+                "uraian": "Tunjangan reses",
+                "penerimaan": 499983500,
+                "pengeluaran": 0,
+                "saldo": 499983500
+            },
+            {
+                "id": "reses_3_18",
+                "no": "7",
+                "tanggal": "6\/7\/2026",
+                "uraian": "Tunjangan reses",
+                "penerimaan": 0,
+                "pengeluaran": 499153750,
+                "saldo": 829750
+            },
+            {
+                "id": "reses_3_19",
+                "no": "8",
+                "tanggal": "27\/10\/2026",
+                "uraian": "kekurangan pajak tunjangan",
+                "penerimaan": 0,
+                "pengeluaran": 829750,
+                "saldo": 0
+            }
+        ],
+        "rekap_kasda": [
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 0
+            },
+            {
+                "kategori": "ATK",
+                "sp2d": 1575000,
+                "spj": 1575000,
+                "kasda": 0
+            },
+            {
+                "kategori": "MATERAI",
+                "sp2d": 600000,
+                "spj": 600000,
+                "kasda": 0
+            },
+            {
+                "kategori": "Mamin",
+                "sp2d": 389550000,
+                "spj": 366760000,
+                "kasda": 22790000
+            },
+            {
+                "kategori": "Sewa",
+                "sp2d": 73500000,
+                "spj": 70950000,
+                "kasda": 2550000
+            },
+            {
+                "kategori": "",
+                "sp2d": 465225000,
+                "spj": 439885000,
+                "kasda": 25340000
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 0
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 24431000
+            },
+            {
+                "kategori": "",
+                "sp2d": 2175000,
+                "spj": 0,
+                "kasda": 909000
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 1029000
+            },
+            {
+                "kategori": "",
+                "sp2d": 0,
+                "spj": 0,
+                "kasda": 120000
+            }
+        ],
+        "summary": {
+            "total_penerimaan": 965208500,
+            "total_pengeluaran": 499983500,
+            "saldo_akhir": 465225000
+        }
+    },
+    "Deb Reses1": {
+        "type": "deb_reses",
+        "sidang": 1,
+        "meta": {
+            "skpd": ": SETWAN KABUPATEN BANYUMAS",
+            "pa_kpa": ": SUMARDI, S.H., M.Hum.",
+            "bendahara": ": INDAH SETIOWATI",
+            "bulan": ": FEBRUARI 2026"
+        },
+        "sewa": {
+            "rows": [
+                {
+                    "id": "deb_1_sewa_15",
+                    "no": 1,
+                    "uraian": "Deb rek sewa tempat Agus Priyanggodo",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_16",
+                    "no": 2,
+                    "uraian": "Deb rek sewa tempat Imam Ahfas",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_17",
+                    "no": 3,
+                    "uraian": "Deb rek sewa tempat Muh Erlangga AD",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_18",
+                    "no": 4,
+                    "uraian": "Deb rek sewa tempat Joko Pramono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_19",
+                    "no": null,
+                    "uraian": "Deb rek sewa tempat Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "pajak": 0,
+                    "netto": 0,
+                    "spj": 0,
+                    "pph_spj": 0,
+                    "netto_spj": 0,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_20",
+                    "no": 5,
+                    "uraian": "Deb rek sewa tempat Jasmin",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_21",
+                    "no": 6,
+                    "uraian": "Deb rek sewa tempat Ito Anjarini",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_22",
+                    "no": 7,
+                    "uraian": "Deb rek sewa tempat Rellya Venny O",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_23",
+                    "no": 8,
+                    "uraian": "Deb rek sewa tempat drg. Andreas K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_24",
+                    "no": 9,
+                    "uraian": "Deb rek sewa tempat dr. Henry C",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_25",
+                    "no": 10,
+                    "uraian": "Deb rek sewa tempat  Didi Rudiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1000000,
+                    "pph_spj": 20000,
+                    "netto_spj": 980000,
+                    "setor": 500000,
+                    "pph_setor": 10000,
+                    "netto_setor": 490000
+                },
+                {
+                    "id": "deb_1_sewa_26",
+                    "no": 11,
+                    "uraian": "Deb rek sewa tempat Ofan Sofyan",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_27",
+                    "no": 12,
+                    "uraian": "Deb rek sewa tempat Andri Kusmayadi, ST",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_28",
+                    "no": 13,
+                    "uraian": "Deb rek sewa tempat Sandung Wiyoko",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_29",
+                    "no": 14,
+                    "uraian": "Deb rek sewa tempat Wawan Yuwandha",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_30",
+                    "no": 15,
+                    "uraian": "Deb rek sewa tempat Agus Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_31",
+                    "no": 16,
+                    "uraian": "Deb rek sewa tempat Samsudin Tirta",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_32",
+                    "no": 17,
+                    "uraian": "Deb rek sewa tempat Merakarno R T (2)",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_33",
+                    "no": 18,
+                    "uraian": "Deb rek sewa tempat Anang Agus K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_34",
+                    "no": 19,
+                    "uraian": "Deb rek sewa tempat Trisno Sudarso",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_35",
+                    "no": 20,
+                    "uraian": "Deb rek sewa tempat Balqis Fadillah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_36",
+                    "no": 21,
+                    "uraian": "Deb rek sewa tempat H. Woro Sulistiyono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_37",
+                    "no": 22,
+                    "uraian": "Deb rek sewa tempat Dukha Ngabdul W",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_38",
+                    "no": 23,
+                    "uraian": "Deb rek sewa tempat Tati Irawati",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_39",
+                    "no": 24,
+                    "uraian": "Deb rek sewa tempat Mustofa",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_40",
+                    "no": 25,
+                    "uraian": "Deb rek sewa tempat H. Ahmad Darisun",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_41",
+                    "no": 26,
+                    "uraian": "Deb rek sewa tempat Dr. Mugiyarti",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_42",
+                    "no": 27,
+                    "uraian": "Deb rek sewa tempat Danan S",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_43",
+                    "no": 28,
+                    "uraian": "Deb rek sewa tempat Imam Santosa, SH",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_44",
+                    "no": 29,
+                    "uraian": "Deb rek sewa tempat Ir Budiyono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_45",
+                    "no": 30,
+                    "uraian": "Deb rek sewa tempat Rachmat Imanda",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_46",
+                    "no": 31,
+                    "uraian": "Deb rek sewa tempat Hj Yuningsih",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_47",
+                    "no": 32,
+                    "uraian": "Deb rek sewa tempat Siswondo",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_48",
+                    "no": 33,
+                    "uraian": "Deb rek sewa tempat Bobby Listyo W",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_49",
+                    "no": 34,
+                    "uraian": "Deb rek sewa tempat Alfiatun Khasanah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_50",
+                    "no": 35,
+                    "uraian": "Deb rek sewa tempat Dedi Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_51",
+                    "no": 36,
+                    "uraian": "Deb rek sewa tempat Atik Luthfiyah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_52",
+                    "no": 37,
+                    "uraian": "Deb rek sewa tempat Slamet Sukoco, STP",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1000000,
+                    "pph_spj": 20000,
+                    "netto_spj": 980000,
+                    "setor": 500000,
+                    "pph_setor": 10000,
+                    "netto_setor": 490000
+                },
+                {
+                    "id": "deb_1_sewa_53",
+                    "no": 38,
+                    "uraian": "Deb rek sewa tempat Sutrisno Rudiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_54",
+                    "no": 39,
+                    "uraian": "Deb rek sewa tempat Eko Pramono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_55",
+                    "no": 40,
+                    "uraian": "Deb rek sewa tempat Arief Dwi K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_56",
+                    "no": 41,
+                    "uraian": "Deb rek sewa tempat Dr. Supangkat",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1000000,
+                    "pph_spj": 20000,
+                    "netto_spj": 980000,
+                    "setor": 500000,
+                    "pph_setor": 10000,
+                    "netto_setor": 490000
+                },
+                {
+                    "id": "deb_1_sewa_57",
+                    "no": 42,
+                    "uraian": "Deb rek sewa tempat Andik Pegiarto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_58",
+                    "no": 43,
+                    "uraian": "Deb rek sewa tempat Dodet Suryondaru",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_59",
+                    "no": 44,
+                    "uraian": "Deb rek sewa tempat Setia Budiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_60",
+                    "no": 45,
+                    "uraian": "Deb rek sewa tempat Iwan Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_61",
+                    "no": 46,
+                    "uraian": "Deb rek sewa tempat Cipto Pujiharso,",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_62",
+                    "no": 47,
+                    "uraian": "Deb rek sewa tempat Muchtar Nasir",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_63",
+                    "no": 48,
+                    "uraian": "Deb rek sewa tempat Abdullah Arif Budiman",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_1_sewa_64",
+                    "no": 49,
+                    "uraian": "Deb rek sewa tempat Nartam Andrea Nusa",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                }
+            ],
+            "totals": {
+                "bruto": 73500000,
+                "pajak": 1440000,
+                "netto": 72030000,
+                "spj": 72000000,
+                "pph_spj": 1440000,
+                "netto_spj": 70560000,
+                "setor": 1500000,
+                "pph_setor": 30000,
+                "netto_setor": 1470000
+            }
+        },
+        "mamin": {
+            "rows": [
+                {
+                    "id": "deb_1_mamin_70",
+                    "no": 1,
+                    "uraian": "Deb rek mamin Agus Priyanggodo",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_71",
+                    "no": 2,
+                    "uraian": "Deb rek mamin Imam Ahfas",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_72",
+                    "no": 3,
+                    "uraian": "Deb rek mamin Muh Erlangga AD",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_73",
+                    "no": 4,
+                    "uraian": "Deb rek mamin Joko Pramono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_74",
+                    "no": null,
+                    "uraian": "Deb rek mamin Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_75",
+                    "no": 5,
+                    "uraian": "Deb rek mamin Jasmin",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_76",
+                    "no": 6,
+                    "uraian": "Deb rek mamin Ito Anjarini",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_77",
+                    "no": 7,
+                    "uraian": "Deb rek mamin Rellya Venny O",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_78",
+                    "no": 8,
+                    "uraian": "Deb rek mamin drg. Andreas K",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_79",
+                    "no": 9,
+                    "uraian": "Deb rek mamin dr. Henry C",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_80",
+                    "no": 10,
+                    "uraian": "Deb rek mamin  Didi Rudiyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_81",
+                    "no": 11,
+                    "uraian": "Deb rek mamin Ofan Sofyan",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_82",
+                    "no": 12,
+                    "uraian": "Deb rek mamin Andri Kusmayadi, ST",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_83",
+                    "no": 13,
+                    "uraian": "Deb rek mamin Sandung Wiyoko",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_84",
+                    "no": 14,
+                    "uraian": "Deb rek mamin Wawan Yuwandha",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_85",
+                    "no": 15,
+                    "uraian": "Deb rek mamin Agus Supriyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_86",
+                    "no": 16,
+                    "uraian": "Deb rek mamin Samsudin Tirta",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_87",
+                    "no": 17,
+                    "uraian": "Deb rek mamin Merakarno R T (2)",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_88",
+                    "no": 18,
+                    "uraian": "Deb rek mamin Anang Agus K",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_89",
+                    "no": 19,
+                    "uraian": "Deb rek mamin Trisno Sudarso",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_90",
+                    "no": 20,
+                    "uraian": "Deb rek mamin Balqis Fadillah",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_91",
+                    "no": 21,
+                    "uraian": "Deb rek mamin H. Woro Sulistiyono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_92",
+                    "no": 22,
+                    "uraian": "Deb rek mamin Dukha Ngabdul W",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_93",
+                    "no": 23,
+                    "uraian": "Deb rek mamin Tati Irawati",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_94",
+                    "no": 24,
+                    "uraian": "Deb rek mamin Mustofa",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_95",
+                    "no": 25,
+                    "uraian": "Deb rek mamin H. Ahmad Darisun",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_96",
+                    "no": 26,
+                    "uraian": "Deb rek mamin Dr. Mugiyarti",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_97",
+                    "no": 27,
+                    "uraian": "Deb rek mamin Danan S",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_98",
+                    "no": 28,
+                    "uraian": "Deb rek mamin Imam Santosa, SH",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_99",
+                    "no": 29,
+                    "uraian": "Deb rek mamin Ir Budiyono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_100",
+                    "no": 30,
+                    "uraian": "Deb rek mamin Rachmat Imanda",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_101",
+                    "no": 31,
+                    "uraian": "Deb rek mamin Hj Yuningsih",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_102",
+                    "no": 32,
+                    "uraian": "Deb rek mamin Siswondo",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_103",
+                    "no": 33,
+                    "uraian": "Deb rek mamin Bobby Listyo W",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_104",
+                    "no": 34,
+                    "uraian": "Deb rek mamin Alfiatun Khasanah",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_105",
+                    "no": 35,
+                    "uraian": "Deb rek mamin Dedi Supriyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_106",
+                    "no": 36,
+                    "uraian": "Deb rek mamin Atik Luthfiyah",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_107",
+                    "no": 37,
+                    "uraian": "Deb rek mamin Slamet Sukoco, STP",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_108",
+                    "no": 38,
+                    "uraian": "Deb rek mamin Sutrisno Rudiyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_109",
+                    "no": 39,
+                    "uraian": "Deb rek mamin Eko Pramono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_110",
+                    "no": 40,
+                    "uraian": "Deb rek mamin Arief Dwi K",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_111",
+                    "no": 41,
+                    "uraian": "Deb rek mamin Dr. Supangkat",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_112",
+                    "no": 42,
+                    "uraian": "Deb rek mamin Andik Pegiarto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_113",
+                    "no": 43,
+                    "uraian": "Deb rek mamin Dodet Suryondaru",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_114",
+                    "no": 44,
+                    "uraian": "Deb rek mamin Setia Budiyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_115",
+                    "no": 45,
+                    "uraian": "Deb rek mamin Iwan Supriyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_116",
+                    "no": 46,
+                    "uraian": "Deb rek mamin Cipto Pujiharso,",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_117",
+                    "no": 47,
+                    "uraian": "Deb rek mamin Muchtar Nasir",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_118",
+                    "no": 48,
+                    "uraian": "Deb rek mamin Abdullah Arif Budiman",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_1_mamin_119",
+                    "no": 49,
+                    "uraian": "Deb rek mamin Nartam Andrea Nusa",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                }
+            ]
+        },
+        "tunjangan": {
+            "rows": [
+                {
+                    "id": "deb_1_tunj_139",
+                    "no": 9,
+                    "uraian": "Deb rek Tunj dr. Henry C",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_140",
+                    "no": 10,
+                    "uraian": "Deb rek Tunj  Didi Rudiyanto",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 490000
+                },
+                {
+                    "id": "deb_1_tunj_141",
+                    "no": 11,
+                    "uraian": "Deb rek Tunj Ofan Sofyan",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_142",
+                    "no": 12,
+                    "uraian": "Deb rek Tunj Andri Kusmayadi, ST",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_143",
+                    "no": 13,
+                    "uraian": "Deb rek Tunj Sandung Wiyoko",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_144",
+                    "no": 14,
+                    "uraian": "Deb rek Tunj Wawan Yuwandha",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_145",
+                    "no": 15,
+                    "uraian": "Deb rek Tunj Agus Supriyanto",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_146",
+                    "no": 16,
+                    "uraian": "Deb rek Tunj Samsudin Tirta",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_147",
+                    "no": 17,
+                    "uraian": "Deb rek Tunj Merakarno R T ",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_148",
+                    "no": 18,
+                    "uraian": "Deb rek Tunj Anang Agus K",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_149",
+                    "no": 19,
+                    "uraian": "Deb rek Tunj Trisno Sudarso",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_150",
+                    "no": 20,
+                    "uraian": "Deb rek Tunj Balqis Fadillah",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_151",
+                    "no": 21,
+                    "uraian": "Deb rek Tunj H. Woro Sulistiyono",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_152",
+                    "no": 22,
+                    "uraian": "Deb rek Tunj Dukha Ngabdul W",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_153",
+                    "no": 23,
+                    "uraian": "Deb rek Tunj Tati Irawati",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_154",
+                    "no": 24,
+                    "uraian": "Deb rek Tunj Mustofa",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_155",
+                    "no": 25,
+                    "uraian": "Deb rek Tunj H. Ahmad Darisun",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_156",
+                    "no": 26,
+                    "uraian": "Deb rek Tunj Dr. Mugiyarti",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_157",
+                    "no": 27,
+                    "uraian": "Deb rek Tunj Danan S",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_158",
+                    "no": 28,
+                    "uraian": "Deb rek Tunj Imam Santosa, SH",
+                    "bruto": 14700000,
+                    "pajak": 11220000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_159",
+                    "no": 29,
+                    "uraian": "Deb rek Tunj Ir Budiyono",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_160",
+                    "no": 30,
+                    "uraian": "Deb rek Tunj Rachmat Imanda",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_161",
+                    "no": 31,
+                    "uraian": "Deb rek Tunj Hj Yuningsih",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_162",
+                    "no": 32,
+                    "uraian": "Deb rek Tunj Siswondo",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_163",
+                    "no": 33,
+                    "uraian": "Deb rek Tunj Bobby Listyo W",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_164",
+                    "no": 34,
+                    "uraian": "Deb rek Tunj Alfiatun Khasanah",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_165",
+                    "no": 35,
+                    "uraian": "Deb rek Tunj Dedi Supriyanto",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_166",
+                    "no": 36,
+                    "uraian": "Deb rek Tunj Atik Luthfiyah",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_167",
+                    "no": 37,
+                    "uraian": "Deb rek Tunj Slamet Sukoco, STP",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 490000
+                },
+                {
+                    "id": "deb_1_tunj_168",
+                    "no": 38,
+                    "uraian": "Deb rek Tunj Sutrisno Rudiyanto",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_169",
+                    "no": 39,
+                    "uraian": "Deb rek Tunj Eko Pramono",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_170",
+                    "no": 40,
+                    "uraian": "Deb rek Tunj Arief Dwi K",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_171",
+                    "no": 41,
+                    "uraian": "Deb rek Tunj Dr. Supangkat",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_172",
+                    "no": 42,
+                    "uraian": "Deb rek Tunj Andik Pegiarto",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_173",
+                    "no": 43,
+                    "uraian": "Deb rek Tunj Dodet Suryondaru",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_174",
+                    "no": 44,
+                    "uraian": "Deb rek Tunj Setia Budiyanto",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_175",
+                    "no": 45,
+                    "uraian": "Deb rek Tunj Iwan Supriyanto",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_176",
+                    "no": 46,
+                    "uraian": "Deb rek Tunj Cipto Pujiharso,",
+                    "bruto": 14700000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_177",
+                    "no": 47,
+                    "uraian": "Deb rek Tunj Muchtar Nasir",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_178",
+                    "no": 48,
+                    "uraian": "Deb rek Tunj Abdullah Arif Budiman",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_1_tunj_179",
+                    "no": 49,
+                    "uraian": "Deb rek Tunj Nartam Andrea Nusa",
+                    "bruto": 14700000,
+                    "pajak": 10057500,
+                    "netto": 0
+                }
+            ],
+            "totals": {
+                "bruto": 0,
+                "pajak": 0,
+                "netto": 0
+            }
+        }
+    },
+    "Deb Reses2": {
+        "type": "deb_reses",
+        "sidang": 2,
+        "meta": {
+            "skpd": ": SETWAN KABUPATEN BANYUMAS",
+            "pa_kpa": ": SUMARDI, S.H., M.Hum.",
+            "bendahara": ": INDAH SETIOWATI",
+            "bulan": ": JUNI 2026"
+        },
+        "sewa": {
+            "rows": [
+                {
+                    "id": "deb_2_sewa_15",
+                    "no": 1,
+                    "uraian": "Deb rek sewa tempat Agus Priyanggodo",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_16",
+                    "no": 2,
+                    "uraian": "Deb rek sewa tempat Imam Ahfas",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_17",
+                    "no": 3,
+                    "uraian": "Deb rek sewa tempat Muh Erlangga AD",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_18",
+                    "no": 4,
+                    "uraian": "Deb rek sewa tempat Joko Pramono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_19",
+                    "no": null,
+                    "uraian": "Deb rek sewa tempat Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "pajak": 0,
+                    "netto": 0,
+                    "spj": 0,
+                    "pph_spj": 0,
+                    "netto_spj": 0,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_20",
+                    "no": 5,
+                    "uraian": "Deb rek sewa tempat Jasmin",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_21",
+                    "no": 6,
+                    "uraian": "Deb rek sewa tempat Ito Anjarini",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_22",
+                    "no": 7,
+                    "uraian": "Deb rek sewa tempat Rellya Venny O",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1000000,
+                    "pph_spj": 20000,
+                    "netto_spj": 980000,
+                    "setor": 500000,
+                    "pph_setor": 10000,
+                    "netto_setor": 490000
+                },
+                {
+                    "id": "deb_2_sewa_23",
+                    "no": 8,
+                    "uraian": "Deb rek sewa tempat drg. Andreas K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_24",
+                    "no": 9,
+                    "uraian": "Deb rek sewa tempat dr. Henry C",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_25",
+                    "no": 10,
+                    "uraian": "Deb rek sewa tempat  Didi Rudiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_26",
+                    "no": 11,
+                    "uraian": "Deb rek sewa tempat Ofan Sofyan",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_27",
+                    "no": 12,
+                    "uraian": "Deb rek sewa tempat Andri Kusmayadi, ST",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_28",
+                    "no": 13,
+                    "uraian": "Deb rek sewa tempat Sandung Wiyoko",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_29",
+                    "no": 14,
+                    "uraian": "Deb rek sewa tempat Wawan Yuwandha",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_30",
+                    "no": 15,
+                    "uraian": "Deb rek sewa tempat Agus Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_31",
+                    "no": 16,
+                    "uraian": "Deb rek sewa tempat Samsudin Tirta",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_32",
+                    "no": 17,
+                    "uraian": "Deb rek sewa tempat Merakarno R T (2)",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_33",
+                    "no": 18,
+                    "uraian": "Deb rek sewa tempat Anang Agus K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_34",
+                    "no": 19,
+                    "uraian": "Deb rek sewa tempat Trisno Sudarso",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 0,
+                    "pph_spj": 0,
+                    "netto_spj": 0,
+                    "setor": 1500000,
+                    "pph_setor": 30000,
+                    "netto_setor": 1470000
+                },
+                {
+                    "id": "deb_2_sewa_35",
+                    "no": 20,
+                    "uraian": "Deb rek sewa tempat Balqis Fadillah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_36",
+                    "no": 21,
+                    "uraian": "Deb rek sewa tempat H. Woro Sulistiyono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_37",
+                    "no": 22,
+                    "uraian": "Deb rek sewa tempat Dukha Ngabdul W",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_38",
+                    "no": 23,
+                    "uraian": "Deb rek sewa tempat Tati Irawati",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_39",
+                    "no": 24,
+                    "uraian": "Deb rek sewa tempat Mustofa",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_40",
+                    "no": 25,
+                    "uraian": "Deb rek sewa tempat H. Ahmad Darisun",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_41",
+                    "no": 26,
+                    "uraian": "Deb rek sewa tempat Dr. Mugiyarti",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_42",
+                    "no": 27,
+                    "uraian": "Deb rek sewa tempat Danan S",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_43",
+                    "no": 28,
+                    "uraian": "Deb rek sewa tempat Imam Santosa, SH",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_44",
+                    "no": 29,
+                    "uraian": "Deb rek sewa tempat Ir Budiyono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_45",
+                    "no": 30,
+                    "uraian": "Deb rek sewa tempat Rachmat Imanda",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_46",
+                    "no": 31,
+                    "uraian": "Deb rek sewa tempat Hj Yuningsih",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_47",
+                    "no": 32,
+                    "uraian": "Deb rek sewa tempat Siswondo",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_48",
+                    "no": 33,
+                    "uraian": "Deb rek sewa tempat Bobby Listyo W",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_49",
+                    "no": 34,
+                    "uraian": "Deb rek sewa tempat Alfiatun Khasanah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_50",
+                    "no": 35,
+                    "uraian": "Deb rek sewa tempat Dedi Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_51",
+                    "no": 36,
+                    "uraian": "Deb rek sewa tempat Atik Luthfiyah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_52",
+                    "no": 37,
+                    "uraian": "Deb rek sewa tempat Slamet Sukoco, STP",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_53",
+                    "no": 38,
+                    "uraian": "Deb rek sewa tempat Sutrisno Rudiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_54",
+                    "no": 39,
+                    "uraian": "Deb rek sewa tempat Eko Pramono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_55",
+                    "no": 40,
+                    "uraian": "Deb rek sewa tempat Arief Dwi K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_56",
+                    "no": 41,
+                    "uraian": "Deb rek sewa tempat Dr. Supangkat",
+                    "bruto": 0,
+                    "pajak": 0,
+                    "netto": 0,
+                    "spj": 0,
+                    "pph_spj": 0,
+                    "netto_spj": 0,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_57",
+                    "no": 42,
+                    "uraian": "Deb rek sewa tempat Andik Pegiarto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_58",
+                    "no": 43,
+                    "uraian": "Deb rek sewa tempat Dodet Suryondaru",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_59",
+                    "no": 44,
+                    "uraian": "Deb rek sewa tempat Setia Budiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_60",
+                    "no": 45,
+                    "uraian": "Deb rek sewa tempat Iwan Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_61",
+                    "no": 46,
+                    "uraian": "Deb rek sewa tempat Cipto Pujiharso,",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_62",
+                    "no": 47,
+                    "uraian": "Deb rek sewa tempat Muchtar Nasir",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_63",
+                    "no": 48,
+                    "uraian": "Deb rek sewa tempat Abdullah Arif Budiman",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_2_sewa_64",
+                    "no": 49,
+                    "uraian": "Deb rek sewa tempat Nartam Andrea Nusa",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                }
+            ],
+            "totals": {
+                "bruto": 72000000,
+                "pajak": 1410000,
+                "netto": 70560000,
+                "spj": 70000000,
+                "pph_spj": 1400000,
+                "netto_spj": 68600000,
+                "setor": 2000000,
+                "pph_setor": 40000,
+                "netto_setor": 1960000
+            }
+        },
+        "mamin": {
+            "rows": [
+                {
+                    "id": "deb_2_mamin_70",
+                    "no": 1,
+                    "uraian": "Deb rek mamin Agus Priyanggodo",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_71",
+                    "no": 2,
+                    "uraian": "Deb rek mamin Imam Ahfas",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_72",
+                    "no": 3,
+                    "uraian": "Deb rek mamin Muh Erlangga AD",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_73",
+                    "no": 4,
+                    "uraian": "Deb rek mamin Joko Pramono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_74",
+                    "no": null,
+                    "uraian": "Deb rek mamin Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_75",
+                    "no": 5,
+                    "uraian": "Deb rek mamin Jasmin",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_76",
+                    "no": 6,
+                    "uraian": "Deb rek mamin Ito Anjarini",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_77",
+                    "no": 7,
+                    "uraian": "Deb rek mamin Rellya Venny O",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_78",
+                    "no": 8,
+                    "uraian": "Deb rek mamin drg. Andreas K",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_79",
+                    "no": 9,
+                    "uraian": "Deb rek mamin dr. Henry C",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_80",
+                    "no": 10,
+                    "uraian": "Deb rek mamin  Didi Rudiyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_81",
+                    "no": 11,
+                    "uraian": "Deb rek mamin Ofan Sofyan",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_82",
+                    "no": 12,
+                    "uraian": "Deb rek mamin Andri Kusmayadi, ST",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_83",
+                    "no": 13,
+                    "uraian": "Deb rek mamin Sandung Wiyoko",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_84",
+                    "no": 14,
+                    "uraian": "Deb rek mamin Wawan Yuwandha",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_85",
+                    "no": 15,
+                    "uraian": "Deb rek mamin Agus Supriyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_86",
+                    "no": 16,
+                    "uraian": "Deb rek mamin Samsudin Tirta",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_87",
+                    "no": 17,
+                    "uraian": "Deb rek mamin Merakarno R T (2)",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_88",
+                    "no": 18,
+                    "uraian": "Deb rek mamin Anang Agus K",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_89",
+                    "no": 19,
+                    "uraian": "Deb rek mamin Trisno Sudarso",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_90",
+                    "no": 20,
+                    "uraian": "Deb rek mamin Balqis Fadillah",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_91",
+                    "no": 21,
+                    "uraian": "Deb rek mamin H. Woro Sulistiyono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_92",
+                    "no": 22,
+                    "uraian": "Deb rek mamin Dukha Ngabdul W",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_93",
+                    "no": 23,
+                    "uraian": "Deb rek mamin Tati Irawati",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_94",
+                    "no": 24,
+                    "uraian": "Deb rek mamin Mustofa",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_95",
+                    "no": 25,
+                    "uraian": "Deb rek mamin H. Ahmad Darisun",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_96",
+                    "no": 26,
+                    "uraian": "Deb rek mamin Dr. Mugiyarti",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_97",
+                    "no": 27,
+                    "uraian": "Deb rek mamin Danan S",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_98",
+                    "no": 28,
+                    "uraian": "Deb rek mamin Imam Santosa, SH",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_99",
+                    "no": 29,
+                    "uraian": "Deb rek mamin Ir Budiyono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_100",
+                    "no": 30,
+                    "uraian": "Deb rek mamin Rachmat Imanda",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_101",
+                    "no": 31,
+                    "uraian": "Deb rek mamin Hj Yuningsih",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_102",
+                    "no": 32,
+                    "uraian": "Deb rek mamin Siswondo",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_103",
+                    "no": 33,
+                    "uraian": "Deb rek mamin Bobby Listyo W",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_104",
+                    "no": 34,
+                    "uraian": "Deb rek mamin Alfiatun Khasanah",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_105",
+                    "no": 35,
+                    "uraian": "Deb rek mamin Dedi Supriyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_106",
+                    "no": 36,
+                    "uraian": "Deb rek mamin Atik Luthfiyah",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_107",
+                    "no": 37,
+                    "uraian": "Deb rek mamin Slamet Sukoco, STP",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_108",
+                    "no": 38,
+                    "uraian": "Deb rek mamin Sutrisno Rudiyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_109",
+                    "no": 39,
+                    "uraian": "Deb rek mamin Eko Pramono",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_110",
+                    "no": 40,
+                    "uraian": "Deb rek mamin Arief Dwi K",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_111",
+                    "no": 41,
+                    "uraian": "Deb rek mamin Dr. Supangkat",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_112",
+                    "no": 42,
+                    "uraian": "Deb rek mamin Andik Pegiarto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_113",
+                    "no": 43,
+                    "uraian": "Deb rek mamin Dodet Suryondaru",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_114",
+                    "no": 44,
+                    "uraian": "Deb rek mamin Setia Budiyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_115",
+                    "no": 45,
+                    "uraian": "Deb rek mamin Iwan Supriyanto",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_116",
+                    "no": 46,
+                    "uraian": "Deb rek mamin Cipto Pujiharso,",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_117",
+                    "no": 47,
+                    "uraian": "Deb rek mamin Muchtar Nasir",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_118",
+                    "no": 48,
+                    "uraian": "Deb rek mamin Abdullah Arif Budiman",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_2_mamin_119",
+                    "no": 49,
+                    "uraian": "Deb rek mamin Nartam Andrea Nusa",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                }
+            ]
+        },
+        "tunjangan": {
+            "rows": [
+                {
+                    "id": "deb_2_tunj_139",
+                    "no": 9,
+                    "uraian": "Deb rek Tunj dr. Henry C",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_140",
+                    "no": 10,
+                    "uraian": "Deb rek Tunj  Didi Rudiyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_141",
+                    "no": 11,
+                    "uraian": "Deb rek Tunj Ofan Sofyan",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_142",
+                    "no": 12,
+                    "uraian": "Deb rek Tunj Andri Kusmayadi, ST",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_143",
+                    "no": 13,
+                    "uraian": "Deb rek Tunj Sandung Wiyoko",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_144",
+                    "no": 14,
+                    "uraian": "Deb rek Tunj Wawan Yuwandha",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_145",
+                    "no": 15,
+                    "uraian": "Deb rek Tunj Agus Supriyanto",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_146",
+                    "no": 16,
+                    "uraian": "Deb rek Tunj Samsudin Tirta",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_147",
+                    "no": 17,
+                    "uraian": "Deb rek Tunj Merakarno R T ",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_148",
+                    "no": 18,
+                    "uraian": "Deb rek Tunj Anang Agus K",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_149",
+                    "no": 19,
+                    "uraian": "Deb rek Tunj Trisno Sudarso",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 1470000
+                },
+                {
+                    "id": "deb_2_tunj_150",
+                    "no": 20,
+                    "uraian": "Deb rek Tunj Balqis Fadillah",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_151",
+                    "no": 21,
+                    "uraian": "Deb rek Tunj H. Woro Sulistiyono",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_152",
+                    "no": 22,
+                    "uraian": "Deb rek Tunj Dukha Ngabdul W",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_153",
+                    "no": 23,
+                    "uraian": "Deb rek Tunj Tati Irawati",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 1470000
+                },
+                {
+                    "id": "deb_2_tunj_154",
+                    "no": 24,
+                    "uraian": "Deb rek Tunj Mustofa",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_155",
+                    "no": 25,
+                    "uraian": "Deb rek Tunj H. Ahmad Darisun",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_156",
+                    "no": 26,
+                    "uraian": "Deb rek Tunj Dr. Mugiyarti",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_157",
+                    "no": 27,
+                    "uraian": "Deb rek Tunj Danan S",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_158",
+                    "no": 28,
+                    "uraian": "Deb rek Tunj Imam Santosa, SH",
+                    "bruto": 11220000,
+                    "pajak": 11220000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_159",
+                    "no": 29,
+                    "uraian": "Deb rek Tunj Ir Budiyono",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_160",
+                    "no": 30,
+                    "uraian": "Deb rek Tunj Rachmat Imanda",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_161",
+                    "no": 31,
+                    "uraian": "Deb rek Tunj Hj Yuningsih",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_162",
+                    "no": 32,
+                    "uraian": "Deb rek Tunj Siswondo",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_163",
+                    "no": 33,
+                    "uraian": "Deb rek Tunj Bobby Listyo W",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_164",
+                    "no": 34,
+                    "uraian": "Deb rek Tunj Alfiatun Khasanah",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_165",
+                    "no": 35,
+                    "uraian": "Deb rek Tunj Dedi Supriyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_166",
+                    "no": 36,
+                    "uraian": "Deb rek Tunj Atik Luthfiyah",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_167",
+                    "no": 37,
+                    "uraian": "Deb rek Tunj Slamet Sukoco, STP",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_168",
+                    "no": 38,
+                    "uraian": "Deb rek Tunj Sutrisno Rudiyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_169",
+                    "no": 39,
+                    "uraian": "Deb rek Tunj Eko Pramono",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_170",
+                    "no": 40,
+                    "uraian": "Deb rek Tunj Arief Dwi K",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_171",
+                    "no": 41,
+                    "uraian": "Deb rek Tunj Dr. Supangkat",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_172",
+                    "no": 42,
+                    "uraian": "Deb rek Tunj Andik Pegiarto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_173",
+                    "no": 43,
+                    "uraian": "Deb rek Tunj Dodet Suryondaru",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_174",
+                    "no": 44,
+                    "uraian": "Deb rek Tunj Setia Budiyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_175",
+                    "no": 45,
+                    "uraian": "Deb rek Tunj Iwan Supriyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_176",
+                    "no": 46,
+                    "uraian": "Deb rek Tunj Cipto Pujiharso,",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_177",
+                    "no": 47,
+                    "uraian": "Deb rek Tunj Muchtar Nasir",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_178",
+                    "no": 48,
+                    "uraian": "Deb rek Tunj Abdullah Arif Budiman",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_2_tunj_179",
+                    "no": 49,
+                    "uraian": "Deb rek Tunj Nartam Andrea Nusa",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                }
+            ],
+            "totals": {
+                "bruto": 0,
+                "pajak": 0,
+                "netto": 0
+            }
+        }
+    },
+    "DebReses3": {
+        "type": "deb_reses",
+        "sidang": 3,
+        "meta": {
+            "skpd": ": SETWAN KABUPATEN BANYUMAS",
+            "pa_kpa": ": ",
+            "bendahara": ": INDAH SETIOWATI",
+            "bulan": ": OKTOBER 2026"
+        },
+        "sewa": {
+            "rows": [
+                {
+                    "id": "deb_3_sewa_15",
+                    "no": 1,
+                    "uraian": "Deb rek sewa tempat Agus Priyanggodo",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_16",
+                    "no": 2,
+                    "uraian": "Deb rek sewa tempat Imam Ahfas",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_17",
+                    "no": 3,
+                    "uraian": "Deb rek sewa tempat Muh Erlangga AD",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_18",
+                    "no": 4,
+                    "uraian": "Deb rek sewa tempat Joko Pramono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_19",
+                    "no": null,
+                    "uraian": "Deb rek sewa tempat Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "pajak": 0,
+                    "netto": 0,
+                    "spj": 0,
+                    "pph_spj": 0,
+                    "netto_spj": 0,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_20",
+                    "no": 5,
+                    "uraian": "Deb rek sewa tempat Jasmin",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_21",
+                    "no": 6,
+                    "uraian": "Deb rek sewa tempat Ito Anjarini",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_22",
+                    "no": 7,
+                    "uraian": "Deb rek sewa tempat Rellya Venny O",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 450000,
+                    "pph_spj": 9000,
+                    "netto_spj": 441000,
+                    "setor": 1050000,
+                    "pph_setor": 21000,
+                    "netto_setor": 1029000
+                },
+                {
+                    "id": "deb_3_sewa_23",
+                    "no": 8,
+                    "uraian": "Deb rek sewa tempat drg. Andreas K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_24",
+                    "no": 9,
+                    "uraian": "Deb rek sewa tempat dr. Henry C",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_25",
+                    "no": 10,
+                    "uraian": "Deb rek sewa tempat  Didi Rudiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_26",
+                    "no": 11,
+                    "uraian": "Deb rek sewa tempat Ofan Sofyan",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_27",
+                    "no": 12,
+                    "uraian": "Deb rek sewa tempat Andri Kusmayadi, ST",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_28",
+                    "no": 13,
+                    "uraian": "Deb rek sewa tempat Sandung Wiyoko",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_29",
+                    "no": 14,
+                    "uraian": "Deb rek sewa tempat Wawan Yuwandha",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_30",
+                    "no": 15,
+                    "uraian": "Deb rek sewa tempat Agus Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_31",
+                    "no": 16,
+                    "uraian": "Deb rek sewa tempat Samsudin Tirta",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_32",
+                    "no": 17,
+                    "uraian": "Deb rek sewa tempat Merakarno R T (2)",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_33",
+                    "no": 18,
+                    "uraian": "Deb rek sewa tempat Anang Agus K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_34",
+                    "no": 19,
+                    "uraian": "Deb rek sewa tempat Trisno Sudarso",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_35",
+                    "no": 20,
+                    "uraian": "Deb rek sewa tempat Balqis Fadillah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_36",
+                    "no": 21,
+                    "uraian": "Deb rek sewa tempat H. Woro Sulistiyono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_37",
+                    "no": 22,
+                    "uraian": "Deb rek sewa tempat Dukha Ngabdul W",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_38",
+                    "no": 23,
+                    "uraian": "Deb rek sewa tempat Tati Irawati",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_39",
+                    "no": 24,
+                    "uraian": "Deb rek sewa tempat Mustofa",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_40",
+                    "no": 25,
+                    "uraian": "Deb rek sewa tempat H. Ahmad Darisun",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_41",
+                    "no": 26,
+                    "uraian": "Deb rek sewa tempat Dr. Mugiyarti",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_42",
+                    "no": 27,
+                    "uraian": "Deb rek sewa tempat Danan S",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_43",
+                    "no": 28,
+                    "uraian": "Deb rek sewa tempat Imam Santosa, SH",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_44",
+                    "no": 29,
+                    "uraian": "Deb rek sewa tempat Ir Budiyono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_45",
+                    "no": 30,
+                    "uraian": "Deb rek sewa tempat Rachmat Imanda",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_46",
+                    "no": 31,
+                    "uraian": "Deb rek sewa tempat Hj Yuningsih",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_47",
+                    "no": 32,
+                    "uraian": "Deb rek sewa tempat Siswondo",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_48",
+                    "no": 33,
+                    "uraian": "Deb rek sewa tempat Bobby Listyo W",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_49",
+                    "no": 34,
+                    "uraian": "Deb rek sewa tempat Alfiatun Khasanah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_50",
+                    "no": 35,
+                    "uraian": "Deb rek sewa tempat Dedi Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_51",
+                    "no": 36,
+                    "uraian": "Deb rek sewa tempat Atik Luthfiyah",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_52",
+                    "no": 37,
+                    "uraian": "Deb rek sewa tempat Slamet Sukoco, STP",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_53",
+                    "no": 38,
+                    "uraian": "Deb rek sewa tempat Sutrisno Rudiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_54",
+                    "no": 39,
+                    "uraian": "Deb rek sewa tempat Eko Pramono",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_55",
+                    "no": 40,
+                    "uraian": "Deb rek sewa tempat Arief Dwi K",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_56",
+                    "no": 41,
+                    "uraian": "Deb rek sewa tempat Dr. Supangkat",
+                    "bruto": 0,
+                    "pajak": 0,
+                    "netto": 0,
+                    "spj": 0,
+                    "pph_spj": 0,
+                    "netto_spj": 0,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_57",
+                    "no": 42,
+                    "uraian": "Deb rek sewa tempat Andik Pegiarto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_58",
+                    "no": 43,
+                    "uraian": "Deb rek sewa tempat Dodet Suryondaru",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_59",
+                    "no": 44,
+                    "uraian": "Deb rek sewa tempat Setia Budiyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_60",
+                    "no": 45,
+                    "uraian": "Deb rek sewa tempat Iwan Supriyanto",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_61",
+                    "no": 46,
+                    "uraian": "Deb rek sewa tempat Cipto Pujiharso,",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_62",
+                    "no": 47,
+                    "uraian": "Deb rek sewa tempat Muchtar Nasir",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_63",
+                    "no": 48,
+                    "uraian": "Deb rek sewa tempat Abdullah Arif Budiman",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                },
+                {
+                    "id": "deb_3_sewa_64",
+                    "no": 49,
+                    "uraian": "Deb rek sewa tempat Nartam Andrea Nusa",
+                    "bruto": 1500000,
+                    "pajak": 30000,
+                    "netto": 1470000,
+                    "spj": 1500000,
+                    "pph_spj": 30000,
+                    "netto_spj": 1470000,
+                    "setor": 0,
+                    "pph_setor": 0,
+                    "netto_setor": 0
+                }
+            ],
+            "totals": {
+                "bruto": 72000000,
+                "pajak": 1410000,
+                "netto": 70560000,
+                "spj": 70950000,
+                "pph_spj": 1419000,
+                "netto_spj": 69531000,
+                "setor": 1050000,
+                "pph_setor": 21000,
+                "netto_setor": 1029000
+            }
+        },
+        "mamin": {
+            "rows": [
+                {
+                    "id": "deb_3_mamin_70",
+                    "no": 1,
+                    "uraian": "Deb rek mamin Agus Priyanggodo",
+                    "bruto": 3975000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_72",
+                    "no": 2,
+                    "uraian": "Deb rek mamin Imam Ahfas",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_73",
+                    "no": 3,
+                    "uraian": "Deb rek mamin Muh Erlangga AD",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_74",
+                    "no": 4,
+                    "uraian": "Deb rek mamin Joko Pramono",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_75",
+                    "no": null,
+                    "uraian": "Deb rek mamin Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "netto": 0,
+                    "spj": 0
+                },
+                {
+                    "id": "deb_3_mamin_76",
+                    "no": 5,
+                    "uraian": "Deb rek mamin Jasmin",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_77",
+                    "no": 6,
+                    "uraian": "Deb rek mamin Ito Anjarini",
+                    "bruto": 7950000,
+                    "netto": 6996000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_78",
+                    "no": 7,
+                    "uraian": "Deb rek mamin Rellya Venny O",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_79",
+                    "no": 8,
+                    "uraian": "Deb rek mamin drg. Andreas K",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_80",
+                    "no": 9,
+                    "uraian": "Deb rek mamin dr. Henry C",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_81",
+                    "no": 10,
+                    "uraian": "Deb rek mamin  Didi Rudiyanto",
+                    "bruto": 4240000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_83",
+                    "no": 11,
+                    "uraian": "Deb rek mamin Ofan Sofyan",
+                    "bruto": 7950000,
+                    "netto": 6996000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_84",
+                    "no": 12,
+                    "uraian": "Deb rek mamin Andri Kusmayadi, ST",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_85",
+                    "no": 13,
+                    "uraian": "Deb rek mamin Sandung Wiyoko",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_86",
+                    "no": 14,
+                    "uraian": "Deb rek mamin Wawan Yuwandha",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_87",
+                    "no": 15,
+                    "uraian": "Deb rek mamin Agus Supriyanto",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_88",
+                    "no": 16,
+                    "uraian": "Deb rek mamin Samsudin Tirta",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_89",
+                    "no": 17,
+                    "uraian": "Deb rek mamin Merakarno R T ",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_90",
+                    "no": 18,
+                    "uraian": "Deb rek mamin Anang Agus K",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_91",
+                    "no": 19,
+                    "uraian": "Deb rek mamin Trisno Sudarso",
+                    "bruto": 6360000,
+                    "netto": 6360000,
+                    "spj": 6360000
+                },
+                {
+                    "id": "deb_3_mamin_92",
+                    "no": 20,
+                    "uraian": "Deb rek mamin Balqis Fadillah",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_93",
+                    "no": 21,
+                    "uraian": "Deb rek mamin H. Woro Sulistiyono",
+                    "bruto": 2915000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_96",
+                    "no": 22,
+                    "uraian": "Deb rek mamin Dukha Ngabdul W",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_97",
+                    "no": 23,
+                    "uraian": "Deb rek mamin Tati Irawati",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_98",
+                    "no": 24,
+                    "uraian": "Deb rek mamin Mustofa",
+                    "bruto": 5300000,
+                    "netto": 5300000,
+                    "spj": 5300000
+                },
+                {
+                    "id": "deb_3_mamin_99",
+                    "no": 25,
+                    "uraian": "Deb rek mamin H. Ahmad Darisun",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_100",
+                    "no": 26,
+                    "uraian": "Deb rek mamin Dr. Mugiyarti",
+                    "bruto": 5300000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_102",
+                    "no": 27,
+                    "uraian": "Deb rek mamin Danan S",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_103",
+                    "no": 28,
+                    "uraian": "Deb rek mamin Imam Santosa, SH",
+                    "bruto": 5300000,
+                    "netto": 5300000,
+                    "spj": 5300000
+                },
+                {
+                    "id": "deb_3_mamin_104",
+                    "no": 29,
+                    "uraian": "Deb rek mamin Ir Budiyono",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_105",
+                    "no": 30,
+                    "uraian": "Deb rek mamin Rachmat Imanda",
+                    "bruto": 5300000,
+                    "netto": 5300000,
+                    "spj": 5300000
+                },
+                {
+                    "id": "deb_3_mamin_106",
+                    "no": 31,
+                    "uraian": "Deb rek mamin Hj Yuningsih",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_107",
+                    "no": 32,
+                    "uraian": "Deb rek mamin Siswondo",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_108",
+                    "no": 33,
+                    "uraian": "Deb rek mamin Bobby Listyo W",
+                    "bruto": 2650000,
+                    "netto": 2650000,
+                    "spj": 2650000
+                },
+                {
+                    "id": "deb_3_mamin_109",
+                    "no": 34,
+                    "uraian": "Deb rek mamin Alfiatun Khasanah",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_110",
+                    "no": 35,
+                    "uraian": "Deb rek mamin Dedi Supriyanto",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_111",
+                    "no": 36,
+                    "uraian": "Deb rek mamin Atik Luthfiyah",
+                    "bruto": 6360000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_113",
+                    "no": 37,
+                    "uraian": "Deb rek mamin Slamet Sukoco, STP",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_114",
+                    "no": 38,
+                    "uraian": "Deb rek mamin Sutrisno Rudiyanto",
+                    "bruto": 5300000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_116",
+                    "no": 39,
+                    "uraian": "Deb rek mamin Eko Pramono",
+                    "bruto": 5300000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_118",
+                    "no": 40,
+                    "uraian": "Deb rek mamin Arief Dwi K",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_119",
+                    "no": 41,
+                    "uraian": "Deb rek mamin Dr. Supangkat",
+                    "bruto": 2650000,
+                    "netto": 2650000,
+                    "spj": 2650000
+                },
+                {
+                    "id": "deb_3_mamin_120",
+                    "no": 42,
+                    "uraian": "Deb rek mamin Andik Pegiarto",
+                    "bruto": 3975000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_122",
+                    "no": 43,
+                    "uraian": "Deb rek mamin Dodet Suryondaru",
+                    "bruto": 5300000,
+                    "netto": 4664000,
+                    "spj": 5300000
+                },
+                {
+                    "id": "deb_3_mamin_123",
+                    "no": 44,
+                    "uraian": "Deb rek mamin Setia Budiyanto",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_124",
+                    "no": 45,
+                    "uraian": "Deb rek mamin Iwan Supriyanto",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                },
+                {
+                    "id": "deb_3_mamin_125",
+                    "no": 46,
+                    "uraian": "Deb rek mamin Cipto Pujiharso,",
+                    "bruto": 7950000,
+                    "netto": 7950000,
+                    "spj": 7950000
+                }
+            ]
+        },
+        "tunjangan": {
+            "rows": [
+                {
+                    "id": "deb_3_tunj_139",
+                    "no": 1,
+                    "uraian": "Deb rek Tunj Agus Priyanggodo",
+                    "bruto": 9746250,
+                    "pajak": 9746250,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_140",
+                    "no": 2,
+                    "uraian": "Deb rek Tunj Imam Ahfas",
+                    "bruto": 9639000,
+                    "pajak": 9639000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_141",
+                    "no": 3,
+                    "uraian": "Deb rek Tunj Muh Erlangga AD",
+                    "bruto": 9639000,
+                    "pajak": 9639000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_142",
+                    "no": 4,
+                    "uraian": "Deb rek Tunj Joko Pramono",
+                    "bruto": 9639000,
+                    "pajak": 9639000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_143",
+                    "no": null,
+                    "uraian": "Deb rek Tunj Subagyo, S.Pd., M.Si",
+                    "bruto": 0,
+                    "pajak": 0,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_144",
+                    "no": 5,
+                    "uraian": "Deb rek Tunj Jasmin",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_145",
+                    "no": 6,
+                    "uraian": "Deb rek Tunj Ito Anjarini",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_146",
+                    "no": 7,
+                    "uraian": "Deb rek Tunj Rellya Venny O",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 1029000
+                },
+                {
+                    "id": "deb_3_tunj_147",
+                    "no": 8,
+                    "uraian": "Deb rek Tunj drg. Andreas K",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_148",
+                    "no": 9,
+                    "uraian": "Deb rek Tunj dr. Henry C",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_149",
+                    "no": 10,
+                    "uraian": "Deb rek Tunj  Didi Rudiyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_150",
+                    "no": 11,
+                    "uraian": "Deb rek Tunj Ofan Sofyan",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_151",
+                    "no": 12,
+                    "uraian": "Deb rek Tunj Andri Kusmayadi, ST",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_152",
+                    "no": 13,
+                    "uraian": "Deb rek Tunj Sandung Wiyoko",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_153",
+                    "no": 14,
+                    "uraian": "Deb rek Tunj Wawan Yuwandha",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_154",
+                    "no": 15,
+                    "uraian": "Deb rek Tunj Agus Supriyanto",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_155",
+                    "no": 16,
+                    "uraian": "Deb rek Tunj Samsudin Tirta",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_156",
+                    "no": 17,
+                    "uraian": "Deb rek Tunj Merakarno R T ",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_157",
+                    "no": 18,
+                    "uraian": "Deb rek Tunj Anang Agus K",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_158",
+                    "no": 19,
+                    "uraian": "Deb rek Tunj Trisno Sudarso",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_159",
+                    "no": 20,
+                    "uraian": "Deb rek Tunj Balqis Fadillah",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_160",
+                    "no": 21,
+                    "uraian": "Deb rek Tunj H. Woro Sulistiyono",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_161",
+                    "no": 22,
+                    "uraian": "Deb rek Tunj Dukha Ngabdul W",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_162",
+                    "no": 23,
+                    "uraian": "Deb rek Tunj Tati Irawati",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_163",
+                    "no": 24,
+                    "uraian": "Deb rek Tunj Mustofa",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_164",
+                    "no": 25,
+                    "uraian": "Deb rek Tunj H. Ahmad Darisun",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_165",
+                    "no": 26,
+                    "uraian": "Deb rek Tunj Dr. Mugiyarti",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_166",
+                    "no": 27,
+                    "uraian": "Deb rek Tunj Danan S",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_167",
+                    "no": 28,
+                    "uraian": "Deb rek Tunj Imam Santosa, SH",
+                    "bruto": 11220000,
+                    "pajak": 11220000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_168",
+                    "no": 29,
+                    "uraian": "Deb rek Tunj Ir Budiyono",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_169",
+                    "no": 30,
+                    "uraian": "Deb rek Tunj Rachmat Imanda",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_170",
+                    "no": 31,
+                    "uraian": "Deb rek Tunj Hj Yuningsih",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_171",
+                    "no": 32,
+                    "uraian": "Deb rek Tunj Siswondo",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_172",
+                    "no": 33,
+                    "uraian": "Deb rek Tunj Bobby Listyo W",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_173",
+                    "no": 34,
+                    "uraian": "Deb rek Tunj Alfiatun Khasanah",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_174",
+                    "no": 35,
+                    "uraian": "Deb rek Tunj Dedi Supriyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_175",
+                    "no": 36,
+                    "uraian": "Deb rek Tunj Atik Luthfiyah",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_176",
+                    "no": 37,
+                    "uraian": "Deb rek Tunj Slamet Sukoco, STP",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_177",
+                    "no": 38,
+                    "uraian": "Deb rek Tunj Sutrisno Rudiyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_178",
+                    "no": 39,
+                    "uraian": "Deb rek Tunj Eko Pramono",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_179",
+                    "no": 40,
+                    "uraian": "Deb rek Tunj Arief Dwi K",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_180",
+                    "no": 41,
+                    "uraian": "Deb rek Tunj Dr. Supangkat",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_181",
+                    "no": 42,
+                    "uraian": "Deb rek Tunj Andik Pegiarto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_182",
+                    "no": 43,
+                    "uraian": "Deb rek Tunj Dodet Suryondaru",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_183",
+                    "no": 44,
+                    "uraian": "Deb rek Tunj Setia Budiyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_184",
+                    "no": 45,
+                    "uraian": "Deb rek Tunj Iwan Supriyanto",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_185",
+                    "no": 46,
+                    "uraian": "Deb rek Tunj Cipto Pujiharso,",
+                    "bruto": 10576000,
+                    "pajak": 10576000,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_186",
+                    "no": 47,
+                    "uraian": "Deb rek Tunj Muchtar Nasir",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_187",
+                    "no": 48,
+                    "uraian": "Deb rek Tunj Abdullah Arif Budiman",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                },
+                {
+                    "id": "deb_3_tunj_188",
+                    "no": 49,
+                    "uraian": "Deb rek Tunj Nartam Andrea Nusa",
+                    "bruto": 10057500,
+                    "pajak": 10057500,
+                    "netto": 0
+                }
+            ],
+            "totals": {
+                "bruto": 499153750,
+                "pajak": 499153750,
+                "netto": 1029000
+            }
+        }
+    }
+}

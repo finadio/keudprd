@@ -1,4 +1,5 @@
 *
 !private/
 !public/
+!reses_full_data.json
 !.gitignore
