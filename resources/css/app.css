@@ -1,0 +1,193 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.{vue,js,ts,jsx,tsx}';
+
+@theme {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Excel Sheet Table Grid Styles */
+.excel-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 11.5px;
+}
+
+.excel-table th,
+.excel-table td {
+    border-right: 1px solid #d1d5db;
+    border-bottom: 1px solid #d1d5db;
+    white-space: nowrap;
+    padding: 3px 6px;
+    height: 24px;
+}
+
+.excel-table th {
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    text-align: center;
+    user-select: none;
+}
+
+.excel-header-row {
+    background-color: #e5e7eb;
+    border-top: 1px solid #9ca3af;
+    border-bottom: 2px solid #6b7280;
+}
+
+.excel-subtotal-row {
+    background-color: #f8fafc;
+    font-weight: 600;
+}
+
+.excel-total-row {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    border-top: 1px solid #4b5563;
+    border-bottom: 3px double #374151;
+}
+
+/* Custom compact scrollbar for wide financial sheets */
+.excel-scroll::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.excel-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.excel-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.excel-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ================= PRINT OPTIMIZATION (A4 / FOLIO LANDSCAPE) ================= */
+@page {
+    size: landscape;
+    margin: 8mm 6mm;
+}
+
+@media print {
+    html, body {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 8pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Hide non-printable app UI elements */
+    aside,
+    header,
+    footer,
+    nav,
+    .no-print,
+    .print\:hidden,
+    button,
+    input,
+    select,
+    textarea,
+    .excel-scroll::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    /* Unconstrain containers so content paginates naturally across multiple pages */
+    #app,
+    main,
+    div {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        position: static !important;
+    }
+
+    /* Reset background and shadow */
+    .bg-white,
+    .bg-slate-50,
+    .bg-slate-100 {
+        background: transparent !important;
+    }
+
+    .shadow-xs,
+    .shadow-sm,
+    .shadow-md,
+    .shadow-2xs {
+        box-shadow: none !important;
+    }
+
+    .rounded-xl,
+    .rounded-lg,
+    .rounded-md,
+    .rounded {
+        border-radius: 0 !important;
+    }
+
+    /* Excel Table Print Layout */
+    .excel-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        page-break-inside: auto !important;
+        font-size: 7.5pt !important;
+        table-layout: auto !important;
+    }
+
+    .excel-table tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto !important;
+    }
+
+    .excel-table thead {
+        display: table-header-group !important;
+    }
+
+    .excel-table tfoot {
+        display: table-footer-group !important;
+    }
+
+    .excel-table th,
+    .excel-table td {
+        border: 1px solid #334155 !important;
+        padding: 2px 3px !important;
+        height: auto !important;
+        color: #000000 !important;
+    }
+
+    .excel-table th {
+        background-color: #f1f5f9 !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+    }
+
+    /* Allow text descriptions to wrap so the table doesn't overflow horizontally */
+    .excel-table td {
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+
+    /* Keep numbers and dates on one line */
+    .excel-table td.font-mono,
+    .excel-table td.whitespace-nowrap {
+        white-space: nowrap !important;
+    }
+
+    .excel-total-row,
+    .excel-total-row td {
+        background-color: #f8fafc !important;
+        font-weight: 700 !important;
+        border-top: 2px solid #000000 !important;
+        border-bottom: 2px solid #000000 !important;
+    }
+}
