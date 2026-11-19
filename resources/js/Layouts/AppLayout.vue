@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import { 
     LayoutDashboard, 
@@ -22,7 +22,13 @@ import {
     Loader2,
     Tag,
     Clock,
-    AlertCircle
+    AlertCircle,
+    ChevronDown,
+    FolderKanban,
+    PieChart,
+    Receipt,
+    FolderTree,
+    FileSpreadsheet
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -65,13 +71,23 @@ const switchFiscalYear = (newYear) => {
     });
 };
 
-const navItems = [
+const financeNavItems = [
     { name: 'Dashboard', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
     { name: 'BKU Per PPTK', href: '/bku', routeName: 'bku.*', icon: BookOpen },
     { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
     { name: 'Impor Transaksi', href: '/impor', routeName: 'impor.*', icon: UploadCloud },
     { name: 'Rekonsiliasi', href: '/rekonsiliasi', routeName: 'rekonsiliasi.*', icon: ArrowLeftRight },
     { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
+];
+
+const paguNavItems = [
+    { name: 'Ikhtisar Realisasi Pagu', href: '/pagu', routeName: 'pagu.index', icon: PieChart },
+    { name: 'Catat Realisasi & Sisa', href: '/pagu/transaksi', routeName: 'pagu.transactions', icon: Receipt },
+    { name: 'Pagu per Sub Kegiatan', href: '/pagu/subkegiatan', routeName: 'pagu.activities', icon: FolderTree },
+    { name: 'Impor Data SIPD', href: '/pagu/impor', routeName: 'pagu.import', icon: FileSpreadsheet },
+];
+
+const generalNavItems = [
     { name: 'Pengaturan & Master', href: '/pengaturan', routeName: 'pengaturan.*', icon: Settings },
 ];
 
@@ -83,9 +99,76 @@ const isCurrentRoute = (pattern) => {
     if (pattern === 'impor.*' && currentUrl.startsWith('/impor')) return true;
     if (pattern === 'rekonsiliasi.*' && currentUrl.startsWith('/rekonsiliasi')) return true;
     if (pattern === 'laporan.*' && currentUrl.startsWith('/laporan')) return true;
+    if (pattern === 'pagu.index' && (currentUrl === '/pagu' || currentUrl.startsWith('/pagu?'))) return true;
+    if (pattern === 'pagu.transactions' && currentUrl.startsWith('/pagu/transaksi')) return true;
+    if (pattern === 'pagu.activities' && currentUrl.startsWith('/pagu/subkegiatan')) return true;
+    if (pattern === 'pagu.import' && currentUrl.startsWith('/pagu/impor')) return true;
+    if (pattern === 'pagu.*' && currentUrl.startsWith('/pagu')) return true;
     if (pattern === 'pengaturan.*' && currentUrl.startsWith('/pengaturan')) return true;
     return false;
 };
+
+const isFinanceRouteActive = computed(() => {
+    return isCurrentRoute('dashboard') ||
+        isCurrentRoute('bku.*') ||
+        isCurrentRoute('buku-bank.*') ||
+        isCurrentRoute('impor.*') ||
+        isCurrentRoute('rekonsiliasi.*') ||
+        isCurrentRoute('laporan.*');
+});
+
+const isPaguRouteActive = computed(() => {
+    return isCurrentRoute('pagu.*');
+});
+
+const getInitialFinanceAccordionState = () => {
+    if (typeof window === 'undefined') return true;
+    if (isFinanceRouteActive.value) return true;
+    const saved = localStorage.getItem('keudprd_finance_acc_open');
+    return saved !== null ? saved === 'true' : true;
+};
+
+const getInitialPaguAccordionState = () => {
+    if (typeof window === 'undefined') return true;
+    if (isPaguRouteActive.value) return true;
+    const saved = localStorage.getItem('keudprd_pagu_acc_open');
+    return saved !== null ? saved === 'true' : false;
+};
+
+const isFinanceAccordionOpen = ref(getInitialFinanceAccordionState());
+const isPaguAccordionOpen = ref(getInitialPaguAccordionState());
+
+const toggleFinanceAccordion = () => {
+    isFinanceAccordionOpen.value = !isFinanceAccordionOpen.value;
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('keudprd_finance_acc_open', String(isFinanceAccordionOpen.value));
+    }
+};
+
+const togglePaguAccordion = () => {
+    isPaguAccordionOpen.value = !isPaguAccordionOpen.value;
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('keudprd_pagu_acc_open', String(isPaguAccordionOpen.value));
+    }
+};
+
+watch(isFinanceRouteActive, (active) => {
+    if (active) {
+        isFinanceAccordionOpen.value = true;
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('keudprd_finance_acc_open', 'true');
+        }
+    }
+}, { immediate: true });
+
+watch(isPaguRouteActive, (active) => {
+    if (active) {
+        isPaguAccordionOpen.value = true;
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('keudprd_pagu_acc_open', 'true');
+        }
+    }
+}, { immediate: true });
 
 const logout = () => {
     router.post('/logout');
@@ -231,7 +314,7 @@ const jumpToResult = (url) => {
                             <select
                                 :value="activeFiscalYear"
                                 @change="switchFiscalYear($event.target.value)"
-                                class="w-full appearance-none pl-2.5 pr-6 py-1 bg-emerald-900/90 hover:bg-emerald-800/90 border border-emerald-700/70 text-emerald-100 text-[11px] font-mono font-bold rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 cursor-pointer transition-colors"
+                                class="w-full appearance-none pl-2.5 pr-6 py-1 bg-emerald-900/90 hover:bg-emerald-800/90 border border-emerald-700/70 text-emerald-100 text-[11px] font-sans tabular-nums font-bold rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-400 cursor-pointer transition-colors"
                                 title="Pilih Tahun Anggaran (lihat tahun aktif atau arsip tahun lama)"
                             >
                                 <option
@@ -256,22 +339,130 @@ const jumpToResult = (url) => {
                 </div>
 
                 <!-- Navigation Links -->
-                <nav class="flex-1 px-3 py-2 space-y-1 text-xs overflow-y-auto">
-                    <Link
-                        v-for="item in navItems"
-                        :key="item.name"
-                        :href="item.href"
-                        @click="handleNavClick"
-                        :class="[
-                            'flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap',
-                            isCurrentRoute(item.routeName)
-                                ? 'bg-[#107c41] text-white font-bold shadow-xs'
-                                : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
-                        ]"
-                    >
-                        <component :is="item.icon" class="w-4 h-4 shrink-0" />
-                        <span>{{ item.name }}</span>
-                    </Link>
+                <nav class="flex-1 px-3 py-2 space-y-2 text-xs overflow-y-auto no-scrollbar">
+                    <!-- Parent Accordion: Penatausahaan Keuangan -->
+                    <div class="space-y-1">
+                        <button
+                            type="button"
+                            @click="toggleFinanceAccordion"
+                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg font-medium transition-all text-xs cursor-pointer select-none group"
+                            :class="[
+                                isFinanceRouteActive
+                                    ? 'bg-emerald-900/60 text-white font-semibold'
+                                    : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                            ]"
+                            title="Klik untuk membuka / menutup menu navigasi"
+                        >
+                            <div class="flex items-center gap-2 min-w-0">
+                                <FolderKanban class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
+                                <span class="truncate tracking-tight font-semibold text-[11.5px]" title="BKU & Buku Bank PPTK">BKU & Buku Bank PPTK</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
+                                    {{ financeNavItems.length }}
+                                </span>
+                                <ChevronDown 
+                                    class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
+                                    :class="{ '-rotate-90': !isFinanceAccordionOpen }"
+                                />
+                            </div>
+                        </button>
+
+                        <!-- Accordion Submenu Links (Dashboard, BKU, Buku Bank, Impor, Rekonsiliasi, Laporan) -->
+                        <div 
+                            v-show="isFinanceAccordionOpen" 
+                            class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
+                        >
+                            <Link
+                                v-for="item in financeNavItems"
+                                :key="item.name"
+                                :href="item.href"
+                                @click="handleNavClick"
+                                :class="[
+                                    'flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap',
+                                    isCurrentRoute(item.routeName)
+                                        ? 'bg-[#107c41] text-white font-bold shadow-xs'
+                                        : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                                ]"
+                            >
+                                <component :is="item.icon" class="w-4 h-4 shrink-0" />
+                                <span>{{ item.name }}</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- Parent Accordion: Pantauan Realisasi Pagu -->
+                    <div class="space-y-1">
+                        <button
+                            type="button"
+                            @click="togglePaguAccordion"
+                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg font-medium transition-all text-xs cursor-pointer select-none group"
+                            :class="[
+                                isPaguRouteActive
+                                    ? 'bg-emerald-900/60 text-white font-semibold'
+                                    : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                            ]"
+                            title="Klik untuk membuka / menutup menu navigasi Pantauan Realisasi Pagu"
+                        >
+                            <div class="flex items-center gap-2 min-w-0">
+                                <FolderKanban class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
+                                <span class="truncate tracking-tight font-semibold text-[11px]" title="Pantauan Realisasi Pagu">Pantauan Realisasi Pagu</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
+                                    {{ paguNavItems.length }}
+                                </span>
+                                <ChevronDown 
+                                    class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
+                                    :class="{ '-rotate-90': !isPaguAccordionOpen }"
+                                />
+                            </div>
+                        </button>
+
+                        <!-- Accordion Submenu Links (Kosong sementara untuk fitur baru) -->
+                        <div 
+                            v-show="isPaguAccordionOpen" 
+                            class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
+                        >
+                            <div v-if="paguNavItems.length === 0" class="px-3 py-2 text-[11px] text-emerald-200/50 italic">
+                                Belum ada menu (Fitur baru)
+                            </div>
+                            <Link
+                                v-for="item in paguNavItems"
+                                :key="item.name"
+                                :href="item.href"
+                                @click="handleNavClick"
+                                :class="[
+                                    'flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap',
+                                    isCurrentRoute(item.routeName)
+                                        ? 'bg-[#107c41] text-white font-bold shadow-xs'
+                                        : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                                ]"
+                            >
+                                <component :is="item.icon" class="w-4 h-4 shrink-0" />
+                                <span>{{ item.name }}</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- General Links (Pengaturan & Master) -->
+                    <div class="pt-2 border-t border-emerald-900/40 space-y-1">
+                        <Link
+                            v-for="item in generalNavItems"
+                            :key="item.name"
+                            :href="item.href"
+                            @click="handleNavClick"
+                            :class="[
+                                'flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap',
+                                isCurrentRoute(item.routeName)
+                                    ? 'bg-[#107c41] text-white font-bold shadow-xs'
+                                    : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                            ]"
+                        >
+                            <component :is="item.icon" class="w-4 h-4 shrink-0" />
+                            <span>{{ item.name }}</span>
+                        </Link>
+                    </div>
                 </nav>
 
                 <!-- Sidebar Bottom Info (Optional SKPD) -->
@@ -327,7 +518,7 @@ const jumpToResult = (url) => {
                             <Search class="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700 transition-colors" />
                             <span class="text-slate-500 group-hover:text-slate-700 font-normal">Cari transaksi, BKU, bank, nominal...</span>
                         </div>
-                        <kbd class="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white border border-slate-300 rounded text-slate-500 shadow-2xs">
+                        <kbd class="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-sans font-bold bg-white border border-slate-300 rounded text-slate-500 shadow-2xs">
                             Ctrl K
                         </kbd>
                     </button>
@@ -532,14 +723,14 @@ const jumpToResult = (url) => {
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap mb-1">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px] font-bold">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-sans tabular-nums text-[11px] font-bold">
                                         <Calendar class="w-3 h-3 text-slate-500" />
                                         {{ item.date }}
                                     </span>
                                     <span v-if="item.pptk_name" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold">
                                         {{ item.pptk_name }}
                                     </span>
-                                    <span v-if="item.document_number && item.document_number !== '-'" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono text-[10px]">
+                                    <span v-if="item.document_number && item.document_number !== '-'" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-sans tabular-nums text-[10px]">
                                         {{ item.document_number }}
                                     </span>
                                     <span :class="[
@@ -559,7 +750,7 @@ const jumpToResult = (url) => {
 
                             <!-- Nominal Display -->
                             <div class="text-right shrink-0">
-                                <div :class="['font-mono font-bold text-xs sm:text-sm', item.flow_direction === 'receipt' ? 'text-emerald-700' : 'text-rose-700']">
+                                <div :class="['font-sans font-bold tabular-nums text-xs sm:text-sm', item.flow_direction === 'receipt' ? 'text-emerald-700' : 'text-rose-700']">
                                     {{ item.flow_direction === 'receipt' ? '+' : '-' }} {{ item.amount_formatted }}
                                 </div>
                             </div>
@@ -597,9 +788,9 @@ const jumpToResult = (url) => {
                 <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between select-none">
                     <div class="flex items-center gap-2">
                         <span>Pintasan:</span>
-                        <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold text-slate-600">Ctrl K</kbd>
+                        <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-sans font-bold text-slate-600">Ctrl K</kbd>
                         <span>Cari</span>
-                        <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold text-slate-600">Esc</kbd>
+                        <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-sans font-bold text-slate-600">Esc</kbd>
                         <span>Tutup</span>
                     </div>
                     <span class="text-emerald-700 font-semibold">KeuDPRD Banyumas</span>

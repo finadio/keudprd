@@ -1776,8 +1776,8 @@ const deleteTransaction = (id) => {
                                     <td class="text-right font-mono text-amber-800">{{ formatRupiah(sheet_data.totals?.total_hutang_panjar) }}</td>
                                     <td class="text-right font-mono">{{ formatRupiah(sheet_data.totals?.bank) }}</td>
                                     <td class="text-right font-mono">{{ formatRupiah(sheet_data.totals?.tunai) }}</td>
-                                    <td class="text-right font-mono">-</td>
-                                    <td class="text-right font-mono">-</td>
+                                    <td class="text-right font-mono">{{ formatRupiah(sheet_data.totals?.spj_lanjutan || 0) }}</td>
+                                    <td class="text-right font-mono">{{ formatRupiah(sheet_data.totals?.sisa_panjar || sheet_data.totals?.tunai) }}</td>
                                     <td class="text-right font-mono">{{ formatRupiah(sheet_data.totals?.total_sisa_riil) }}</td>
                                     <td class="text-right font-mono text-emerald-800 bg-emerald-50">
                                         {{ formatRupiah(sheet_data.totals?.kontrol_selisih) }}
@@ -1785,6 +1785,142 @@ const deleteTransaction = (id) => {
                                 </tr>
                             </tfoot>
                         </table>
+
+                        <!-- Rekap Hitung Kas Fisik & Kontrol Sisa UP (Baris 32-44 Sheet Hitungan) -->
+                        <div v-if="sheet_data.rekap_kas" class="mt-8 space-y-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                                <div>
+                                    <h2 class="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                                        <Landmark class="w-4 h-4 text-emerald-700" />
+                                        <span>REKAP HITUNG KAS FISIK &amp; KONTROL UANG PERSEDIAAN (UP)</span>
+                                    </h2>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        Formula rekonsiliasi kas induk: Pagu UP Awal, Saldo BKU UP, Hutang Panjar PPTK, dan Rekening Koran Bank Jateng
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span 
+                                        :class="Math.abs(sheet_data.rekap_kas?.kontrol_akhir) < 1 ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300'"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border shadow-2xs"
+                                    >
+                                        <CheckCircle2 v-if="Math.abs(sheet_data.rekap_kas?.kontrol_akhir) < 1" class="w-3.5 h-3.5 text-emerald-700 stroke-[2.5]" />
+                                        <AlertTriangle v-else class="w-3.5 h-3.5 text-rose-700 stroke-[2.5]" />
+                                        <span>KONTROL SELISIH AKHIR: {{ formatRupiah(sheet_data.rekap_kas?.kontrol_akhir) }}</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- Panel 1: Kontrol Sisa UP (Sisi Kiri) -->
+                                <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs bg-white">
+                                    <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-300 font-bold text-xs text-slate-800 flex items-center justify-between">
+                                        <span class="flex items-center gap-1.5">
+                                            <Coins class="w-4 h-4 text-emerald-700" />
+                                            <span>1. KONTROL UANG PERSEDIAAN (UP)</span>
+                                        </span>
+                                        <span class="font-mono text-emerald-800 text-[11px] font-bold">Pagu Awal: {{ formatRupiah(sheet_data.rekap_kas?.up_awal) }}</span>
+                                    </div>
+                                    <table class="w-full text-xs excel-table">
+                                        <tbody>
+                                            <tr class="border-b border-slate-200">
+                                                <td class="font-bold text-slate-700 px-3 py-2 bg-slate-50/50 w-2/3">UP Awal (Pagu Uang Persediaan)</td>
+                                                <td class="text-right font-mono font-bold text-slate-900 px-3 py-2">{{ formatRupiah(sheet_data.rekap_kas?.up_awal) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                                <td class="px-3 py-1.5 text-slate-600 pl-6">a. Sisa Kas di Buku UP (BKU UP)</td>
+                                                <td class="text-right font-mono text-slate-800 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.sisa_up) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                                <td class="px-3 py-1.5 text-slate-600 pl-6">b. Total Hutang Panjar PPTK (Kolom G)</td>
+                                                <td class="text-right font-mono text-slate-800 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.panjar) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-200">
+                                                <td class="px-3 py-1.5 text-slate-600 pl-6">c. Sisa Kas Kecil / Tunai (BKU KK)</td>
+                                                <td class="text-right font-mono text-slate-800 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.kas_kecil) }}</td>
+                                            </tr>
+                                            <tr class="bg-slate-50 font-semibold border-b border-slate-300">
+                                                <td class="px-3 py-2 text-slate-800">JUMLAH KAS &amp; PANJAR BERJALAN (= a + b + c)</td>
+                                                <td class="text-right font-mono font-bold text-slate-900 px-3 py-2">{{ formatRupiah(sheet_data.rekap_kas?.total_kas_up) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                                <td class="px-3 py-2 text-slate-700 font-medium">Selisih Pagu UP (= UP Awal - Jumlah)</td>
+                                                <td class="text-right font-mono font-semibold text-amber-800 px-3 py-2">{{ formatRupiah(sheet_data.rekap_kas?.selisih_up) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-100 text-slate-600">
+                                                <td class="px-3 py-1.5 pl-6">- Rencana SPJ Definitif (Pending Verifikasi)</td>
+                                                <td class="text-right font-mono text-slate-700 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.rencana_spj) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-200 text-slate-600">
+                                                <td class="px-3 py-1.5 pl-6">- Rencana LS Rampung</td>
+                                                <td class="text-right font-mono text-slate-700 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.rencana_ls) }}</td>
+                                            </tr>
+                                            <tr class="bg-emerald-50/70 font-bold border-t border-emerald-300">
+                                                <td class="px-3 py-2.5 text-emerald-950 font-bold">SISA KONTROL UP AKHIR (= Selisih - Rencana SPJ)</td>
+                                                <td 
+                                                    :class="Math.abs(sheet_data.rekap_kas?.sisa_kontrol_up) < 1 ? 'text-emerald-800' : 'text-rose-700'"
+                                                    class="text-right font-mono font-black text-sm px-3 py-2.5"
+                                                >
+                                                    {{ formatRupiah(sheet_data.rekap_kas?.sisa_kontrol_up) }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Panel 2: Rekapitulasi Saldo Bank / RK (Sisi Kanan) -->
+                                <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs bg-white">
+                                    <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-300 font-bold text-xs text-slate-800 flex items-center justify-between">
+                                        <span class="flex items-center gap-1.5">
+                                            <Building class="w-4 h-4 text-emerald-700" />
+                                            <span>2. REKAPITULASI SALDO BANK / REKENING KORAN (RK)</span>
+                                        </span>
+                                        <span class="font-mono text-emerald-800 text-[11px] font-bold">Bank Jateng Cab. Purwokerto</span>
+                                    </div>
+                                    <table class="w-full text-xs excel-table">
+                                        <tbody>
+                                            <tr class="border-b border-slate-200">
+                                                <td class="font-bold text-slate-700 px-3 py-2 bg-slate-50/50 w-2/3">Saldo Kas Menurut Buku Kas</td>
+                                                <td class="text-right font-mono font-bold text-slate-900 px-3 py-2">Nominal (Rp)</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                                <td class="px-3 py-1.5 text-slate-600 pl-6">a. Saldo UP (Buku Kas Umum UP)</td>
+                                                <td class="text-right font-mono text-slate-800 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.bank_rekap?.up) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                                <td class="px-3 py-1.5 text-slate-600 pl-6">b. Sisa Kas LS Reses</td>
+                                                <td class="text-right font-mono text-slate-800 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.bank_rekap?.ls_reses) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-200">
+                                                <td class="px-3 py-1.5 text-slate-600 pl-6">c. Sisa Kas LS Lainnya</td>
+                                                <td class="text-right font-mono text-slate-800 px-3 py-1.5">{{ formatRupiah(sheet_data.rekap_kas?.bank_rekap?.ls_lain) }}</td>
+                                            </tr>
+                                            <tr class="bg-slate-50 font-semibold border-b border-slate-300">
+                                                <td class="px-3 py-2 text-slate-800">JUMLAH SALDO KAS MENURUT BUKU BANK</td>
+                                                <td class="text-right font-mono font-bold text-slate-900 px-3 py-2">{{ formatRupiah(sheet_data.rekap_kas?.bank_rekap?.total_bank_buku) }}</td>
+                                            </tr>
+                                            <tr class="hover:bg-slate-50 border-b border-slate-200">
+                                                <td class="px-3 py-2 text-slate-700 font-medium">Saldo Rekening Koran Bank Jateng (RK)</td>
+                                                <td class="text-right font-mono font-bold text-emerald-800 px-3 py-2">{{ formatRupiah(sheet_data.rekap_kas?.bank_rekap?.rekening_koran) }}</td>
+                                            </tr>
+                                            <tr class="bg-emerald-50/70 font-bold border-t border-emerald-300">
+                                                <td class="px-3 py-2.5 text-emerald-950 font-bold">SELISIH BUKU BANK VS REKENING KORAN (= RK - Buku)</td>
+                                                <td 
+                                                    :class="Math.abs(sheet_data.rekap_kas?.bank_rekap?.selisih) < 1 ? 'text-emerald-800' : 'text-rose-700'"
+                                                    class="text-right font-mono font-black text-sm px-3 py-2.5"
+                                                >
+                                                    {{ formatRupiah(sheet_data.rekap_kas?.bank_rekap?.selisih) }}
+                                                </td>
+                                            </tr>
+                                            <tr class="border-t border-slate-200 bg-white">
+                                                <td colspan="2" class="p-3 text-[11px] text-slate-500 italic">
+                                                    * Selisih nol membuktikan seluruh penerimaan SP2D UP, belanja debet giro, dan penarikan tunai terrekonsiliasi sempurna dengan catatan mutasi mutlak Bank Jateng.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- ================= VIEW 2: STANDARD BKU (UP / KK / PPTK SHEETS) ================= -->

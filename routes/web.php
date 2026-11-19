@@ -5,6 +5,7 @@ use App\Http\Controllers\BankBookController;
 use App\Http\Controllers\BkuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportTransactionController;
+use App\Http\Controllers\PaguController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SearchController;
@@ -64,6 +65,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/export-hitungan', [ReportController::class, 'exportHitungan'])->name('export-hitungan');
         Route::get('/backup-zip', [ReportController::class, 'downloadBackupZip'])->name('backup-zip');
         Route::post('/backup-email', [ReportController::class, 'emailBackupZip'])->name('backup-email');
+    });
+
+    // Pantauan Realisasi Pagu
+    Route::prefix('pagu')->name('pagu.')->group(function () {
+        Route::get('/', [PaguController::class, 'index'])->name('index');
+        Route::get('/transaksi', [PaguController::class, 'transactions'])->name('transactions');
+        Route::post('/transaksi', [PaguController::class, 'storeTransaction'])->name('transactions.store');
+        Route::put('/transaksi/{realization}', [PaguController::class, 'updateTransaction'])->name('transactions.update');
+        Route::delete('/transaksi/{realization}', [PaguController::class, 'destroyTransaction'])->name('transactions.destroy');
+        Route::post('/transaksi/{realization}/toggle-spj', [PaguController::class, 'toggleSpj'])->name('transactions.toggle-spj');
+        Route::get('/subkegiatan', [PaguController::class, 'activities'])->name('activities');
+        Route::post('/subkegiatan/{activity}/assign-pptk', [PaguController::class, 'assignPptk'])->name('activities.assign-pptk');
+        Route::get('/impor', [PaguController::class, 'importView'])->name('import');
+        Route::post('/impor', [PaguController::class, 'import'])->name('import.post');
     });
 
     // Pencarian Global (Global Search)
