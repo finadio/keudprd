@@ -20,8 +20,8 @@ class PptkController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'display_name' => 'required|string|max:100',
+            'name' => 'nullable|string|max:255',
+            'display_name' => 'nullable|string|max:100',
             'code' => 'nullable|string|max:50|unique:pptks,code',
             'nip' => 'nullable|string|max:50',
             'subunit_id' => 'nullable|exists:subunits,id',
@@ -30,6 +30,13 @@ class PptkController extends Controller
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
         ]);
+
+        $name = trim($validated['display_name'] ?? $validated['name'] ?? '');
+        if (empty($name)) {
+            return redirect()->back()->withErrors(['display_name' => 'Nama PPTK wajib diisi.']);
+        }
+        $validated['display_name'] = $validated['display_name'] ?: $name;
+        $validated['name'] = $validated['name'] ?: $name;
 
         // Auto-generate code if not provided
         if (empty($validated['code'])) {
@@ -76,8 +83,8 @@ class PptkController extends Controller
     public function update(Request $request, Pptk $pptk): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'display_name' => 'required|string|max:100',
+            'name' => 'nullable|string|max:255',
+            'display_name' => 'nullable|string|max:100',
             'code' => 'required|string|max:50|unique:pptks,code,'.$pptk->id,
             'nip' => 'nullable|string|max:50',
             'subunit_id' => 'nullable|exists:subunits,id',
@@ -86,6 +93,10 @@ class PptkController extends Controller
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
         ]);
+
+        $name = trim($validated['display_name'] ?? $validated['name'] ?? $pptk->display_name ?? $pptk->name);
+        $validated['display_name'] = $validated['display_name'] ?: $name;
+        $validated['name'] = $validated['name'] ?: $name;
 
         $validated['code'] = strtoupper(trim($validated['code']));
         $validated['is_active'] = isset($validated['is_active']) ? (bool) $validated['is_active'] : $pptk->is_active;

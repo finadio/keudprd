@@ -142,8 +142,8 @@ const openEditPptkModal = (pptk) => {
     pptkForm.clearErrors();
     pptkForm.id = pptk.id;
     pptkForm.code = pptk.code || '';
-    pptkForm.name = pptk.name || '';
-    pptkForm.display_name = pptk.display_name || '';
+    pptkForm.display_name = pptk.display_name || pptk.name || '';
+    pptkForm.name = pptkForm.display_name;
     pptkForm.nip = pptk.nip || '';
     pptkForm.subunit_id = pptk.subunit_id || '';
     pptkForm.sheet_name = pptk.sheet_name || '';
@@ -154,6 +154,7 @@ const openEditPptkModal = (pptk) => {
 };
 
 const onDisplayNameInput = () => {
+    pptkForm.name = pptkForm.display_name;
     if (!isEditingPptk.value) {
         if (!pptkForm.sheet_name || pptkForm.sheet_name === pptkForm.display_name.slice(0, -1)) {
             pptkForm.sheet_name = pptkForm.display_name;
@@ -608,8 +609,7 @@ const togglePptkActive = (pptk) => {
                             <tr>
                                 <th class="px-3 py-2 text-center w-10">No</th>
                                 <th class="px-3 py-2 text-left">Kode</th>
-                                <th class="px-3 py-2 text-left">Label / Panggilan</th>
-                                <th class="px-3 py-2 text-left">Nama Lengkap &amp; Gelar</th>
+                                <th class="px-3 py-2 text-left">Nama PPTK</th>
                                 <th class="px-3 py-2 text-left">NIP</th>
                                 <th class="px-3 py-2 text-left">Bagian / Subunit</th>
                                 <th class="px-3 py-2 text-left">Sheet BKU</th>
@@ -627,8 +627,7 @@ const togglePptkActive = (pptk) => {
                                         {{ p.code }}
                                     </span>
                                 </td>
-                                <td class="px-3 py-2 font-bold text-emerald-900">{{ p.display_name }}</td>
-                                <td class="px-3 py-2 text-slate-900 font-medium">{{ p.name }}</td>
+                                <td class="px-3 py-2 font-bold text-emerald-950">{{ p.display_name || p.name }}</td>
                                 <td class="px-3 py-2 font-mono text-slate-600">{{ p.nip || '-' }}</td>
                                 <td class="px-3 py-2 text-slate-600">{{ p.subunit?.name || '-' }}</td>
                                 <td class="px-3 py-2 font-mono text-blue-700 underline">
@@ -669,7 +668,7 @@ const togglePptkActive = (pptk) => {
                                 </td>
                             </tr>
                             <tr v-if="!pptks || pptks.length === 0">
-                                <td colspan="10" class="px-3 py-6 text-center text-slate-500">
+                                <td colspan="9" class="px-3 py-6 text-center text-slate-500">
                                     Belum ada data PPTK tersimpan. Klik tombol "+ Tambah PPTK Baru" di atas.
                                 </td>
                             </tr>
@@ -740,35 +739,20 @@ const togglePptkActive = (pptk) => {
 
                     <form @submit.prevent="submitPptkForm" class="p-4 space-y-3 text-xs">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <!-- Nama Lengkap & Gelar -->
+                            <!-- Nama PPTK -->
                             <div class="sm:col-span-2">
                                 <label class="block font-semibold text-slate-700 mb-1">
-                                    Nama Lengkap &amp; Gelar Resmi <span class="text-red-500">*</span>
-                                </label>
-                                <input 
-                                    v-model="pptkForm.name" 
-                                    type="text" 
-                                    required
-                                    placeholder="contoh: DRS. AHMAD HIDAYAT, M.Si."
-                                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
-                                />
-                                <div v-if="pptkForm.errors.name" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.name }}</div>
-                            </div>
-
-                            <!-- Display Name / Nama Panggilan -->
-                            <div>
-                                <label class="block font-semibold text-slate-700 mb-1">
-                                    Label Tampilan / Panggilan <span class="text-red-500">*</span>
+                                    Nama PPTK <span class="text-red-500">*</span>
                                 </label>
                                 <input 
                                     v-model="pptkForm.display_name" 
                                     @input="onDisplayNameInput"
                                     type="text" 
                                     required
-                                    placeholder="contoh: P Ahmad / Ahmad"
+                                    placeholder="contoh: Pak Sugeng/Emi, Irna, atau B Aulia/Ety"
                                     class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
                                 />
-                                <span class="text-[10px] text-slate-400">Muncul di tabel &amp; dropdown</span>
+                                <span class="text-[10px] text-slate-400">Nama/label PPTK yang tampil di tabel &amp; dropdown</span>
                                 <div v-if="pptkForm.errors.display_name" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.display_name }}</div>
                             </div>
 
