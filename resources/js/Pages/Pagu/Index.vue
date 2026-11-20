@@ -117,29 +117,55 @@ const applyPptkFilter = (val) => {
                         <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">▼</span>
                     </div>
 
-                    <!-- Quick Action: Catat Transaksi Realisasi -->
-                    <Link
-                        href="/pagu/transaksi"
-                        class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
-                    >
-                        <Plus class="w-4 h-4" />
-                        <span>Catat Pencairan / Sisa</span>
-                    </Link>
+                    <!-- Quick Action: Catat Transaksi Realisasi (Khusus Admin / Bendahara / Kasubag) -->
+                    <template v-if="!overview.is_pptk_user">
+                        <Link
+                            href="/pagu/transaksi"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                        >
+                            <Plus class="w-4 h-4" />
+                            <span>Catat Pencairan / Sisa</span>
+                        </Link>
 
-                    <!-- Import SIPD button -->
-                    <Link
-                        href="/pagu/impor"
-                        class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
-                        title="Perbarui Pagu dari Excel SIPD"
-                    >
-                        <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
-                        <span>Sinkron SIPD</span>
-                    </Link>
+                        <!-- Import SIPD button -->
+                        <Link
+                            href="/pagu/impor"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                            title="Perbarui Pagu dari Excel SIPD"
+                        >
+                            <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
+                            <span>Sinkron SIPD</span>
+                        </Link>
+                    </template>
+                    <template v-else>
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200 text-xs font-bold">
+                            <Users class="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Pejabat PPTK: {{ overview.current_pptk?.display_name }} (View-Only)</span>
+                        </div>
+                        <Link
+                            href="/pagu/transaksi"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
+                        >
+                            <Receipt class="w-4 h-4 text-emerald-600" />
+                            <span>Riwayat Pencairan Saya</span>
+                        </Link>
+                    </template>
                 </div>
             </div>
 
             <!-- Notice / Banner Info Alur Kerja -->
-            <div class="bg-emerald-50/80 border border-emerald-200/90 rounded-2xl p-4 flex items-start gap-3">
+            <div v-if="overview.is_pptk_user" class="bg-blue-50/90 border border-blue-200/90 rounded-2xl p-4 flex items-start gap-3">
+                <div class="p-2 bg-blue-500/10 text-blue-700 rounded-xl shrink-0">
+                    <Users class="w-5 h-5" />
+                </div>
+                <div class="text-xs text-blue-950 leading-relaxed">
+                    <span class="font-bold text-sm text-blue-900 block mb-0.5">
+                        Portal Monitoring Pagu: {{ overview.current_pptk?.display_name }} ({{ overview.current_pptk?.name }})
+                    </span>
+                    Anda melihat data real-time khusus untuk <strong>{{ overview.subkegiatan_table?.length || 0 }} Sub Kegiatan</strong> yang Anda ampu. Data ini mencatat sisa kas di tangan dan sisa pagu anggaran riil setelah kegiatan berjalan, tanpa perlu menunggu SPJ disetujui di SIPD.
+                </div>
+            </div>
+            <div v-else class="bg-emerald-50/80 border border-emerald-200/90 rounded-2xl p-4 flex items-start gap-3">
                 <div class="p-2 bg-emerald-500/10 text-emerald-700 rounded-xl shrink-0">
                     <AlertCircle class="w-5 h-5" />
                 </div>

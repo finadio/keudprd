@@ -83,4 +83,35 @@ class PaguRealizationTest extends TestCase
             'spj_document_number' => '0099/SPJ/SETWAN/2026',
         ]);
     }
+
+    public function test_pptk_user_can_view_dashboard_but_forbidden_from_mutating_data(): void
+    {
+        $pptkUser = User::where('role', 'pptk')->first();
+        if (! $pptkUser) {
+            $pptk = Pptk::first();
+            $pptkUser = User::factory()->create([
+                'role' => 'pptk',
+                'pptk_id' => $pptk->id,
+            ]);
+        }
+
+        // 1. PPTK can view /pagu dashboard
+        $viewResponse = $this->actingAs($pptkUser)->get('/pagu');
+        $viewResponse->assertStatus(200);
+
+        // 2. PPTK cannot create transaction (should return 403)
+        $storeResponse = $this->actingAs($pptkUser)->post('/pagu/transaksi', [
+            'pptk_id' => $pptkUser->pptk_id,
+            'transaction_date' => '2026-11-20',
+            'type' => 'pencairan',
+            'amount' => 5000000,
+            'recipient' => 'Dewan',
+            'description' => 'Test',
+        ]);
+        $storeResponse->assertStatus(403);
+
+        // 3. PPTK is redirected away from /pengaturan
+        $settingResponse = $this->actingAs($pptkUser)->get('/pengaturan');
+        $settingResponse->assertRedirect('/pagu');
+    }
 }

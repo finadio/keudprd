@@ -188,7 +188,7 @@ const toggleSpj = (tx) => {
                     </p>
                 </div>
 
-                <div class="flex items-center gap-2.5 flex-wrap">
+                <div v-if="!is_pptk_user" class="flex items-center gap-2.5 flex-wrap">
                     <button
                         type="button"
                         @click="openCreateModal('pencairan')"
@@ -206,6 +206,12 @@ const toggleSpj = (tx) => {
                         <ArrowDownLeft class="w-4 h-4" />
                         <span>+ Pengembalian Sisa Kas</span>
                     </button>
+                </div>
+                <div v-else class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200">
+                        <CheckCircle2 class="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Mode Tinjauan PPTK (View-Only)</span>
+                    </span>
                 </div>
             </div>
 
@@ -294,12 +300,12 @@ const toggleSpj = (tx) => {
                                 <th class="px-5 py-3.5 text-center whitespace-nowrap">Tipe Kas</th>
                                 <th class="px-5 py-3.5 text-right whitespace-nowrap">Nominal Kas</th>
                                 <th class="px-5 py-3.5 text-center whitespace-nowrap">Status SPJ SIPD</th>
-                                <th class="px-5 py-3.5 text-center whitespace-nowrap">Aksi</th>
+                                <th v-if="!is_pptk_user" class="px-5 py-3.5 text-center whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             <tr v-if="transactions.data.length === 0">
-                                <td colspan="7" class="px-5 py-12 text-center text-slate-400 text-xs italic">
+                                <td :colspan="is_pptk_user ? 6 : 7" class="px-5 py-12 text-center text-slate-400 text-xs italic">
                                     Tidak ada catatan transaksi yang sesuai dengan filter.
                                 </td>
                             </tr>
@@ -348,6 +354,7 @@ const toggleSpj = (tx) => {
                                 </td>
                                 <td class="px-5 py-4 text-center whitespace-nowrap">
                                     <button
+                                        v-if="!is_pptk_user"
                                         type="button"
                                         @click="toggleSpj(tx)"
                                         class="px-2.5 py-1 rounded-lg text-[10px] font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 border"
@@ -358,8 +365,17 @@ const toggleSpj = (tx) => {
                                         <Clock v-else class="w-3 h-3 text-slate-400" />
                                         <span>{{ tx.is_spj_submitted ? 'Sudah SPJ SIPD' : 'Belum SPJ' }}</span>
                                     </button>
+                                    <span
+                                        v-else
+                                        class="px-2.5 py-1 rounded-lg text-[10px] font-bold inline-flex items-center gap-1.5 border"
+                                        :class="tx.is_spj_submitted ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-50 text-slate-600 border-slate-200'"
+                                    >
+                                        <CheckCircle2 v-if="tx.is_spj_submitted" class="w-3 h-3 text-blue-600" />
+                                        <Clock v-else class="w-3 h-3 text-slate-400" />
+                                        <span>{{ tx.is_spj_submitted ? 'Sudah SPJ SIPD' : 'Belum SPJ' }}</span>
+                                    </span>
                                 </td>
-                                <td class="px-5 py-4 text-center whitespace-nowrap space-x-1.5">
+                                <td v-if="!is_pptk_user" class="px-5 py-4 text-center whitespace-nowrap space-x-1.5">
                                     <button
                                         type="button"
                                         @click="openEditModal(tx)"

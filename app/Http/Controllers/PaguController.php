@@ -76,6 +76,8 @@ class PaguController extends Controller
      */
     public function storeTransaction(Request $request, PaguRealizationService $service): RedirectResponse
     {
+        $this->ensureNotPptk();
+
         $validated = $request->validate([
             'pptk_id' => 'required|exists:pptks,id',
             'activity_id' => 'nullable|exists:activities,id',
@@ -106,6 +108,8 @@ class PaguController extends Controller
      */
     public function updateTransaction(Request $request, PaguRealization $realization, PaguRealizationService $service): RedirectResponse
     {
+        $this->ensureNotPptk();
+
         $validated = $request->validate([
             'pptk_id' => 'required|exists:pptks,id',
             'activity_id' => 'nullable|exists:activities,id',
@@ -132,6 +136,8 @@ class PaguController extends Controller
      */
     public function destroyTransaction(PaguRealization $realization, PaguRealizationService $service): RedirectResponse
     {
+        $this->ensureNotPptk();
+
         $service->deleteRealization($realization);
 
         return redirect()->back()->with('success', 'Transaksi realisasi pagu berhasil dihapus!');
@@ -142,6 +148,8 @@ class PaguController extends Controller
      */
     public function toggleSpj(Request $request, PaguRealization $realization, PaguRealizationService $service): RedirectResponse
     {
+        $this->ensureNotPptk();
+
         $isSubmitted = (bool) $request->input('is_spj_submitted', ! $realization->is_spj_submitted);
         $docNumber = $request->input('spj_document_number');
         $date = $request->input('spj_submission_date');
@@ -181,6 +189,8 @@ class PaguController extends Controller
      */
     public function assignPptk(Request $request, Activity $activity, PaguRealizationService $service): RedirectResponse
     {
+        $this->ensureNotPptk();
+
         $validated = $request->validate([
             'pptk_id' => 'required|exists:pptks,id',
         ]);
@@ -193,8 +203,12 @@ class PaguController extends Controller
     /**
      * Halaman Impor Excel SIPD Fungsional.
      */
-    public function importView(Request $request): Response
+    public function importView(Request $request): Response|RedirectResponse
     {
+        if (auth()->user() && strtolower(auth()->user()->role) === 'pptk') {
+            return redirect()->route('pagu.index')->with('warning', 'Pejabat PPTK hanya memiliki hak peninjauan (View-Only). Fitur impor SIPD dikelola oleh Bendahara atau Operator.');
+        }
+
         $year = FiscalYearContext::resolve($request);
         $totalActivities = Activity::where('period_year', $year)->count();
         $totalPagu = (float) Activity::where('period_year', $year)->sum('pagu_budget');
@@ -213,6 +227,8 @@ class PaguController extends Controller
      */
     public function import(Request $request, PaguRealizationService $service): RedirectResponse
     {
+        $this->ensureNotPptk();
+
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls|max:20480',
         ]);
@@ -227,6 +243,17 @@ class PaguController extends Controller
             return redirect()->route('pagu.index')->with('success', "Berhasil menyinkronkan {$result['imported_count']} subkegiatan dari SIPD! Total Pagu: Rp ".number_format($result['total_pagu'], 0, ',', '.'));
         } catch (\Throwable $e) {
             return redirect()->back()->withErrors(['file' => 'Gagal membaca file Excel SIPD: '.$e->getMessage()]);
+        }
+    }
+
+    /**
+     * Pastikan pengguna saat ini bukan ber-role PPTK (PPTK bersifat View-Only).
+     */
+    private function ensureNotPptk(): void
+    {
+        $user = auth()->user();
+        if ($user && strtolower($user->role) === 'pptk') {
+            abort(403, 'Akses dibatasi. Pejabat PPTK hanya memiliki hak akses peninjauan (View-Only). Pencatatan kas riil dilakukan oleh Bendahara Pengeluaran atau Operator.');
         }
     }
 }

@@ -71,56 +71,51 @@ const switchFiscalYear = (newYear) => {
     });
 };
 
-const financeNavItems = [
-    { name: 'Dashboard', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
-    { name: 'BKU Per PPTK', href: '/bku', routeName: 'bku.*', icon: BookOpen },
-    { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
-    { name: 'Impor Transaksi', href: '/impor', routeName: 'impor.*', icon: UploadCloud },
-    { name: 'Rekonsiliasi', href: '/rekonsiliasi', routeName: 'rekonsiliasi.*', icon: ArrowLeftRight },
-    { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
-];
-
-const paguNavItems = [
-    { name: 'Ikhtisar Realisasi Pagu', href: '/pagu', routeName: 'pagu.index', icon: PieChart },
-    { name: 'Catat Realisasi & Sisa', href: '/pagu/transaksi', routeName: 'pagu.transactions', icon: Receipt },
-    { name: 'Pagu per Sub Kegiatan', href: '/pagu/subkegiatan', routeName: 'pagu.activities', icon: FolderTree },
-    { name: 'Impor Data SIPD', href: '/pagu/impor', routeName: 'pagu.import', icon: FileSpreadsheet },
-];
-
-const generalNavItems = [
-    { name: 'Pengaturan & Master', href: '/pengaturan', routeName: 'pengaturan.*', icon: Settings },
-];
-
-const isPptkUser = computed(() => authUser.value?.role === 'pptk');
-
-const visibleFinanceNavItems = computed(() => {
-    if (isPptkUser.value) {
-        const sheetTab = authUser.value?.pptk?.sheet_name;
-        return [
-            { name: 'BKU PPTK Saya', href: sheetTab ? `/bku?tab=${sheetTab}` : '/bku', routeName: 'bku.*', icon: BookOpen },
-            { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
-            { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
-        ];
-    }
-    return financeNavItems;
+const isPptkUser = computed(() => {
+    return authUser.value && String(authUser.value.role).toLowerCase() === 'pptk';
 });
 
-const visiblePaguNavItems = computed(() => {
+const financeNavItems = computed(() => {
+    if (isPptkUser.value) {
+        return [
+            { name: 'Dashboard Keuangan', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
+            { name: 'BKU Pembantu Saya', href: '/bku', routeName: 'bku.*', icon: BookOpen },
+            { name: 'Laporan Pembukuan', href: '/laporan', routeName: 'laporan.*', icon: Printer },
+        ];
+    }
+    return [
+        { name: 'Dashboard', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
+        { name: 'BKU Per PPTK', href: '/bku', routeName: 'bku.*', icon: BookOpen },
+        { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
+        { name: 'Impor Transaksi', href: '/impor', routeName: 'impor.*', icon: UploadCloud },
+        { name: 'Rekonsiliasi', href: '/rekonsiliasi', routeName: 'rekonsiliasi.*', icon: ArrowLeftRight },
+        { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
+    ];
+});
+
+const paguNavItems = computed(() => {
     if (isPptkUser.value) {
         return [
             { name: 'Dashboard Pagu Saya', href: '/pagu', routeName: 'pagu.index', icon: PieChart },
-            { name: 'Pencairan Kas & Sisa', href: '/pagu/transaksi', routeName: 'pagu.transactions', icon: Receipt },
+            { name: 'Riwayat Realisasi & Sisa', href: '/pagu/transaksi', routeName: 'pagu.transactions', icon: Receipt },
             { name: 'Sub Kegiatan Saya', href: '/pagu/subkegiatan', routeName: 'pagu.activities', icon: FolderTree },
         ];
     }
-    return paguNavItems;
+    return [
+        { name: 'Ikhtisar Realisasi Pagu', href: '/pagu', routeName: 'pagu.index', icon: PieChart },
+        { name: 'Catat Realisasi & Sisa', href: '/pagu/transaksi', routeName: 'pagu.transactions', icon: Receipt },
+        { name: 'Pagu per Sub Kegiatan', href: '/pagu/subkegiatan', routeName: 'pagu.activities', icon: FolderTree },
+        { name: 'Impor Data SIPD', href: '/pagu/impor', routeName: 'pagu.import', icon: FileSpreadsheet },
+    ];
 });
 
-const visibleGeneralNavItems = computed(() => {
+const generalNavItems = computed(() => {
     if (isPptkUser.value) {
         return [];
     }
-    return generalNavItems;
+    return [
+        { name: 'Pengaturan & Master', href: '/pengaturan', routeName: 'pengaturan.*', icon: Settings },
+    ];
 });
 
 const isCurrentRoute = (pattern) => {
@@ -155,7 +150,6 @@ const isPaguRouteActive = computed(() => {
 
 const getInitialFinanceAccordionState = () => {
     if (typeof window === 'undefined') return true;
-    if (isPptkUser.value) return false;
     if (isFinanceRouteActive.value) return true;
     const saved = localStorage.getItem('keudprd_finance_acc_open');
     return saved !== null ? saved === 'true' : true;
@@ -163,7 +157,6 @@ const getInitialFinanceAccordionState = () => {
 
 const getInitialPaguAccordionState = () => {
     if (typeof window === 'undefined') return true;
-    if (isPptkUser.value) return true;
     if (isPaguRouteActive.value) return true;
     const saved = localStorage.getItem('keudprd_pagu_acc_open');
     return saved !== null ? saved === 'true' : false;
@@ -393,7 +386,7 @@ const jumpToResult = (url) => {
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
-                                    {{ visibleFinanceNavItems.length }}
+                                    {{ financeNavItems.length }}
                                 </span>
                                 <ChevronDown 
                                     class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
@@ -408,7 +401,7 @@ const jumpToResult = (url) => {
                             class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
                         >
                             <Link
-                                v-for="item in visibleFinanceNavItems"
+                                v-for="item in financeNavItems"
                                 :key="item.name"
                                 :href="item.href"
                                 @click="handleNavClick"
@@ -444,7 +437,7 @@ const jumpToResult = (url) => {
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
-                                    {{ visiblePaguNavItems.length }}
+                                    {{ paguNavItems.length }}
                                 </span>
                                 <ChevronDown 
                                     class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
@@ -453,13 +446,16 @@ const jumpToResult = (url) => {
                             </div>
                         </button>
 
-                        <!-- Accordion Submenu Links -->
+                        <!-- Accordion Submenu Links (Kosong sementara untuk fitur baru) -->
                         <div 
                             v-show="isPaguAccordionOpen" 
                             class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
                         >
+                            <div v-if="paguNavItems.length === 0" class="px-3 py-2 text-[11px] text-emerald-200/50 italic">
+                                Belum ada menu (Fitur baru)
+                            </div>
                             <Link
-                                v-for="item in visiblePaguNavItems"
+                                v-for="item in paguNavItems"
                                 :key="item.name"
                                 :href="item.href"
                                 @click="handleNavClick"
@@ -477,9 +473,9 @@ const jumpToResult = (url) => {
                     </div>
 
                     <!-- General Links (Pengaturan & Master) -->
-                    <div v-if="visibleGeneralNavItems.length > 0" class="pt-2 border-t border-emerald-900/40 space-y-1">
+                    <div class="pt-2 border-t border-emerald-900/40 space-y-1">
                         <Link
-                            v-for="item in visibleGeneralNavItems"
+                            v-for="item in generalNavItems"
                             :key="item.name"
                             :href="item.href"
                             @click="handleNavClick"
@@ -569,22 +565,12 @@ const jumpToResult = (url) => {
                     
                     <!-- Bendahara Special Badge (only if logged in as Indah) -->
                     <div 
-                        v-if="authUser && (authUser.role === 'bendahara' || authUser.email?.includes('bendahara') || authUser.name?.toLowerCase().includes('indah'))" 
+                        v-if="authUser && (authUser.role === 'Bendahara' || authUser.email?.includes('bendahara') || authUser.name?.toLowerCase().includes('indah'))" 
                         class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700"
                     >
                         <User class="w-3.5 h-3.5 text-emerald-600" />
                         <span class="text-slate-500">Bendahara:</span>
                         <span class="font-bold text-slate-800">INDAH SETIYOWATI, A.Md.AB.</span>
-                    </div>
-
-                    <!-- PPTK Special Badge (if logged in as PPTK) -->
-                    <div 
-                        v-if="authUser && authUser.role === 'pptk' && authUser.pptk" 
-                        class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-950 shadow-2xs"
-                    >
-                        <Users class="w-3.5 h-3.5 text-emerald-700" />
-                        <span class="text-slate-500 text-[11px]">Pejabat PPTK:</span>
-                        <span class="font-bold text-emerald-800 text-xs">{{ authUser.pptk.display_name }}</span>
                     </div>
 
                     <!-- User Profile Info -->
@@ -598,7 +584,7 @@ const jumpToResult = (url) => {
                                     {{ authUser.name }}
                                 </div>
                                 <div class="text-[9px] text-[#107c41] font-black uppercase tracking-wider">
-                                    {{ authUser.role_label || authUser.role || 'Super Admin' }}
+                                    {{ authUser.role || 'Super Admin' }}
                                 </div>
                             </div>
                         </div>

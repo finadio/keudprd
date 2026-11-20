@@ -43,15 +43,7 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    'role' => strtolower($request->user()->role ?? 'operator'),
-                    'role_label' => $request->user()->role_label ?? ucfirst($request->user()->role ?? 'operator'),
-                    'pptk_id' => $request->user()->pptk_id,
-                    'pptk' => $request->user()->pptk ? [
-                        'id' => $request->user()->pptk->id,
-                        'name' => $request->user()->pptk->name,
-                        'display_name' => $request->user()->pptk->display_name,
-                        'code' => $request->user()->pptk->code,
-                    ] : null,
+                    'role' => $request->user()->role ?? 'operator',
                 ] : null,
             ],
             'flash' => [

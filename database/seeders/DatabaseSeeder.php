@@ -3,11 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\AccountingPeriod;
+use App\Models\Activity;
 use App\Models\ManualAdjustment;
 use App\Models\MasterSetting;
 use App\Models\Pptk;
 use App\Models\Subunit;
 use App\Models\User;
+use App\Services\PaguRealizationService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -161,6 +163,26 @@ class DatabaseSeeder extends Seeder
 
         foreach ($pptks as $p) {
             Pptk::firstOrCreate(['code' => $p['code']], $p);
+        }
+
+        // 4.1 Create User Account for each PPTK (Role: pptk, View-Only)
+        foreach (Pptk::all() as $p) {
+            $slug = strtolower(str_replace(['_', ' ', '/'], '-', $p->code));
+            User::firstOrCreate(
+                ['email' => "pptk.{$slug}@dprd.banyumaskab.go.id"],
+                [
+                    'name' => $p->name ?: $p->display_name,
+                    'password' => Hash::make('password'),
+                    'role' => 'pptk',
+                    'pptk_id' => $p->id,
+                ]
+            );
+        }
+
+        // 4.2 Seed SIPD Fungsional Activities if excel exists
+        $spjFile = base_path('SPJ_Fungsional_November_2026 (2).xlsx');
+        if (file_exists($spjFile) && Activity::count() === 0) {
+            app(PaguRealizationService::class)->importSipdFungsional($spjFile, 2026);
         }
 
         // 5. Accounting Periods (12 Months)

@@ -98,12 +98,16 @@ const updatePptkAssignment = (activityId, newPptkId) => {
 
                 <div class="flex items-center gap-2.5">
                     <Link
+                        v-if="!is_pptk_user"
                         href="/pagu/impor"
                         class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors"
                     >
                         <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
                         <span>Perbarui dari SIPD</span>
                     </Link>
+                    <span v-else class="px-3 py-1.5 bg-emerald-50 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200">
+                        Mode Tinjauan PPTK (View-Only)
+                    </span>
                 </div>
             </div>
 
