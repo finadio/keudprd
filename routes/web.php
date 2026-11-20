@@ -6,6 +6,7 @@ use App\Http\Controllers\BkuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportTransactionController;
 use App\Http\Controllers\PaguController;
+use App\Http\Controllers\PptkController;
 use App\Http\Controllers\ReconciliationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SearchController;
@@ -100,5 +101,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/tahun-baru', [SettingController::class, 'openNewFiscalYear'])->name('open-new-year');
         Route::post('/bersihkan-backup', [SettingController::class, 'pruneBackups'])->name('prune-backups');
         Route::post('/period/{period}/toggle-lock', [SettingController::class, 'togglePeriodLock'])->name('toggle-lock');
+
+        // Manajemen PPTK (Tambah, Edit, Hapus, Status Aktif)
+        Route::post('/pptk', [PptkController::class, 'store'])->name('pptk.store');
+        Route::put('/pptk/{pptk}', [PptkController::class, 'update'])->name('pptk.update');
+        Route::delete('/pptk/{pptk}', [PptkController::class, 'destroy'])->name('pptk.destroy');
+        Route::post('/pptk/{pptk}/toggle-active', [PptkController::class, 'toggleActive'])->name('pptk.toggle-active');
     });
 });

@@ -17,12 +17,17 @@ import {
     Database,
     Trash2,
     ArrowRight,
-    KeyRound
+    KeyRound,
+    Plus,
+    Pencil,
+    X,
+    AlertTriangle
 } from 'lucide-vue-next';
 
 const props = defineProps({
     setting: Object,
     pptks: Array,
+    subunits: Array,
     periods: Array,
     audit_logs: Array,
     active_year: Number,
@@ -94,6 +99,109 @@ const submitPasswordChange = () => {
 
 const formatRupiah = (val) => {
     return 'Rp ' + Number(val || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+};
+
+// Manajemen PPTK (Tambah, Edit, Hapus, Toggle Aktif)
+const showPptkModal = ref(false);
+const isEditingPptk = ref(false);
+const showDeletePptkModal = ref(false);
+const pptkToDelete = ref(null);
+
+const pptkForm = useForm({
+    id: null,
+    code: '',
+    name: '',
+    display_name: '',
+    nip: '',
+    subunit_id: '',
+    sheet_name: '',
+    color_tag: '#04331a',
+    sort_order: 1,
+    is_active: true,
+});
+
+const openCreatePptkModal = () => {
+    isEditingPptk.value = false;
+    pptkForm.reset();
+    pptkForm.clearErrors();
+    pptkForm.id = null;
+    pptkForm.code = '';
+    pptkForm.name = '';
+    pptkForm.display_name = '';
+    pptkForm.nip = '';
+    pptkForm.sheet_name = '';
+    pptkForm.color_tag = '#04331a';
+    pptkForm.sort_order = (props.pptks?.length || 0) + 1;
+    pptkForm.is_active = true;
+    pptkForm.subunit_id = props.subunits?.[0]?.id || '';
+    showPptkModal.value = true;
+};
+
+const openEditPptkModal = (pptk) => {
+    isEditingPptk.value = true;
+    pptkForm.clearErrors();
+    pptkForm.id = pptk.id;
+    pptkForm.code = pptk.code || '';
+    pptkForm.name = pptk.name || '';
+    pptkForm.display_name = pptk.display_name || '';
+    pptkForm.nip = pptk.nip || '';
+    pptkForm.subunit_id = pptk.subunit_id || '';
+    pptkForm.sheet_name = pptk.sheet_name || '';
+    pptkForm.color_tag = pptk.color_tag || '#04331a';
+    pptkForm.sort_order = pptk.sort_order ?? 0;
+    pptkForm.is_active = Boolean(pptk.is_active);
+    showPptkModal.value = true;
+};
+
+const onDisplayNameInput = () => {
+    if (!isEditingPptk.value) {
+        if (!pptkForm.sheet_name || pptkForm.sheet_name === pptkForm.display_name.slice(0, -1)) {
+            pptkForm.sheet_name = pptkForm.display_name;
+        }
+        if (!pptkForm.code) {
+            pptkForm.code = pptkForm.display_name.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+        }
+    }
+};
+
+const submitPptkForm = () => {
+    if (isEditingPptk.value && pptkForm.id) {
+        pptkForm.put(`/pengaturan/pptk/${pptkForm.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showPptkModal.value = false;
+            },
+        });
+    } else {
+        pptkForm.post('/pengaturan/pptk', {
+            preserveScroll: true,
+            onSuccess: () => {
+                showPptkModal.value = false;
+            },
+        });
+    }
+};
+
+const confirmDeletePptk = (pptk) => {
+    pptkToDelete.value = pptk;
+    showDeletePptkModal.value = true;
+};
+
+const executeDeletePptk = () => {
+    if (!pptkToDelete.value) return;
+    router.delete(`/pengaturan/pptk/${pptkToDelete.value.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showDeletePptkModal.value = false;
+            pptkToDelete.value = null;
+        },
+    });
+};
+
+const togglePptkActive = (pptk) => {
+    router.post(`/pengaturan/pptk/${pptk.id}/toggle-active`, {}, {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -467,12 +575,30 @@ const formatRupiah = (val) => {
                 </form>
             </div>
 
-            <!-- Card 4: Master 9 PPTK List -->
+            <!-- Card 4: Master PPTK Management -->
             <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
-                        <Users class="w-4 h-4 text-blue-600" />
-                        <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Daftar 9 PPTK Sekretariat DPRD Banyumas</h2>
+                        <Users class="w-4 h-4 text-emerald-700" />
+                        <div>
+                            <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Daftar PPTK Sekretariat DPRD Banyumas</h2>
+                            <p class="text-[11px] text-slate-500">
+                                Tambah, ubah identitas pejabat/gelar, atau nonaktifkan PPTK ketika pergantian periode anggaran baru.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-slate-500 font-medium">
+                            Total: <strong class="text-slate-800">{{ pptks?.length || 0 }}</strong> ({{ pptks?.filter(p => p.is_active)?.length || 0 }} Aktif)
+                        </span>
+                        <button 
+                            type="button"
+                            @click="openCreatePptkModal"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#04331a] hover:bg-emerald-800 text-white rounded text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                        >
+                            <Plus class="w-3.5 h-3.5" />
+                            <span>Tambah PPTK Baru</span>
+                        </button>
                     </div>
                 </div>
 
@@ -480,25 +606,71 @@ const formatRupiah = (val) => {
                     <table class="w-full text-xs">
                         <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
                             <tr>
-                                <th class="px-3 py-2 text-center w-12">No</th>
+                                <th class="px-3 py-2 text-center w-10">No</th>
                                 <th class="px-3 py-2 text-left">Kode</th>
-                                <th class="px-3 py-2 text-left">Label Sheet Excel</th>
-                                <th class="px-3 py-2 text-left">Nama Lengkap & Gelar</th>
-                                <th class="px-3 py-2 text-left">Sheet BKU Terkait</th>
-                                <th class="px-3 py-2 text-center">Status</th>
+                                <th class="px-3 py-2 text-left">Label / Panggilan</th>
+                                <th class="px-3 py-2 text-left">Nama Lengkap &amp; Gelar</th>
+                                <th class="px-3 py-2 text-left">NIP</th>
+                                <th class="px-3 py-2 text-left">Bagian / Subunit</th>
+                                <th class="px-3 py-2 text-left">Sheet BKU</th>
+                                <th class="px-3 py-2 text-center w-16">Urut</th>
+                                <th class="px-3 py-2 text-center w-28">Status</th>
+                                <th class="px-3 py-2 text-center w-24">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            <tr v-for="(p, idx) in pptks" :key="p.id" class="hover:bg-slate-50">
+                            <tr v-for="(p, idx) in pptks" :key="p.id" :class="['hover:bg-slate-50 transition-colors', !p.is_active ? 'bg-slate-50/60 opacity-60' : '']">
                                 <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
-                                <td class="px-3 py-2 font-mono font-semibold text-slate-800">{{ p.code }}</td>
-                                <td class="px-3 py-2 font-bold text-emerald-800">{{ p.display_name }}</td>
+                                <td class="px-3 py-2">
+                                    <span class="inline-flex items-center gap-1.5 font-mono font-bold text-slate-800 px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block shrink-0" :style="{ backgroundColor: p.color_tag || '#04331a' }"></span>
+                                        {{ p.code }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2 font-bold text-emerald-900">{{ p.display_name }}</td>
                                 <td class="px-3 py-2 text-slate-900 font-medium">{{ p.name }}</td>
+                                <td class="px-3 py-2 font-mono text-slate-600">{{ p.nip || '-' }}</td>
+                                <td class="px-3 py-2 text-slate-600">{{ p.subunit?.name || '-' }}</td>
                                 <td class="px-3 py-2 font-mono text-blue-700 underline">
-                                    <Link :href="`/bku?tab=${p.sheet_name}`">{{ p.sheet_name }}</Link>
+                                    <Link v-if="p.is_active" :href="`/bku?tab=${p.sheet_name}`">{{ p.sheet_name }}</Link>
+                                    <span v-else class="text-slate-400 no-underline">{{ p.sheet_name }}</span>
+                                </td>
+                                <td class="px-3 py-2 text-center font-mono text-slate-600">{{ p.sort_order }}</td>
+                                <td class="px-3 py-2 text-center">
+                                    <button 
+                                        type="button" 
+                                        @click="togglePptkActive(p)"
+                                        :title="p.is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'"
+                                        class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors border"
+                                        :class="p.is_active ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200' : 'bg-slate-200 text-slate-700 border-slate-300 hover:bg-slate-300'"
+                                    >
+                                        {{ p.is_active ? '● Aktif' : '○ Nonaktif' }}
+                                    </button>
                                 </td>
                                 <td class="px-3 py-2 text-center">
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Aktif</span>
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button 
+                                            type="button"
+                                            @click="openEditPptkModal(p)"
+                                            class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
+                                            title="Edit PPTK"
+                                        >
+                                            <Pencil class="w-3.5 h-3.5" />
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            @click="confirmDeletePptk(p)"
+                                            class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                                            title="Hapus / Nonaktifkan PPTK"
+                                        >
+                                            <Trash2 class="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="!pptks || pptks.length === 0">
+                                <td colspan="10" class="px-3 py-6 text-center text-slate-500">
+                                    Belum ada data PPTK tersimpan. Klik tombol "+ Tambah PPTK Baru" di atas.
                                 </td>
                             </tr>
                         </tbody>
@@ -506,7 +678,7 @@ const formatRupiah = (val) => {
                 </div>
             </div>
 
-            <!-- Card 4: Audit Trail -->
+            <!-- Card 5: Audit Trail -->
             <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
                 <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -541,6 +713,248 @@ const formatRupiah = (val) => {
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Modal Tambah / Edit PPTK -->
+            <div 
+                v-if="showPptkModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded border border-slate-200 shadow-xl w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-4 py-3 bg-[#04331a] text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <Users class="w-4 h-4 text-emerald-300" />
+                            <h3 class="text-xs font-bold uppercase tracking-wide">
+                                {{ isEditingPptk ? 'Ubah Data PPTK' : 'Tambah PPTK Baru (Periode Baru)' }}
+                            </h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showPptkModal = false"
+                            class="text-emerald-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <form @submit.prevent="submitPptkForm" class="p-4 space-y-3 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Nama Lengkap & Gelar -->
+                            <div class="sm:col-span-2">
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Nama Lengkap &amp; Gelar Resmi <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    v-model="pptkForm.name" 
+                                    type="text" 
+                                    required
+                                    placeholder="contoh: DRS. AHMAD HIDAYAT, M.Si."
+                                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                                />
+                                <div v-if="pptkForm.errors.name" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.name }}</div>
+                            </div>
+
+                            <!-- Display Name / Nama Panggilan -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Label Tampilan / Panggilan <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    v-model="pptkForm.display_name" 
+                                    @input="onDisplayNameInput"
+                                    type="text" 
+                                    required
+                                    placeholder="contoh: P Ahmad / Ahmad"
+                                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                                />
+                                <span class="text-[10px] text-slate-400">Muncul di tabel &amp; dropdown</span>
+                                <div v-if="pptkForm.errors.display_name" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.display_name }}</div>
+                            </div>
+
+                            <!-- Kode Singkat Unik -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Kode Singkat PPTK <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    v-model="pptkForm.code" 
+                                    type="text" 
+                                    required
+                                    placeholder="contoh: AHMAD"
+                                    class="w-full px-2.5 py-1.5 font-mono uppercase border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                                />
+                                <span class="text-[10px] text-slate-400">Harus unik (tanpa spasi)</span>
+                                <div v-if="pptkForm.errors.code" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.code }}</div>
+                            </div>
+
+                            <!-- NIP -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    NIP (Nomor Induk Pegawai)
+                                </label>
+                                <input 
+                                    v-model="pptkForm.nip" 
+                                    type="text" 
+                                    placeholder="contoh: 19780512 200212 1 004"
+                                    class="w-full px-2.5 py-1.5 font-mono border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                                />
+                                <div v-if="pptkForm.errors.nip" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.nip }}</div>
+                            </div>
+
+                            <!-- Bagian / Subunit -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Bagian / Subunit
+                                </label>
+                                <select 
+                                    v-model="pptkForm.subunit_id"
+                                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs bg-white"
+                                >
+                                    <option value="">-- Pilih Bagian (Opsional) --</option>
+                                    <option v-for="sub in subunits" :key="sub.id" :value="sub.id">
+                                        {{ sub.name }}
+                                    </option>
+                                </select>
+                                <div v-if="pptkForm.errors.subunit_id" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.subunit_id }}</div>
+                            </div>
+
+                            <!-- Nama Tab Sheet BKU -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Nama Sheet BKU
+                                </label>
+                                <input 
+                                    v-model="pptkForm.sheet_name" 
+                                    type="text" 
+                                    placeholder="contoh: Ahmad"
+                                    class="w-full px-2.5 py-1.5 font-mono border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                                />
+                                <span class="text-[10px] text-slate-400">Nama tab buku kas per PPTK</span>
+                                <div v-if="pptkForm.errors.sheet_name" class="text-red-600 text-[10px] mt-0.5">{{ pptkForm.errors.sheet_name }}</div>
+                            </div>
+
+                            <!-- Tag Warna Identitas -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Warna Label Tag
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input 
+                                        v-model="pptkForm.color_tag" 
+                                        type="color" 
+                                        class="w-8 h-8 p-0 border border-slate-300 rounded cursor-pointer"
+                                    />
+                                    <input 
+                                        v-model="pptkForm.color_tag" 
+                                        type="text" 
+                                        placeholder="#04331a"
+                                        class="flex-1 px-2.5 py-1.5 font-mono border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs uppercase"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Nomor Urut -->
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Nomor Urutan Tampilan
+                                </label>
+                                <input 
+                                    v-model.number="pptkForm.sort_order" 
+                                    type="number" 
+                                    min="0"
+                                    class="w-full px-2.5 py-1.5 font-mono border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                                />
+                            </div>
+
+                            <!-- Status Aktif -->
+                            <div class="flex items-center gap-2 pt-6">
+                                <label class="relative flex items-center gap-2 cursor-pointer select-none">
+                                    <input 
+                                        v-model="pptkForm.is_active" 
+                                        type="checkbox" 
+                                        class="w-4 h-4 text-emerald-700 rounded border-slate-300 focus:ring-emerald-600"
+                                    />
+                                    <span class="font-semibold text-slate-700">Status Aktif (Tampil di Periode Berjalan)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showPptkModal = false"
+                                class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded font-semibold transition-colors cursor-pointer"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="submit" 
+                                :disabled="pptkForm.processing"
+                                class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#04331a] hover:bg-emerald-800 disabled:opacity-50 text-white rounded font-bold transition-colors cursor-pointer shadow-xs"
+                            >
+                                <Save class="w-3.5 h-3.5" />
+                                <span>{{ pptkForm.processing ? 'Menyimpan...' : (isEditingPptk ? 'Perbarui PPTK' : 'Simpan PPTK') }}</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Konfirmasi Hapus / Nonaktifkan PPTK -->
+            <div 
+                v-if="showDeletePptkModal && pptkToDelete" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-4 py-3 bg-red-800 text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <AlertTriangle class="w-4 h-4 text-amber-300" />
+                            <h3 class="text-xs font-bold uppercase tracking-wide">Konfirmasi Hapus / Nonaktifkan PPTK</h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showDeletePptkModal = false"
+                            class="text-red-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div class="p-4 space-y-3 text-xs">
+                        <p class="text-slate-700 leading-relaxed">
+                            Apakah Anda yakin ingin menghapus PPTK <strong class="text-slate-900 font-bold">"{{ pptkToDelete.display_name }}"</strong> ({{ pptkToDelete.name }})?
+                        </p>
+                        
+                        <div class="p-3 bg-amber-50 border border-amber-200 rounded text-amber-900 space-y-1">
+                            <p class="font-bold flex items-center gap-1 text-[11px]">
+                                <ShieldCheck class="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                                <span>Perlindungan Riwayat Pembukuan:</span>
+                            </p>
+                            <p class="text-[11px] leading-relaxed">
+                                Jika PPTK ini sudah memiliki riwayat transaksi BKU atau pagu anggaran, sistem secara otomatis akan <strong>menonaktifkannya</strong> (tidak menghapus permanen) agar laporan pembukuan tahun sebelumnya tetap utuh dan valid.
+                            </p>
+                        </div>
+
+                        <div class="pt-2 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showDeletePptkModal = false"
+                                class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded font-semibold transition-colors cursor-pointer"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="executeDeletePptk"
+                                class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-bold transition-colors cursor-pointer shadow-xs"
+                            >
+                                <Trash2 class="w-3.5 h-3.5" />
+                                <span>Lanjutkan Hapus</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -6,6 +6,7 @@ use App\Models\AccountingPeriod;
 use App\Models\AuditLog;
 use App\Models\MasterSetting;
 use App\Models\Pptk;
+use App\Models\Subunit;
 use App\Models\Transaction;
 use App\Services\BackupExportService;
 use App\Services\FiscalYearContext;
@@ -28,7 +29,8 @@ class SettingController extends Controller
 
         $setting = MasterSetting::where('fiscal_year', $activeYear)->latest()->first()
             ?? MasterSetting::current();
-        $pptks = Pptk::orderBy('sort_order')->get();
+        $pptks = Pptk::with('subunit')->orderBy('sort_order')->get();
+        $subunits = Subunit::orderBy('id')->get();
         $periods = AccountingPeriod::where('fiscal_year', $activeYear)->orderBy('month')->get();
         $auditLogs = AuditLog::with('user')->latest('id')->take(25)->get();
 
@@ -39,6 +41,7 @@ class SettingController extends Controller
         return Inertia::render('Setting/Index', [
             'setting' => $setting,
             'pptks' => $pptks,
+            'subunits' => $subunits,
             'periods' => $periods,
             'audit_logs' => $auditLogs,
             'active_year' => $activeYear,

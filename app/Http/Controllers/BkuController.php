@@ -24,16 +24,16 @@ class BkuController extends Controller
         $year = FiscalYearContext::resolve($request);
         $activeTab = $request->input('tab', 'Hitungan'); // Default first sheet
 
-        $allTabs = [
-            'Hitungan', 'UP', 'KK', 'Jml Deb Rek', 'Deb Rek',
-            'Aul-Ety', 'Gaya', 'Ratman', 'Aul-Rina', 'Sigit',
-            'SgngSyesa', 'SgngEmi', 'Sri L', 'Irna',
-            'Reses3', 'DebReses3', 'Reses2', 'Deb Reses2', 'Reses 1', 'Deb Reses1',
-        ];
-
         $setting = MasterSetting::current();
         $pptks = Pptk::where('is_active', true)->orderBy('sort_order')->get();
         $periods = AccountingPeriod::where('fiscal_year', $year)->orderBy('month')->get();
+
+        $pptkSheets = $pptks->pluck('sheet_name')->filter()->values()->all();
+        $allTabs = array_values(array_unique([
+            'Hitungan', 'UP', 'KK', 'Jml Deb Rek', 'Deb Rek',
+            ...$pptkSheets,
+            'Reses3', 'DebReses3', 'Reses2', 'Deb Reses2', 'Reses 1', 'Deb Reses1',
+        ]));
 
         $sheetData = $this->resolveSheetData($activeTab, $year, $pptks, $service);
 
