@@ -66,4 +66,3 @@ class AuthProtectionTest extends TestCase
         $this->assertTrue(Hash::check('NewSecurePass123', $user->password));
     }
 }
-

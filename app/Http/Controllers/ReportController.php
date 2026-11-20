@@ -185,8 +185,70 @@ class ReportController extends Controller
         $sheet->setCellValue("G{$row}", $data['totals']['total_hutang_panjar']);
         $sheet->setCellValue("H{$row}", $data['totals']['bank']);
         $sheet->setCellValue("I{$row}", $data['totals']['tunai']);
+        $sheet->setCellValue("J{$row}", $data['totals']['spj_lanjutan']);
+        $sheet->setCellValue("K{$row}", $data['totals']['sisa_panjar']);
         $sheet->setCellValue("L{$row}", $data['totals']['total_sisa_riil']);
         $sheet->setCellValue("M{$row}", $data['totals']['kontrol_selisih']);
+
+        // Rekap Hitung Kas Fisik & Kontrol UP (Baris 32-44 Sheet Hitungan)
+        $rKas = $data['rekap_kas'] ?? [];
+        if (! empty($rKas)) {
+            $rStart = $row + 3;
+            $sheet->setCellValue("D{$rStart}", 'REKAP HITUNG KAS FISIK & KONTROL UP');
+            $sheet->setCellValue("H{$rStart}", 'REKAPITULASI SALDO BANK / RK');
+
+            $r1 = $rStart + 1;
+            $sheet->setCellValue("D{$r1}", 'UP Awal');
+            $sheet->setCellValue("F{$r1}", $rKas['up_awal'] ?? 0);
+
+            $r2 = $rStart + 2;
+            $sheet->setCellValue("D{$r2}", 'Sisa UP');
+            $sheet->setCellValue("F{$r2}", $rKas['sisa_up'] ?? 0);
+            $sheet->setCellValue("H{$r2}", 'UP');
+            $sheet->setCellValue("I{$r2}", $rKas['bank_rekap']['up'] ?? 0);
+
+            $r3 = $rStart + 3;
+            $sheet->setCellValue("D{$r3}", 'Panjar');
+            $sheet->setCellValue("F{$r3}", $rKas['panjar'] ?? 0);
+            $sheet->setCellValue("H{$r3}", 'LS Reses');
+            $sheet->setCellValue("I{$r3}", $rKas['bank_rekap']['ls_reses'] ?? 0);
+
+            $r4 = $rStart + 4;
+            $sheet->setCellValue("D{$r4}", 'Kas Kecil');
+            $sheet->setCellValue("F{$r4}", $rKas['kas_kecil'] ?? 0);
+            $sheet->setCellValue("H{$r4}", 'LS');
+            $sheet->setCellValue("I{$r4}", $rKas['bank_rekap']['ls_lain'] ?? 0);
+
+            $r5 = $rStart + 5;
+            $sheet->setCellValue("D{$r5}", 'Jumlah Kas UP Berjalan');
+            $sheet->setCellValue("F{$r5}", $rKas['total_kas_up'] ?? 0);
+            $sheet->setCellValue("H{$r5}", 'Jumlah Total Bank');
+            $sheet->setCellValue("I{$r5}", $rKas['bank_rekap']['total_bank_buku'] ?? 0);
+
+            $r6 = $rStart + 6;
+            $sheet->setCellValue("D{$r6}", 'Selisih UP');
+            $sheet->setCellValue("F{$r6}", $rKas['selisih_up'] ?? 0);
+            $sheet->setCellValue("H{$r6}", 'RK Bank Jateng');
+            $sheet->setCellValue("I{$r6}", $rKas['bank_rekap']['rekening_koran'] ?? 0);
+
+            $r7 = $rStart + 7;
+            $sheet->setCellValue("D{$r7}", 'Rencana SPJ');
+            $sheet->setCellValue("F{$r7}", $rKas['rencana_spj'] ?? 0);
+
+            $r8 = $rStart + 8;
+            $sheet->setCellValue("D{$r8}", 'Rencana LS Rampung');
+            $sheet->setCellValue("F{$r8}", $rKas['rencana_ls'] ?? 0);
+            $sheet->setCellValue("H{$r8}", 'Selisih RK Bank');
+            $sheet->setCellValue("I{$r8}", $rKas['bank_rekap']['selisih'] ?? 0);
+
+            $r9 = $rStart + 9;
+            $sheet->setCellValue("D{$r9}", 'Sisa Kontrol UP');
+            $sheet->setCellValue("F{$r9}", $rKas['sisa_kontrol_up'] ?? 0);
+
+            $r10 = $rStart + 10;
+            $sheet->setCellValue("E{$r10}", 'KONTROL SELISIH AKHIR:');
+            $sheet->setCellValue("G{$r10}", $rKas['kontrol_akhir'] ?? 0);
+        }
 
         foreach (range('A', 'M') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);

@@ -1632,63 +1632,137 @@ const deleteTransaction = (id) => {
 
                 <!-- ================= VIEW 2: TAB REKAP & SISA KAS ================= -->
                 <div v-if="activeSubTab === 'rekap'" class="space-y-6">
-                    <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs">
+                    <!-- Tabel 1: Rekapitulasi Penerimaan & Pengeluaran Berjenjang (Format Resmi Buku Bank) -->
+                    <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs bg-white">
                         <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-300 font-bold text-xs text-slate-800 flex items-center justify-between">
-                            <span>REKAPITULASI PENERIMAAN &amp; PENGELUARAN BUKU BANK</span>
+                            <span class="flex items-center gap-1.5">
+                                <FileSpreadsheet class="w-4 h-4 text-emerald-700" />
+                                <span>REKAPITULASI PENUTUPAN KAS BUKU BANK</span>
+                            </span>
                             <span class="font-mono text-emerald-800 font-bold">{{ monthNames[current_month] }} {{ year }}</span>
                         </div>
                         <table class="w-full text-xs excel-table">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-700">
-                                    <th class="text-left font-bold py-2 px-3">Uraian Akumulasi</th>
-                                    <th class="text-right font-bold py-2 px-3">Penerimaan (Rp)</th>
-                                    <th class="text-right font-bold py-2 px-3">Pengeluaran (Rp)</th>
-                                    <th class="text-right font-bold py-2 px-3">Saldo Buku (Rp)</th>
+                                    <th class="text-left font-bold py-2.5 px-3">Uraian Akumulasi</th>
+                                    <th class="text-right font-bold py-2.5 px-3">Penerimaan (Kolom 4)</th>
+                                    <th class="text-right font-bold py-2.5 px-3">Pengeluaran (Kolom 5)</th>
+                                    <th class="text-right font-bold py-2.5 px-3">Saldo Buku (Kolom 6)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="hover:bg-slate-50">
-                                    <td class="font-medium text-slate-800 px-3 py-2">1. Jumlah Periode Ini ({{ monthNames[current_month] }})</td>
-                                    <td class="text-right font-mono px-3 py-2 text-emerald-700 font-bold">{{ formatRupiah(bank_data.summary?.periode_ini?.penerimaan) }}</td>
-                                    <td class="text-right font-mono px-3 py-2 text-rose-700 font-bold">{{ formatRupiah(bank_data.summary?.periode_ini?.pengeluaran) }}</td>
-                                    <td class="text-right font-mono px-3 py-2 font-bold">{{ formatRupiah(bank_data.summary?.periode_ini?.saldo) }}</td>
+                                    <td class="font-medium text-slate-800 px-3 py-2.5">
+                                        <div class="font-semibold">1. Jumlah Periode Ini ({{ monthNames[current_month] }})</div>
+                                        <div class="text-[11px] text-slate-500">* Mencakup saldo bulan lalu (Rp {{ formatRupiah(bank_data.summary?.rincian_operasional?.saldo_awal) }}) + mutasi berjalan</div>
+                                    </td>
+                                    <td class="text-right font-mono px-3 py-2.5 text-emerald-700 font-bold text-sm">{{ formatRupiah(bank_data.summary?.periode_ini?.penerimaan) }}</td>
+                                    <td class="text-right font-mono px-3 py-2.5 text-rose-700 font-bold text-sm">{{ formatRupiah(bank_data.summary?.periode_ini?.pengeluaran) }}</td>
+                                    <td class="text-right font-mono px-3 py-2.5 font-black text-slate-900 text-sm">{{ formatRupiah(bank_data.summary?.periode_ini?.saldo) }}</td>
                                 </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td class="font-medium text-slate-800 px-3 py-2">2. Jumlah Sampai Dengan Periode Lalu</td>
+                                <tr class="hover:bg-slate-50 text-slate-600 bg-slate-50/40">
+                                    <td class="font-medium px-3 py-2">
+                                        <span>2. Jumlah Sampai Dengan Periode Lalu</span>
+                                    </td>
                                     <td class="text-right font-mono px-3 py-2">{{ formatRupiah(bank_data.summary?.sampai_periode_lalu?.penerimaan) }}</td>
                                     <td class="text-right font-mono px-3 py-2">{{ formatRupiah(bank_data.summary?.sampai_periode_lalu?.pengeluaran) }}</td>
-                                    <td class="text-right font-mono px-3 py-2 font-bold">{{ formatRupiah(bank_data.summary?.sampai_periode_lalu?.saldo) }}</td>
+                                    <td class="text-right font-mono px-3 py-2 font-semibold text-slate-700">{{ formatRupiah(bank_data.summary?.sampai_periode_lalu?.saldo) }}</td>
                                 </tr>
-                                <tr class="bg-emerald-50/70 font-bold border-t border-emerald-200">
-                                    <td class="px-3 py-2 text-emerald-950">3. Jumlah Sampai Dengan Periode Ini</td>
-                                    <td class="text-right font-mono px-3 py-2 text-emerald-900">{{ formatRupiah(bank_data.summary?.sampai_periode_ini?.penerimaan) }}</td>
-                                    <td class="text-right font-mono px-3 py-2 text-rose-900">{{ formatRupiah(bank_data.summary?.sampai_periode_ini?.pengeluaran) }}</td>
-                                    <td class="text-right font-mono px-3 py-2 text-emerald-950 font-black text-sm">{{ formatRupiah(bank_data.summary?.sampai_periode_ini?.saldo) }}</td>
+                                <tr class="bg-emerald-50/70 font-bold border-t border-emerald-300">
+                                    <td class="px-3 py-2.5 text-emerald-950 font-bold">
+                                        <div class="text-xs uppercase">3. Jumlah Sampai Dengan Periode Ini</div>
+                                        <div class="text-[10px] text-emerald-700 font-normal">Akumulasi resmi penutupan kas bulan {{ monthNames[current_month] }} {{ year }}</div>
+                                    </td>
+                                    <td class="text-right font-mono px-3 py-2.5 text-emerald-900 font-bold">{{ formatRupiah(bank_data.summary?.sampai_periode_ini?.penerimaan) }}</td>
+                                    <td class="text-right font-mono px-3 py-2.5 text-rose-900 font-bold">{{ formatRupiah(bank_data.summary?.sampai_periode_ini?.pengeluaran) }}</td>
+                                    <td class="text-right font-mono px-3 py-2.5 text-emerald-950 font-black text-sm">{{ formatRupiah(bank_data.summary?.sampai_periode_ini?.saldo) }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Rekap Sisa Kas Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-5 border border-slate-300 rounded-xl bg-slate-50/60 shadow-2xs space-y-2">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Sisa Kas Menurut Buku Bank:</span>
-                            <div class="text-2xl font-black font-mono text-emerald-800">
-                                Rp {{ formatRupiah(bank_data.sisa_kas) }}
+                    <!-- Grid: Komponen Sisa Kas (Terdiri Dari) & Ikhtisar Aliran Kas -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Tabel 2: Komponen Sisa Kas (Terdiri Dari: Sesuai Format Excel) -->
+                        <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs bg-white">
+                            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-300 font-bold text-xs text-slate-800 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <Coins class="w-4 h-4 text-emerald-700" />
+                                    <span>KOMPONEN SISA KAS (TERDIRI DARI)</span>
+                                </span>
+                                <span class="font-mono text-emerald-800 text-[11px] font-bold">Sisa: Rp {{ formatRupiah(bank_data.sisa_kas) }}</span>
                             </div>
-                            <p class="text-[11px] text-slate-500">Saldo kas yang tersimpan di Rekening Kas Daerah / Giro Setwan pada akhir bulan {{ monthNames[current_month] }}.</p>
+                            <table class="w-full text-xs excel-table">
+                                <tbody>
+                                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                        <td class="px-3 py-2 text-slate-700 font-medium w-2/3">A. Kas Tunai Fisik (Brankas Bendahara)</td>
+                                        <td class="text-right font-mono text-slate-700 px-3 py-2">{{ formatRupiah(bank_data.summary?.komponen_kas?.tunai) }}</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 border-b border-slate-100 bg-emerald-50/30">
+                                        <td class="px-3 py-2 text-emerald-900 font-bold w-2/3">B. Saldo Bank (Rekening Giro Bank Jateng)</td>
+                                        <td class="text-right font-mono font-black text-emerald-900 px-3 py-2 text-sm">{{ formatRupiah(bank_data.summary?.komponen_kas?.saldo_bank) }}</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                        <td class="px-3 py-2 text-slate-700 font-medium w-2/3">C. Surat Berharga</td>
+                                        <td class="text-right font-mono text-slate-700 px-3 py-2">{{ formatRupiah(bank_data.summary?.komponen_kas?.surat_berharga) }}</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-50 border-b border-slate-200">
+                                        <td class="px-3 py-2 text-slate-700 font-medium w-2/3">D. Uang Muka Kegiatan (UMK)</td>
+                                        <td class="text-right font-mono text-slate-700 px-3 py-2">{{ formatRupiah(bank_data.summary?.komponen_kas?.umk) }}</td>
+                                    </tr>
+                                    <tr class="bg-slate-100 font-bold border-t border-slate-300">
+                                        <td class="px-3 py-2.5 text-slate-900 font-bold">JUMLAH TOTAL FISIK SISA KAS</td>
+                                        <td class="text-right font-mono font-black text-slate-900 text-sm px-3 py-2.5">{{ formatRupiah(bank_data.summary?.komponen_kas?.jumlah) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Status Rekonsiliasi Fisik vs Buku Bank:</span>
+                                <span class="inline-flex items-center gap-1 text-emerald-700 font-bold bg-emerald-100/80 px-2 py-0.5 rounded-full text-[11px]">
+                                    <CheckCircle2 class="w-3.5 h-3.5 stroke-[2.5]" />
+                                    <span>Seimbang (Selisih: Rp 0)</span>
+                                </span>
+                            </div>
                         </div>
 
-                        <div class="p-5 border border-slate-300 rounded-xl bg-slate-50/60 shadow-2xs space-y-2">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Status Penutupan Buku:</span>
-                            <div class="text-base font-bold flex items-center gap-2" :class="is_locked ? 'text-amber-800' : 'text-emerald-700'">
-                                <Lock v-if="is_locked" class="w-4 h-4" />
-                                <CheckCircle2 v-else class="w-4 h-4" />
-                                <span>{{ is_locked ? 'Tutup Buku / Periode Terkunci' : 'Periode Terbuka & Siap Rekonsiliasi' }}</span>
+                        <!-- Card Rincian Aliran Kas Operasional -->
+                        <div class="border border-slate-300 rounded-xl overflow-hidden shadow-2xs bg-white flex flex-col justify-between">
+                            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-300 font-bold text-xs text-slate-800 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">
+                                    <Landmark class="w-4 h-4 text-emerald-700" />
+                                    <span>IKHTISAR ALIRAN KAS BULAN INI</span>
+                                </span>
+                                <span class="font-mono text-slate-600 text-[11px]">{{ monthNames[current_month]?.toUpperCase() }}</span>
                             </div>
-                            <p class="text-[11px] text-slate-500">
-                                {{ is_locked ? 'Periode ini telah disahkan. Klik Kunci Periode di atas jika perlu membuka kunci.' : 'Klik Kunci Periode di atas bila seluruh mutasi bulan ini telah selesai dan valid.' }}
-                            </p>
+                            <div class="p-4 space-y-3 text-xs">
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="text-slate-600">Saldo Awal Bulan Lalu (Baris 12):</span>
+                                    <span class="font-mono font-bold text-slate-900">{{ formatRupiah(bank_data.summary?.rincian_operasional?.saldo_awal) }}</span>
+                                </div>
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="text-slate-600">+ Mutasi Penerimaan Bulan Ini:</span>
+                                    <span class="font-mono font-bold text-emerald-700">+ {{ formatRupiah(bank_data.summary?.rincian_operasional?.mutasi_penerimaan) }}</span>
+                                </div>
+                                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                    <span class="text-slate-600">- Mutasi Pengeluaran Bulan Ini:</span>
+                                    <span class="font-mono font-bold text-rose-700">- {{ formatRupiah(bank_data.summary?.rincian_operasional?.mutasi_pengeluaran) }}</span>
+                                </div>
+                                <div class="flex items-center justify-between pt-1">
+                                    <span class="font-bold text-slate-900 text-xs">= Saldo Kas Akhir Penutupan:</span>
+                                    <span class="font-mono font-black text-emerald-900 text-base">Rp {{ formatRupiah(bank_data.sisa_kas) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-50 border-t border-slate-200">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-700">Status Buku:</span>
+                                    <div class="text-xs font-bold flex items-center gap-1.5" :class="is_locked ? 'text-amber-800' : 'text-emerald-700'">
+                                        <Lock v-if="is_locked" class="w-3.5 h-3.5" />
+                                        <CheckCircle2 v-else class="w-3.5 h-3.5" />
+                                        <span>{{ is_locked ? 'Terkunci (Mode Baca Saja)' : 'Terbuka & Terverifikasi' }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

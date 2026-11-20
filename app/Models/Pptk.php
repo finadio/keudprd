@@ -44,4 +44,9 @@ class Pptk extends Model
     {
         return $this->hasMany(ManualAdjustment::class);
     }
+
+    public function paguRealizations(): HasMany
+    {
+        return $this->hasMany(PaguRealization::class);
+    }
 }
