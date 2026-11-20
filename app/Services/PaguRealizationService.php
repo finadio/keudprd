@@ -263,10 +263,67 @@ class PaguRealizationService
             ->limit(8)
             ->get();
 
+        // Monthly Realization Trends (Jan - Des)
+        $monthNames = [
+            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
+            5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu',
+            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
+        ];
+
+        $monthlyTrends = [];
+        foreach ($monthNames as $num => $name) {
+            $mRealizations = $allRealizations->filter(function ($r) use ($num) {
+                return (int) date('n', strtotime($r->transaction_date)) === $num;
+            });
+
+            $mPencairan = (float) $mRealizations->where('type', 'pencairan')->sum('amount');
+            $mPengembalian = (float) $mRealizations->where('type', 'pengembalian')->sum('amount');
+            $mSpj = (float) $mRealizations->where('type', 'pencairan')->where('is_spj_submitted', true)->sum('amount');
+
+            $monthlyTrends[] = [
+                'month' => $name,
+                'month_num' => $num,
+                'pencairan' => $mPencairan,
+                'pengembalian' => $mPengembalian,
+                'net_riil' => $mPencairan - $mPengembalian,
+                'spj_amount' => $mSpj,
+            ];
+        }
+
+        // Subkegiatan Breakdown for PPTK / Detail View
+        $subkegiatanBreakdown = $activities->map(function ($act) use ($allRealizations) {
+            $actRealizations = $allRealizations->where('activity_id', $act->id);
+            $pencairan = (float) $actRealizations->where('type', 'pencairan')->sum('amount');
+            $pengembalian = (float) $actRealizations->where('type', 'pengembalian')->sum('amount');
+            $netRiil = $pencairan - $pengembalian;
+            $pagu = (float) $act->pagu_budget;
+            $sisaRiil = $pagu - $netRiil;
+            $persen = $pagu > 0 ? round(($netRiil / $pagu) * 100, 1) : 0.0;
+
+            return [
+                'id' => $act->id,
+                'code' => $act->code,
+                'name' => $act->name,
+                'pagu' => $pagu,
+                'spj_sipd' => (float) $act->spj_sipd_total,
+                'pencairan' => $pencairan,
+                'pengembalian' => $pengembalian,
+                'net_realisasi_riil' => $netRiil,
+                'sisa_pagu_riil' => $sisaRiil,
+                'persen_serapan' => $persen,
+            ];
+        })->sortByDesc('pagu')->values()->all();
+
+        $currentPptk = null;
+        if ($user && strtolower($user->role) === 'pptk' && $user->pptk_id) {
+            $currentPptk = Pptk::find($user->pptk_id);
+        }
+
         return [
             'year' => $year,
             'effective_pptk_id' => $effectivePptkId,
             'is_pptk_user' => (bool) ($user && strtolower($user->role) === 'pptk'),
+            'current_pptk' => $currentPptk,
             'kpi' => [
                 'total_pagu' => $totalPagu,
                 'total_pencairan' => $totalPencairan,
@@ -280,6 +337,8 @@ class PaguRealizationService
                 'outstanding_belum_spj' => $outstandingBelumSpj,
             ],
             'pptk_breakdown' => $pptkBreakdown,
+            'subkegiatan_table' => $subkegiatanBreakdown,
+            'monthly_trends' => $monthlyTrends,
             'programs' => $programs,
             'subunits' => $subunits,
             'recent_transactions' => $recentTransactions,

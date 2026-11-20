@@ -4,6 +4,8 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {
     PieChart,
+    BarChart3,
+    TrendingUp,
     Wallet,
     TrendingDown,
     Clock,
@@ -18,7 +20,9 @@ import {
     Filter,
     ChevronRight,
     Building2,
-    Users
+    Users,
+    Info,
+    Calendar
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -53,6 +57,17 @@ const formatPercent = (val) => {
     }) + '%';
 };
 
+const formatCompactRupiah = (val) => {
+    const num = Number(val || 0);
+    if (num >= 1_000_000_000) {
+        return (num / 1_000_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M';
+    }
+    if (num >= 1_000_000) {
+        return (num / 1_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' Jt';
+    }
+    return formatNumber(num);
+};
+
 const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     const cleanStr = String(dateStr).includes('T') ? String(dateStr).split('T')[0] : String(dateStr).substring(0, 10);
@@ -79,6 +94,146 @@ const applyPptkFilter = (val) => {
         preserveScroll: true,
     });
 };
+
+// ================= CHART CONFIGURATION & STATE =================
+const activeChartTab = ref('distribution'); // 'distribution' | 'composition' | 'trends'
+const hoveredMonthIndex = ref(null);
+const hoveredDistributionIndex = ref(null);
+
+// 1. Donut Chart Math (Circumference of r=70 is 2*PI*70 ~ 439.82)
+const donutRadius = 70;
+const donutCircumference = 2 * Math.PI * donutRadius;
+
+const donutData = computed(() => {
+    const total = props.overview.kpi.total_pagu || 1;
+    const spj = props.overview.kpi.total_spj_sipd || 0;
+    const belumSpj = props.overview.kpi.outstanding_belum_spj || 0;
+    const sisa = Math.max(0, (props.overview.kpi.sisa_pagu_riil || 0) - belumSpj);
+
+    const spjPct = Math.min(1, spj / total);
+    const belumSpjPct = Math.min(1 - spjPct, belumSpj / total);
+    const sisaPct = Math.max(0, 1 - spjPct - belumSpjPct);
+
+    const spjLength = spjPct * donutCircumference;
+    const belumSpjLength = belumSpjPct * donutCircumference;
+    const sisaLength = sisaPct * donutCircumference;
+
+    return {
+        spj: {
+            amount: spj,
+            percent: (spjPct * 100).toFixed(1),
+            dasharray: `${spjLength} ${donutCircumference}`,
+            dashoffset: 0,
+        },
+        belumSpj: {
+            amount: belumSpj,
+            percent: (belumSpjPct * 100).toFixed(1),
+            dasharray: `${belumSpjLength} ${donutCircumference}`,
+            dashoffset: -spjLength,
+        },
+        sisa: {
+            amount: sisa,
+            percent: (sisaPct * 100).toFixed(1),
+            dasharray: `${sisaLength} ${donutCircumference}`,
+            dashoffset: -(spjLength + belumSpjLength),
+        },
+    };
+});
+
+// 2. Distribution Items (PPTK Comparison or Subkegiatan Breakdown)
+const distributionItems = computed(() => {
+    if (props.overview.is_pptk_user) {
+        return (props.overview.subkegiatan_table || []).slice(0, 10).map(s => ({
+            id: s.id,
+            title: s.name,
+            subtitle: s.code,
+            pagu: s.pagu,
+            realisasi: s.net_realisasi_riil,
+            sisa: s.sisa_pagu_riil,
+            spj: s.spj_sipd,
+            percent: s.pagu > 0 ? Number(((s.net_realisasi_riil / s.pagu) * 100).toFixed(1)) : 0,
+            spjPercent: s.pagu > 0 ? Number(((s.spj_sipd / s.pagu) * 100).toFixed(1)) : 0,
+        }));
+    }
+    return (props.overview.pptk_breakdown || []).map(p => ({
+        id: p.id,
+        title: p.display_name,
+        subtitle: `${p.subunit_name} • ${p.subkegiatan_count} subkegiatan`,
+        pagu: p.pagu,
+        realisasi: p.net_realisasi_riil,
+        sisa: p.sisa_pagu_riil,
+        spj: p.spj_sipd,
+        percent: p.persen_serapan,
+        spjPercent: p.pagu > 0 ? Number(((p.spj_sipd / p.pagu) * 100).toFixed(1)) : 0,
+    }));
+});
+
+const maxDistributionPagu = computed(() => {
+    const items = distributionItems.value;
+    if (!items.length) return 1;
+    return Math.max(...items.map(i => i.pagu), 1);
+});
+
+// 3. Monthly Trend Chart Coordinates & Paths
+const trendChartLeft = 60;
+const trendChartRight = 860;
+const trendChartTop = 30;
+const trendChartBottom = 165;
+const trendChartWidth = trendChartRight - trendChartLeft;
+const trendChartHeight = trendChartBottom - trendChartTop;
+
+const maxMonthlyValue = computed(() => {
+    const list = props.overview.monthly_trends || [];
+    let max = 0;
+    for (const m of list) {
+        max = Math.max(max, m.pencairan || 0, m.pengembalian || 0, m.spj_amount || 0);
+    }
+    return max > 0 ? max : 50_000_000;
+});
+
+const trendTicks = computed(() => {
+    const max = maxMonthlyValue.value;
+    return [0, max * 0.25, max * 0.5, max * 0.75, max];
+});
+
+const getTrendX = (index) => {
+    const total = props.overview.monthly_trends?.length || 12;
+    if (total <= 1) return (trendChartLeft + trendChartRight) / 2;
+    return trendChartLeft + (index / (total - 1)) * trendChartWidth;
+};
+
+const getTrendY = (val) => {
+    const max = maxMonthlyValue.value;
+    const v = Math.max(0, Number(val) || 0);
+    return trendChartBottom - (v / max) * trendChartHeight;
+};
+
+const pencairanAreaPath = computed(() => {
+    const list = props.overview.monthly_trends || [];
+    if (!list.length) return '';
+    const points = list.map((m, i) => `${getTrendX(i).toFixed(1)},${getTrendY(m.pencairan).toFixed(1)}`);
+    const firstX = getTrendX(0).toFixed(1);
+    const lastX = getTrendX(list.length - 1).toFixed(1);
+    return `M ${points.join(' L ')} L ${lastX},${trendChartBottom} L ${firstX},${trendChartBottom} Z`;
+});
+
+const pencairanLinePath = computed(() => {
+    const list = props.overview.monthly_trends || [];
+    if (!list.length) return '';
+    return 'M ' + list.map((m, i) => `${getTrendX(i).toFixed(1)},${getTrendY(m.pencairan).toFixed(1)}`).join(' L ');
+});
+
+const pengembalianLinePath = computed(() => {
+    const list = props.overview.monthly_trends || [];
+    if (!list.length) return '';
+    return 'M ' + list.map((m, i) => `${getTrendX(i).toFixed(1)},${getTrendY(m.pengembalian).toFixed(1)}`).join(' L ');
+});
+
+const spjLinePath = computed(() => {
+    const list = props.overview.monthly_trends || [];
+    if (!list.length) return '';
+    return 'M ' + list.map((m, i) => `${getTrendX(i).toFixed(1)},${getTrendY(m.spj_amount).toFixed(1)}`).join(' L ');
+});
 </script>
 
 <template>
@@ -289,47 +444,525 @@ const applyPptkFilter = (val) => {
                 </div>
             </div>
 
-            <!-- Comparison Bar: Serapan Riil vs SPJ SIPD Resmi (White Card) -->
-            <div class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                    <span class="font-bold text-slate-900 uppercase tracking-wider">Perbandingan Progres Penyerapan Anggaran</span>
-                    <div class="flex items-center gap-4 text-xs">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
-                            <span class="text-slate-600">Realisasi Riil ({{ formatPercent(overview.kpi.persen_realisasi_riil) }})</span>
+            <!-- ================= SECTION GRAFIK & ANALISIS VISUAL REALISASI PAGU ================= -->
+            <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+                <!-- Panel Header with Tab Switching -->
+                <div class="p-5 border-b border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600">
+                            <PieChart class="w-4 h-4" />
+                            <span>Visualisasi Analisis Anggaran</span>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span>
-                            <span class="text-slate-600">SPJ SIPD Resmi ({{ formatPercent(overview.kpi.persen_spj_sipd) }})</span>
+                        <h2 class="text-base sm:text-lg font-black text-slate-900 mt-0.5">
+                            Grafik Pantauan Realisasi Pagu & Arus Kas Lapangan
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Visualisasi interaktif serapan pagu, perbandingan kas riil vs SPJ SIPD, dan tren transaksi bulanan.
+                        </p>
+                    </div>
+
+                    <!-- Chart Navigation Tabs -->
+                    <div class="inline-flex p-1 bg-slate-100 rounded-xl gap-1 shrink-0 self-start md:self-auto">
+                        <button
+                            type="button"
+                            @click="activeChartTab = 'distribution'"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                            :class="activeChartTab === 'distribution' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'"
+                        >
+                            <BarChart3 class="w-3.5 h-3.5" :class="activeChartTab === 'distribution' ? 'text-emerald-600' : 'text-slate-400'" />
+                            <span>{{ overview.is_pptk_user ? 'Sub Kegiatan' : 'Distribusi PPTK' }}</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            @click="activeChartTab = 'composition'"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                            :class="activeChartTab === 'composition' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'"
+                        >
+                            <PieChart class="w-3.5 h-3.5" :class="activeChartTab === 'composition' ? 'text-blue-600' : 'text-slate-400'" />
+                            <span>Komposisi Kas (Donut)</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            @click="activeChartTab = 'trends'"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                            :class="activeChartTab === 'trends' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'"
+                        >
+                            <TrendingUp class="w-3.5 h-3.5" :class="activeChartTab === 'trends' ? 'text-emerald-600' : 'text-slate-400'" />
+                            <span>Tren Arus Bulanan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 1: Distribusi Pagu & Serapan (Bar Chart View) -->
+                <div v-if="activeChartTab === 'distribution'" class="p-5 sm:p-6 space-y-5">
+                    <!-- Legend & Header Bar -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs pb-3 border-b border-slate-100">
+                        <span class="font-bold text-slate-700">
+                            {{ overview.is_pptk_user ? '10 Sub Kegiatan Terbesar & Tingkat Serapannya' : 'Komparasi Alokasi Pagu & Realisasi per PPTK' }}
+                        </span>
+
+                        <!-- Color Legend -->
+                        <div class="flex flex-wrap items-center gap-4 text-[11px] text-slate-600 font-medium">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-sm bg-blue-600 inline-block"></span>
+                                <span>SPJ SIPD Resmi</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-sm bg-amber-500 inline-block"></span>
+                                <span>Kas Belum SPJ</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-sm bg-slate-200 inline-block"></span>
+                                <span>Sisa Pagu Riil</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stacked Horizontal Bar Rows -->
+                    <div class="space-y-4">
+                        <div
+                            v-for="(item, idx) in distributionItems"
+                            :key="item.id || idx"
+                            @mouseenter="hoveredDistributionIndex = idx"
+                            @mouseleave="hoveredDistributionIndex = null"
+                            class="p-3.5 rounded-xl border transition-all"
+                            :class="hoveredDistributionIndex === idx ? 'bg-slate-50 border-emerald-300 shadow-2xs' : 'bg-white border-slate-200/80'"
+                        >
+                            <!-- Row Header: Labels & Numerical Stats -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                                            {{ item.title }}
+                                        </span>
+                                        <span
+                                            class="text-[10px] px-2 py-0.5 rounded-full font-bold font-mono shrink-0"
+                                            :class="item.percent >= 75 ? 'bg-emerald-100 text-emerald-800' : item.percent >= 40 ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'"
+                                        >
+                                            {{ item.percent }}% Serapan
+                                        </span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-500 truncate mt-0.5">
+                                        {{ item.subtitle }}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3 text-right text-xs shrink-0 tabular-nums font-sans">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">Pagu SIPD</span>
+                                        <span class="font-bold text-slate-900">{{ formatCurrency(item.pagu) }}</span>
+                                    </div>
+                                    <span class="text-slate-300">|</span>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">Realisasi Riil</span>
+                                        <span class="font-bold text-emerald-700">{{ formatCurrency(item.realisasi) }}</span>
+                                    </div>
+                                    <span class="text-slate-300">|</span>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block">Sisa Bebas</span>
+                                        <span class="font-black text-slate-800">{{ formatCurrency(item.sisa) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Proportional Bar Visual (Normalized against Max Pagu) -->
+                            <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex relative">
+                                <!-- Track width based on total pagu relative to maximum PPTK pagu -->
+                                <div
+                                    class="h-full flex transition-all duration-500 rounded-full overflow-hidden"
+                                    :style="{ width: Math.max(5, (item.pagu / maxDistributionPagu) * 100) + '%' }"
+                                >
+                                    <!-- SPJ SIPD segment (Blue) -->
+                                    <div
+                                        class="bg-blue-600 h-full transition-all duration-300"
+                                        :style="{ width: Math.min(100, item.spjPercent) + '%' }"
+                                        :title="`SPJ Masuk SIPD: ${formatCurrency(item.spj)}`"
+                                    ></div>
+
+                                    <!-- Kas Beredar Belum SPJ segment (Amber) -->
+                                    <div
+                                        v-if="item.percent > item.spjPercent"
+                                        class="bg-amber-500 h-full transition-all duration-300"
+                                        :style="{ width: Math.min(100 - item.spjPercent, item.percent - item.spjPercent) + '%' }"
+                                        :title="`Kas Lapangan Belum SPJ: ${formatCurrency(item.realisasi - item.spj)}`"
+                                    ></div>
+
+                                    <!-- Sisa Pagu Bebas segment (Light Emerald/Slate) -->
+                                    <div
+                                        class="bg-slate-200 h-full flex-1"
+                                        :title="`Sisa Pagu Riil: ${formatCurrency(item.sisa)}`"
+                                    ></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Dual Progress Bar -->
-                <div class="space-y-2">
-                    <div>
-                        <div class="flex justify-between text-[11px] text-slate-500 mb-1">
-                            <span>Realisasi Kas Lapangan (Uang Keluar)</span>
-                            <span class="font-bold font-sans tabular-nums text-slate-900">{{ formatCurrency(overview.kpi.net_realisasi_riil) }}</span>
+                <!-- TAB 2: Komposisi Anggaran (Donut & Split Breakdown View) -->
+                <div v-else-if="activeChartTab === 'composition'" class="p-5 sm:p-6 space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                        <!-- Left Column: Circular SVG Donut Chart (5 cols) -->
+                        <div class="lg:col-span-5 flex flex-col items-center justify-center p-4">
+                            <div class="relative w-56 h-56 flex items-center justify-center">
+                                <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90 select-none">
+                                    <!-- Background Base Ring -->
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        :r="donutRadius"
+                                        fill="none"
+                                        stroke="#f1f5f9"
+                                        stroke-width="22"
+                                    />
+
+                                    <!-- Sisa Pagu Riil Segment (Emerald / Slate) -->
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        :r="donutRadius"
+                                        fill="none"
+                                        stroke="#10b981"
+                                        stroke-width="22"
+                                        :stroke-dasharray="donutData.sisa.dasharray"
+                                        :stroke-dashoffset="donutData.sisa.dashoffset"
+                                        class="transition-all duration-700"
+                                    />
+
+                                    <!-- Kas Belum SPJ Segment (Amber) -->
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        :r="donutRadius"
+                                        fill="none"
+                                        stroke="#f59e0b"
+                                        stroke-width="22"
+                                        :stroke-dasharray="donutData.belumSpj.dasharray"
+                                        :stroke-dashoffset="donutData.belumSpj.dashoffset"
+                                        class="transition-all duration-700"
+                                    />
+
+                                    <!-- SPJ SIPD Resmi Segment (Blue) -->
+                                    <circle
+                                        cx="100"
+                                        cy="100"
+                                        :r="donutRadius"
+                                        fill="none"
+                                        stroke="#2563eb"
+                                        stroke-width="22"
+                                        :stroke-dasharray="donutData.spj.dasharray"
+                                        :stroke-dashoffset="donutData.spj.dashoffset"
+                                        class="transition-all duration-700"
+                                    />
+                                </svg>
+
+                                <!-- Donut Center Statistics -->
+                                <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                        Total Serapan
+                                    </span>
+                                    <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
+                                        {{ formatPercent(overview.kpi.persen_realisasi_riil) }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-500 font-medium">
+                                        Kas Keluar Lapangan
+                                    </span>
+                                </div>
+                            </div>
+
+                            <p class="text-[11px] text-slate-500 text-center mt-3 max-w-xs">
+                                Dari total pagu Rp {{ formatCompactRupiah(overview.kpi.total_pagu) }}, mencakup kas resmi tercatat di SIPD dan uang muka kegiatan.
+                            </p>
                         </div>
-                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                            <div
-                                class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
-                                :style="{ width: Math.min(100, overview.kpi.persen_realisasi_riil) + '%' }"
-                            ></div>
+
+                        <!-- Right Column: Metric Breakdown Cards (7 cols) -->
+                        <div class="lg:col-span-7 space-y-3">
+                            <!-- Metric 1: SPJ SIPD Masuk -->
+                            <div class="p-4 rounded-xl border border-blue-200/90 bg-blue-50/40 flex items-start justify-between gap-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-blue-600 mt-1 shrink-0"></span>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-xs sm:text-sm font-bold text-blue-950">SPJ SIPD Resmi (Pertanggungjawaban Sah)</h4>
+                                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                                                {{ donutData.spj.percent }}%
+                                            </span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                            Kegiatan yang sudah selesai dan berkas SPJ telah resmi di-acc / dicatat dalam pembukuan SIPD Pemda.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0 tabular-nums">
+                                    <span class="text-sm sm:text-base font-black text-blue-900 block font-sans">
+                                        {{ formatCurrency(donutData.spj.amount) }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400">Tercatat di BKU / SIPD</span>
+                                </div>
+                            </div>
+
+                            <!-- Metric 2: Kas Belum SPJ -->
+                            <div class="p-4 rounded-xl border border-amber-200/90 bg-amber-50/40 flex items-start justify-between gap-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-amber-500 mt-1 shrink-0"></span>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-xs sm:text-sm font-bold text-amber-950">Kas Lapangan Menunggu SPJ (Outstanding)</h4>
+                                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                                {{ donutData.belumSpj.percent }}%
+                                            </span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                            Uang kas yang sudah dicairkan ke PPTK/dewan sebelum kegiatan, namun SPJ resminya masih dalam proses.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0 tabular-nums">
+                                    <span class="text-sm sm:text-base font-black text-amber-900 block font-sans">
+                                        {{ formatCurrency(donutData.belumSpj.amount) }}
+                                    </span>
+                                    <span class="text-[10px] text-amber-600 font-bold">Uang Muka Beredar</span>
+                                </div>
+                            </div>
+
+                            <!-- Metric 3: Sisa Pagu Bebas -->
+                            <div class="p-4 rounded-xl border border-emerald-200/90 bg-emerald-50/40 flex items-start justify-between gap-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-emerald-500 mt-1 shrink-0"></span>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h4 class="text-xs sm:text-sm font-bold text-emerald-950">Sisa Pagu Anggaran Bersih (Bebas)</h4>
+                                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                                {{ donutData.sisa.percent }}%
+                                            </span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                            Plafon anggaran yang masih utuh dan belum pernah diambil/dicairkan untuk kegiatan apapun.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0 tabular-nums">
+                                    <span class="text-sm sm:text-base font-black text-emerald-900 block font-sans">
+                                        {{ formatCurrency(donutData.sisa.amount) }}
+                                    </span>
+                                    <span class="text-[10px] text-emerald-700 font-bold">Siap Digunakan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Tren Arus Bulanan (SVG Area & Line Chart View) -->
+                <div v-else-if="activeChartTab === 'trends'" class="p-5 sm:p-6 space-y-5">
+                    <!-- Chart Header & Legend -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">
+                                Fluktuasi Arus Kas Realisasi Bulanan (TA {{ overview.year }})
+                            </h3>
+                            <p class="text-xs text-slate-500">
+                                Menampilkan kurva pencairan dana, pengembalian sisa kas, dan SPJ yang telah disahkan.
+                            </p>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="flex items-center gap-4 text-xs font-bold text-slate-700">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-6 h-3 shrink-0" viewBox="0 0 24 10">
+                                    <line x1="0" y1="5" x2="24" y2="5" stroke="#107c41" stroke-width="2.5" />
+                                    <circle cx="12" cy="5" r="3" fill="#ffffff" stroke="#107c41" stroke-width="2" />
+                                </svg>
+                                <span>Pencairan Kas</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-6 h-3 shrink-0" viewBox="0 0 24 10">
+                                    <line x1="0" y1="5" x2="24" y2="5" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3 2" />
+                                    <circle cx="12" cy="5" r="3" fill="#ffffff" stroke="#f59e0b" stroke-width="2" />
+                                </svg>
+                                <span>Pengembalian Sisa</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="w-6 h-3 shrink-0" viewBox="0 0 24 10">
+                                    <line x1="0" y1="5" x2="24" y2="5" stroke="#2563eb" stroke-width="2" />
+                                    <circle cx="12" cy="5" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2" />
+                                </svg>
+                                <span>SPJ Masuk</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="flex justify-between text-[11px] text-slate-500 mb-1">
-                            <span>SPJ Masuk SIPD (Pertanggungjawaban Resmi)</span>
-                            <span class="font-bold font-sans tabular-nums text-slate-900">{{ formatCurrency(overview.kpi.total_spj_sipd) }}</span>
-                        </div>
-                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <!-- SVG Chart Container -->
+                    <div class="w-full overflow-x-auto pb-2">
+                        <div class="min-w-[700px] relative">
+                            <!-- Floating Tooltip on Hover -->
                             <div
-                                class="bg-blue-500 h-2.5 rounded-full transition-all duration-500"
-                                :style="{ width: Math.min(100, overview.kpi.persen_spj_sipd) + '%' }"
-                            ></div>
+                                v-if="hoveredMonthIndex !== null && overview.monthly_trends && overview.monthly_trends[hoveredMonthIndex]"
+                                class="absolute top-0 right-4 z-10 bg-slate-900/95 text-white rounded-xl px-3.5 py-2 text-xs shadow-xl flex items-center gap-3 pointer-events-none"
+                            >
+                                <span class="font-bold text-emerald-400">
+                                    {{ overview.monthly_trends[hoveredMonthIndex].month }} {{ overview.year }}
+                                </span>
+                                <span>Pencairan: <strong class="text-white font-sans">{{ formatCurrency(overview.monthly_trends[hoveredMonthIndex].pencairan) }}</strong></span>
+                                <span>Pengembalian: <strong class="text-amber-300 font-sans">-{{ formatCurrency(overview.monthly_trends[hoveredMonthIndex].pengembalian) }}</strong></span>
+                                <span>Netto Kas: <strong class="text-emerald-300 font-sans">{{ formatCurrency(overview.monthly_trends[hoveredMonthIndex].net_riil) }}</strong></span>
+                            </div>
+
+                            <svg viewBox="0 0 900 200" class="w-full h-auto overflow-visible select-none">
+                                <defs>
+                                    <linearGradient id="pencairanAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#107c41" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="#107c41" stop-opacity="0.01" />
+                                    </linearGradient>
+                                </defs>
+
+                                <!-- Y Axis Unit -->
+                                <text x="18" y="16" class="text-[10px] font-sans fill-slate-400 font-medium">Rp (Nominal)</text>
+
+                                <!-- Grid Lines & Y-ticks -->
+                                <g class="grid-lines">
+                                    <template v-for="t in trendTicks" :key="'ytick-' + t">
+                                        <line
+                                            v-if="t > 0"
+                                            :x1="trendChartLeft"
+                                            :y1="getTrendY(t)"
+                                            :x2="trendChartRight"
+                                            :y2="getTrendY(t)"
+                                            stroke="#f1f5f9"
+                                            stroke-width="1"
+                                        />
+                                        <text
+                                            :x="trendChartLeft - 10"
+                                            :y="getTrendY(t) + 3.5"
+                                            text-anchor="end"
+                                            class="text-[10px] font-sans fill-slate-400 font-medium tabular-nums"
+                                        >
+                                            {{ formatCompactRupiah(t) }}
+                                        </text>
+                                    </template>
+                                </g>
+
+                                <!-- Left Vertical Axis -->
+                                <line
+                                    :x1="trendChartLeft"
+                                    :y1="trendChartTop"
+                                    :x2="trendChartLeft"
+                                    :y2="trendChartBottom"
+                                    stroke="#cbd5e1"
+                                    stroke-width="1.2"
+                                />
+
+                                <!-- Bottom Horizontal Baseline -->
+                                <line
+                                    :x1="trendChartLeft"
+                                    :y1="trendChartBottom"
+                                    :x2="trendChartRight"
+                                    :y2="trendChartBottom"
+                                    stroke="#cbd5e1"
+                                    stroke-width="1.2"
+                                />
+
+                                <!-- Shaded Area for Pencairan -->
+                                <path
+                                    v-if="pencairanAreaPath"
+                                    :d="pencairanAreaPath"
+                                    fill="url(#pencairanAreaGrad)"
+                                />
+
+                                <!-- Pencairan Line Path -->
+                                <path
+                                    v-if="pencairanLinePath"
+                                    :d="pencairanLinePath"
+                                    fill="none"
+                                    stroke="#107c41"
+                                    stroke-width="2.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+
+                                <!-- Pengembalian Sisa Line Path (Dashed) -->
+                                <path
+                                    v-if="pengembalianLinePath"
+                                    :d="pengembalianLinePath"
+                                    fill="none"
+                                    stroke="#f59e0b"
+                                    stroke-width="2"
+                                    stroke-dasharray="4 3"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+
+                                <!-- SPJ Masuk Line Path -->
+                                <path
+                                    v-if="spjLinePath"
+                                    :d="spjLinePath"
+                                    fill="none"
+                                    stroke="#2563eb"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+
+                                <!-- Interactive Month Data Points & Columns -->
+                                <g v-for="(m, i) in (overview.monthly_trends || [])" :key="'col-' + i">
+                                    <!-- Hover Column Trigger Area -->
+                                    <rect
+                                        :x="getTrendX(i) - (trendChartWidth / 24)"
+                                        :y="trendChartTop"
+                                        :width="trendChartWidth / 12"
+                                        :height="trendChartHeight"
+                                        fill="transparent"
+                                        class="cursor-pointer"
+                                        @mouseenter="hoveredMonthIndex = i"
+                                        @mouseleave="hoveredMonthIndex = null"
+                                    />
+
+                                    <!-- Vertical Guide Line on Hover -->
+                                    <line
+                                        v-if="hoveredMonthIndex === i"
+                                        :x1="getTrendX(i)"
+                                        :y1="trendChartTop"
+                                        :x2="getTrendX(i)"
+                                        :y2="trendChartBottom"
+                                        stroke="#94a3b8"
+                                        stroke-width="1"
+                                        stroke-dasharray="2 2"
+                                    />
+
+                                    <!-- Data Point Circles (Pencairan) -->
+                                    <circle
+                                        :cx="getTrendX(i)"
+                                        :cy="getTrendY(m.pencairan)"
+                                        :r="hoveredMonthIndex === i ? 5 : 3.5"
+                                        fill="#ffffff"
+                                        stroke="#107c41"
+                                        stroke-width="2"
+                                        class="transition-all"
+                                    />
+
+                                    <!-- Data Point Circles (Pengembalian if > 0) -->
+                                    <circle
+                                        v-if="m.pengembalian > 0"
+                                        :cx="getTrendX(i)"
+                                        :cy="getTrendY(m.pengembalian)"
+                                        :r="hoveredMonthIndex === i ? 4.5 : 3"
+                                        fill="#ffffff"
+                                        stroke="#f59e0b"
+                                        stroke-width="2"
+                                    />
+
+                                    <!-- X Axis Month Labels -->
+                                    <text
+                                        :x="getTrendX(i)"
+                                        :y="trendChartBottom + 18"
+                                        text-anchor="middle"
+                                        class="text-[11px] font-sans font-bold"
+                                        :class="hoveredMonthIndex === i ? 'fill-emerald-700 font-black' : 'fill-slate-600'"
+                                    >
+                                        {{ m.month }}
+                                    </text>
+                                </g>
+                            </svg>
                         </div>
                     </div>
                 </div>
