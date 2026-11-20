@@ -108,10 +108,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/pptk/{pptk}', [PptkController::class, 'destroy'])->name('pptk.destroy');
         Route::post('/pptk/{pptk}/toggle-active', [PptkController::class, 'toggleActive'])->name('pptk.toggle-active');
 
-        // Manajemen PPTK (Tambah, Edit, Hapus, Status Aktif)
-        Route::post('/pptk', [PptkController::class, 'store'])->name('pptk.store');
-        Route::put('/pptk/{pptk}', [PptkController::class, 'update'])->name('pptk.update');
-        Route::delete('/pptk/{pptk}', [PptkController::class, 'destroy'])->name('pptk.destroy');
-        Route::post('/pptk/{pptk}/toggle-active', [PptkController::class, 'toggleActive'])->name('pptk.toggle-active');
+        // Manajemen Pengguna & Hak Akses (Role)
+        Route::post('/users', [SettingController::class, 'storeUser'])->name('users.store');
+        Route::put('/users/{user}', [SettingController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{user}', [SettingController::class, 'destroyUser'])->name('users.destroy');
     });
 });

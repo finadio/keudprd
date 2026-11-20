@@ -28,6 +28,7 @@ const props = defineProps({
     setting: Object,
     pptks: Array,
     subunits: Array,
+    users: Array,
     periods: Array,
     audit_logs: Array,
     active_year: Number,
@@ -202,6 +203,80 @@ const executeDeletePptk = () => {
 const togglePptkActive = (pptk) => {
     router.post(`/pengaturan/pptk/${pptk.id}/toggle-active`, {}, {
         preserveScroll: true,
+    });
+};
+
+// Manajemen Pengguna & Hak Akses (Role)
+const showUserModal = ref(false);
+const isEditingUser = ref(false);
+const showDeleteUserModal = ref(false);
+const userToDelete = ref(null);
+
+const userForm = useForm({
+    id: null,
+    name: '',
+    email: '',
+    password: '',
+    role: 'pptk',
+    pptk_id: '',
+});
+
+const openCreateUserModal = () => {
+    isEditingUser.value = false;
+    userForm.reset();
+    userForm.clearErrors();
+    userForm.id = null;
+    userForm.name = '';
+    userForm.email = '';
+    userForm.password = '';
+    userForm.role = 'pptk';
+    userForm.pptk_id = props.pptks?.[0]?.id || '';
+    showUserModal.value = true;
+};
+
+const openEditUserModal = (u) => {
+    isEditingUser.value = true;
+    userForm.clearErrors();
+    userForm.id = u.id;
+    userForm.name = u.name || '';
+    userForm.email = u.email || '';
+    userForm.password = '';
+    userForm.role = u.role || 'operator';
+    userForm.pptk_id = u.pptk_id || (props.pptks?.[0]?.id || '');
+    showUserModal.value = true;
+};
+
+const submitUserForm = () => {
+    if (isEditingUser.value && userForm.id) {
+        userForm.put(`/pengaturan/users/${userForm.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showUserModal.value = false;
+            },
+        });
+    } else {
+        userForm.post('/pengaturan/users', {
+            preserveScroll: true,
+            onSuccess: () => {
+                showUserModal.value = false;
+            },
+        });
+    }
+};
+
+const confirmDeleteUser = (u) => {
+    userToDelete.value = u;
+    showDeleteUserModal.value = true;
+};
+
+const executeDeleteUser = () => {
+    if (!userToDelete.value) return;
+    router.delete(`/pengaturan/users/${userToDelete.value.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showDeleteUserModal.value = false;
+            userToDelete.value = null;
+        },
     });
 };
 </script>
@@ -677,7 +752,113 @@ const togglePptkActive = (pptk) => {
                 </div>
             </div>
 
-            <!-- Card 5: Audit Trail -->
+            <!-- Card 5: User Management & Roles -->
+            <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <KeyRound class="w-4 h-4 text-emerald-700" />
+                        <div>
+                            <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Manajemen Akun Pengguna &amp; Hak Akses (Role)</h2>
+                            <p class="text-[11px] text-slate-500">
+                                Atur akun login: Super Admin, Bendahara, Operator, dan Akun PPTK untuk memantau dashboard pagu kegiatan secara mandiri.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-slate-500 font-medium">
+                            Total Pengguna: <strong class="text-slate-800">{{ users?.length || 0 }}</strong>
+                        </span>
+                        <button 
+                            type="button"
+                            @click="openCreateUserModal"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#04331a] hover:bg-emerald-800 text-white rounded text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                        >
+                            <Plus class="w-3.5 h-3.5" />
+                            <span>Tambah Akun Pengguna</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="px-3 py-2 text-center w-10">No</th>
+                                <th class="px-3 py-2 text-left">Nama Pengguna</th>
+                                <th class="px-3 py-2 text-left">Email Login</th>
+                                <th class="px-3 py-2 text-center w-36">Hak Akses (Role)</th>
+                                <th class="px-3 py-2 text-left">Pejabat PPTK Terkait</th>
+                                <th class="px-3 py-2 text-center w-24">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr v-for="(u, idx) in users" :key="u.id" class="hover:bg-slate-50 transition-colors">
+                                <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
+                                <td class="px-3 py-2 font-bold text-slate-900">{{ u.name }}</td>
+                                <td class="px-3 py-2 font-mono text-slate-700">{{ u.email }}</td>
+                                <td class="px-3 py-2 text-center">
+                                    <span 
+                                        v-if="u.role === 'superadmin' || u.role === 'Super Admin'" 
+                                        class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200"
+                                    >
+                                        Super Admin
+                                    </span>
+                                    <span 
+                                        v-else-if="u.role === 'bendahara'" 
+                                        class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200"
+                                    >
+                                        Bendahara
+                                    </span>
+                                    <span 
+                                        v-else-if="u.role === 'pptk'" 
+                                        class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"
+                                    >
+                                        PPTK
+                                    </span>
+                                    <span 
+                                        v-else 
+                                        class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                                    >
+                                        Operator
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <span v-if="u.role === 'pptk' && u.pptk" class="inline-flex items-center gap-1.5 font-semibold text-emerald-900">
+                                        <span class="w-2 h-2 rounded-full inline-block shrink-0" :style="{ backgroundColor: u.pptk.color_tag || '#04331a' }"></span>
+                                        {{ u.pptk.display_name }} ({{ u.pptk.name }})
+                                    </span>
+                                    <span v-else-if="u.role === 'pptk'" class="text-amber-600 font-semibold italic text-[11px]">
+                                        Belum dihubungkan ke data PPTK
+                                    </span>
+                                    <span v-else class="text-slate-400 font-mono text-[11px]">-</span>
+                                </td>
+                                <td class="px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button 
+                                            type="button"
+                                            @click="openEditUserModal(u)"
+                                            class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
+                                            title="Edit Pengguna"
+                                        >
+                                            <Pencil class="w-3.5 h-3.5" />
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            @click="confirmDeleteUser(u)"
+                                            class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                                            title="Hapus Pengguna"
+                                        >
+                                            <Trash2 class="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Card 6: Audit Trail -->
             <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
                 <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                     <div class="flex items-center gap-2">
@@ -936,6 +1117,181 @@ const togglePptkActive = (pptk) => {
                             >
                                 <Trash2 class="w-3.5 h-3.5" />
                                 <span>Lanjutkan Hapus</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Tambah / Edit Pengguna -->
+            <div 
+                v-if="showUserModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-4 py-3 bg-[#04331a] text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <KeyRound class="w-4 h-4 text-emerald-300" />
+                            <h3 class="text-xs font-bold uppercase tracking-wide">
+                                {{ isEditingUser ? 'Ubah Data Pengguna' : 'Tambah Akun Pengguna Baru' }}
+                            </h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showUserModal = false"
+                            class="text-emerald-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <form @submit.prevent="submitUserForm" class="p-4 space-y-3 text-xs">
+                        <!-- Nama Lengkap -->
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Nama Lengkap Pengguna <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="userForm.name" 
+                                type="text" 
+                                required
+                                placeholder="contoh: IRNAWATINGRUM, S.S.TP., M.Si."
+                                class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                            />
+                            <div v-if="userForm.errors.name" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.name }}</div>
+                        </div>
+
+                        <!-- Email Login -->
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Email Login <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="userForm.email" 
+                                type="email" 
+                                required
+                                placeholder="contoh: pptk.irna@dprd.banyumaskab.go.id"
+                                class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                            />
+                            <div v-if="userForm.errors.email" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.email }}</div>
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Password <span v-if="!isEditingUser" class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="userForm.password" 
+                                type="password" 
+                                :required="!isEditingUser"
+                                :placeholder="isEditingUser ? '(Kosongkan jika tidak ingin mengubah password)' : 'Minimal 6 karakter'"
+                                class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs"
+                            />
+                            <div v-if="userForm.errors.password" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.password }}</div>
+                        </div>
+
+                        <!-- Role / Hak Akses -->
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Hak Akses (Role) <span class="text-red-500">*</span>
+                            </label>
+                            <select 
+                                v-model="userForm.role"
+                                required
+                                class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs bg-white"
+                            >
+                                <option value="superadmin">Super Admin (Akses Penuh)</option>
+                                <option value="bendahara">Bendahara Pengeluaran</option>
+                                <option value="operator">Operator Pembukuan</option>
+                                <option value="pptk">PPTK (Pemantau Dashboard Pagu Kegiatan)</option>
+                            </select>
+                            <div v-if="userForm.errors.role" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.role }}</div>
+                        </div>
+
+                        <!-- Hubungkan ke PPTK (khusus role PPTK) -->
+                        <div v-if="userForm.role === 'pptk'" class="p-3 bg-emerald-50 border border-emerald-200 rounded space-y-1.5 animate-in fade-in duration-150">
+                            <label class="block font-bold text-emerald-900">
+                                Pilih Pejabat PPTK Terkait <span class="text-red-500">*</span>
+                            </label>
+                            <select 
+                                v-model="userForm.pptk_id"
+                                required
+                                class="w-full px-2.5 py-1.5 border border-emerald-300 rounded focus:ring-1 focus:ring-emerald-700 focus:border-emerald-700 outline-none text-xs bg-white font-medium"
+                            >
+                                <option value="">-- Pilih PPTK --</option>
+                                <option v-for="p in pptks" :key="p.id" :value="p.id">
+                                    {{ p.display_name }} ({{ p.code }}) - {{ p.name }}
+                                </option>
+                            </select>
+                            <p class="text-[10px] text-emerald-700 leading-normal">
+                                💡 Akun ini akan otomatis terhubung dan terkunci hanya untuk melihat dan mengelola dashboard pagu dari PPTK yang dipilih.
+                            </p>
+                            <div v-if="userForm.errors.pptk_id" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.pptk_id }}</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showUserModal = false"
+                                class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded font-semibold transition-colors cursor-pointer"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="submit" 
+                                :disabled="userForm.processing"
+                                class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#04331a] hover:bg-emerald-800 disabled:opacity-50 text-white rounded font-bold transition-colors cursor-pointer shadow-xs"
+                            >
+                                <Save class="w-3.5 h-3.5" />
+                                <span>{{ userForm.processing ? 'Menyimpan...' : (isEditingUser ? 'Perbarui Pengguna' : 'Simpan Pengguna') }}</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Konfirmasi Hapus Pengguna -->
+            <div 
+                v-if="showDeleteUserModal && userToDelete" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded border border-slate-200 shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-4 py-3 bg-red-800 text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <AlertTriangle class="w-4 h-4 text-amber-300" />
+                            <h3 class="text-xs font-bold uppercase tracking-wide">Konfirmasi Hapus Pengguna</h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showDeleteUserModal = false"
+                            class="text-red-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div class="p-4 space-y-3 text-xs">
+                        <p class="text-slate-700 leading-relaxed">
+                            Apakah Anda yakin ingin menghapus akun pengguna <strong class="text-slate-900 font-bold">"{{ userToDelete.name }}"</strong> ({{ userToDelete.email }})?
+                        </p>
+
+                        <div class="pt-2 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showDeleteUserModal = false"
+                                class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded font-semibold transition-colors cursor-pointer"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="executeDeleteUser"
+                                class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-bold transition-colors cursor-pointer shadow-xs"
+                            >
+                                <Trash2 class="w-3.5 h-3.5" />
+                                <span>Hapus Akun</span>
                             </button>
                         </div>
                     </div>

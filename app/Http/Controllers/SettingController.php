@@ -8,8 +8,10 @@ use App\Models\MasterSetting;
 use App\Models\Pptk;
 use App\Models\Subunit;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Services\BackupExportService;
 use App\Services\FiscalYearContext;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -31,6 +33,7 @@ class SettingController extends Controller
             ?? MasterSetting::current();
         $pptks = Pptk::with('subunit')->orderBy('sort_order')->get();
         $subunits = Subunit::orderBy('id')->get();
+        $users = User::with('pptk')->orderBy('id')->get();
         $periods = AccountingPeriod::where('fiscal_year', $activeYear)->orderBy('month')->get();
         $auditLogs = AuditLog::with('user')->latest('id')->take(25)->get();
 
@@ -42,6 +45,7 @@ class SettingController extends Controller
             'setting' => $setting,
             'pptks' => $pptks,
             'subunits' => $subunits,
+            'users' => $users,
             'periods' => $periods,
             'audit_logs' => $auditLogs,
             'active_year' => $activeYear,
@@ -361,5 +365,79 @@ class SettingController extends Controller
             'backup_size_mb' => round($backupBytes / 1024 / 1024, 2),
             'backup_keep_limit' => 5,
         ];
+    }
+
+    /**
+     * Store new system user.
+     */
+    public function storeUser(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|string|in:superadmin,bendahara,operator,pptk,kasubag',
+            'pptk_id' => 'nullable|required_if:role,pptk|exists:pptks,id',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'],
+            'pptk_id' => $validated['role'] === 'pptk' ? $validated['pptk_id'] : null,
+        ]);
+
+        AuditLog::log('create', 'User', $user->id, null, ['name' => $user->name, 'email' => $user->email, 'role' => $user->role]);
+
+        return redirect()->back()->with('success', "Akun pengguna '{$user->name}' berhasil dibuat!");
+    }
+
+    /**
+     * Update existing user details or password.
+     */
+    public function updateUser(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'password' => 'nullable|string|min:6',
+            'role' => 'required|string|in:superadmin,bendahara,operator,pptk,kasubag',
+            'pptk_id' => 'nullable|required_if:role,pptk|exists:pptks,id',
+        ]);
+
+        $payload = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+            'pptk_id' => $validated['role'] === 'pptk' ? $validated['pptk_id'] : null,
+        ];
+
+        if (! empty($validated['password'])) {
+            $payload['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($payload);
+
+        AuditLog::log('update', 'User', $user->id, null, ['name' => $user->name, 'role' => $user->role]);
+
+        return redirect()->back()->with('success', "Akun pengguna '{$user->name}' berhasil diperbarui!");
+    }
+
+    /**
+     * Delete user account.
+     */
+    public function destroyUser(User $user): RedirectResponse
+    {
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->withErrors(['error' => 'Tidak dapat menghapus akun Anda sendiri yang sedang aktif digunakan.']);
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        AuditLog::log('delete', 'User', $user->id, null, null);
+
+        return redirect()->back()->with('success', "Akun pengguna '{$name}' berhasil dihapus!");
     }
 }

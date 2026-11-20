@@ -37,6 +37,21 @@ class User extends Authenticatable
         return $this->belongsTo(Pptk::class);
     }
 
+    public function isPptk(): bool
+    {
+        return strtolower($this->role ?? '') === 'pptk';
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return in_array(strtolower($this->role ?? ''), ['superadmin', 'super admin', 'admin']);
+    }
+
+    public function isBendahara(): bool
+    {
+        return strtolower($this->role ?? '') === 'bendahara';
+    }
+
     /**
      * Get user role attribute dynamically.
      */
@@ -50,13 +65,26 @@ class User extends Authenticatable
         $name = strtolower($this->name ?? '');
 
         if (str_contains($email, 'admin') || str_contains($name, 'admin') || str_contains($name, 'ning')) {
-            return 'Super Admin';
+            return 'superadmin';
         }
 
         if (str_contains($email, 'bendahara') || str_contains($name, 'indah')) {
-            return 'Bendahara';
+            return 'bendahara';
         }
 
-        return 'Operator';
+        return 'operator';
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        $r = strtolower($this->role ?? 'operator');
+
+        return match ($r) {
+            'superadmin', 'super admin', 'admin' => 'Super Admin',
+            'bendahara' => 'Bendahara Pengeluaran',
+            'pptk' => 'PPTK',
+            'kasubag' => 'Kasubag',
+            default => 'Operator Pembukuan',
+        };
     }
 }

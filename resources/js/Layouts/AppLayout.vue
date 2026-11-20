@@ -91,6 +91,38 @@ const generalNavItems = [
     { name: 'Pengaturan & Master', href: '/pengaturan', routeName: 'pengaturan.*', icon: Settings },
 ];
 
+const isPptkUser = computed(() => authUser.value?.role === 'pptk');
+
+const visibleFinanceNavItems = computed(() => {
+    if (isPptkUser.value) {
+        const sheetTab = authUser.value?.pptk?.sheet_name;
+        return [
+            { name: 'BKU PPTK Saya', href: sheetTab ? `/bku?tab=${sheetTab}` : '/bku', routeName: 'bku.*', icon: BookOpen },
+            { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
+            { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
+        ];
+    }
+    return financeNavItems;
+});
+
+const visiblePaguNavItems = computed(() => {
+    if (isPptkUser.value) {
+        return [
+            { name: 'Dashboard Pagu Saya', href: '/pagu', routeName: 'pagu.index', icon: PieChart },
+            { name: 'Pencairan Kas & Sisa', href: '/pagu/transaksi', routeName: 'pagu.transactions', icon: Receipt },
+            { name: 'Sub Kegiatan Saya', href: '/pagu/subkegiatan', routeName: 'pagu.activities', icon: FolderTree },
+        ];
+    }
+    return paguNavItems;
+});
+
+const visibleGeneralNavItems = computed(() => {
+    if (isPptkUser.value) {
+        return [];
+    }
+    return generalNavItems;
+});
+
 const isCurrentRoute = (pattern) => {
     const currentUrl = page.url;
     if (pattern === 'dashboard' && currentUrl.startsWith('/dashboard')) return true;
@@ -123,6 +155,7 @@ const isPaguRouteActive = computed(() => {
 
 const getInitialFinanceAccordionState = () => {
     if (typeof window === 'undefined') return true;
+    if (isPptkUser.value) return false;
     if (isFinanceRouteActive.value) return true;
     const saved = localStorage.getItem('keudprd_finance_acc_open');
     return saved !== null ? saved === 'true' : true;
@@ -130,6 +163,7 @@ const getInitialFinanceAccordionState = () => {
 
 const getInitialPaguAccordionState = () => {
     if (typeof window === 'undefined') return true;
+    if (isPptkUser.value) return true;
     if (isPaguRouteActive.value) return true;
     const saved = localStorage.getItem('keudprd_pagu_acc_open');
     return saved !== null ? saved === 'true' : false;
@@ -359,7 +393,7 @@ const jumpToResult = (url) => {
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
-                                    {{ financeNavItems.length }}
+                                    {{ visibleFinanceNavItems.length }}
                                 </span>
                                 <ChevronDown 
                                     class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
@@ -374,7 +408,7 @@ const jumpToResult = (url) => {
                             class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
                         >
                             <Link
-                                v-for="item in financeNavItems"
+                                v-for="item in visibleFinanceNavItems"
                                 :key="item.name"
                                 :href="item.href"
                                 @click="handleNavClick"
@@ -410,7 +444,7 @@ const jumpToResult = (url) => {
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
-                                    {{ paguNavItems.length }}
+                                    {{ visiblePaguNavItems.length }}
                                 </span>
                                 <ChevronDown 
                                     class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
@@ -419,16 +453,13 @@ const jumpToResult = (url) => {
                             </div>
                         </button>
 
-                        <!-- Accordion Submenu Links (Kosong sementara untuk fitur baru) -->
+                        <!-- Accordion Submenu Links -->
                         <div 
                             v-show="isPaguAccordionOpen" 
                             class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
                         >
-                            <div v-if="paguNavItems.length === 0" class="px-3 py-2 text-[11px] text-emerald-200/50 italic">
-                                Belum ada menu (Fitur baru)
-                            </div>
                             <Link
-                                v-for="item in paguNavItems"
+                                v-for="item in visiblePaguNavItems"
                                 :key="item.name"
                                 :href="item.href"
                                 @click="handleNavClick"
@@ -446,9 +477,9 @@ const jumpToResult = (url) => {
                     </div>
 
                     <!-- General Links (Pengaturan & Master) -->
-                    <div class="pt-2 border-t border-emerald-900/40 space-y-1">
+                    <div v-if="visibleGeneralNavItems.length > 0" class="pt-2 border-t border-emerald-900/40 space-y-1">
                         <Link
-                            v-for="item in generalNavItems"
+                            v-for="item in visibleGeneralNavItems"
                             :key="item.name"
                             :href="item.href"
                             @click="handleNavClick"
@@ -538,12 +569,22 @@ const jumpToResult = (url) => {
                     
                     <!-- Bendahara Special Badge (only if logged in as Indah) -->
                     <div 
-                        v-if="authUser && (authUser.role === 'Bendahara' || authUser.email?.includes('bendahara') || authUser.name?.toLowerCase().includes('indah'))" 
+                        v-if="authUser && (authUser.role === 'bendahara' || authUser.email?.includes('bendahara') || authUser.name?.toLowerCase().includes('indah'))" 
                         class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700"
                     >
                         <User class="w-3.5 h-3.5 text-emerald-600" />
                         <span class="text-slate-500">Bendahara:</span>
                         <span class="font-bold text-slate-800">INDAH SETIYOWATI, A.Md.AB.</span>
+                    </div>
+
+                    <!-- PPTK Special Badge (if logged in as PPTK) -->
+                    <div 
+                        v-if="authUser && authUser.role === 'pptk' && authUser.pptk" 
+                        class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-300 text-emerald-950 shadow-2xs"
+                    >
+                        <Users class="w-3.5 h-3.5 text-emerald-700" />
+                        <span class="text-slate-500 text-[11px]">Pejabat PPTK:</span>
+                        <span class="font-bold text-emerald-800 text-xs">{{ authUser.pptk.display_name }}</span>
                     </div>
 
                     <!-- User Profile Info -->
@@ -557,7 +598,7 @@ const jumpToResult = (url) => {
                                     {{ authUser.name }}
                                 </div>
                                 <div class="text-[9px] text-[#107c41] font-black uppercase tracking-wider">
-                                    {{ authUser.role || 'Super Admin' }}
+                                    {{ authUser.role_label || authUser.role || 'Super Admin' }}
                                 </div>
                             </div>
                         </div>

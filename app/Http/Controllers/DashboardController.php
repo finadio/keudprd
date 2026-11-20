@@ -5,14 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Services\BookkeepingService;
 use App\Services\FiscalYearContext;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request, BookkeepingService $service): Response
+    public function index(Request $request, BookkeepingService $service): Response|RedirectResponse
     {
+        $user = auth()->user();
+        if ($user && strtolower($user->role) === 'pptk') {
+            return redirect()->route('pagu.index');
+        }
+
         $year = FiscalYearContext::resolve($request);
         $activeMonth = (int) $request->input('month', 10); // current latest month is Oktober
 
