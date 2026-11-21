@@ -266,6 +266,14 @@ class SmartTransactionParser
                             $y += 2000;
                         }
                         $dateStr = sprintf('%04d-%02d-%02d', $y, $mo, $d);
+                    } elseif (preg_match('/^(\d{2})(\d{2})[\/\-\.](\d{2,4})$/', (string) $rawDate, $m)) {
+                        $d = (int) $m[1];
+                        $mo = (int) $m[2];
+                        $y = (int) $m[3];
+                        if ($y < 100) {
+                            $y += 2000;
+                        }
+                        $dateStr = sprintf('%04d-%02d-%02d', $y, $mo, $d);
                     }
                     if (! $dateStr) {
                         continue;
