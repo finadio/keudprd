@@ -185,4 +185,97 @@ class MultiYearFiscalTest extends TestCase
         $this->assertSame(0.0, $summary2027['totals']['total_hutang_panjar']);
         $this->assertSame(0.0, $summary2027['totals']['kontrol_selisih']);
     }
+
+    /**
+     * Test setting a fiscal year as the default active year.
+     */
+    public function test_setting_fiscal_year_as_active(): void
+    {
+        $response = $this->post('/pengaturan/tahun/2027/jadikan-aktif');
+        $response->assertRedirect('/pengaturan?year=2027');
+        $response->assertSessionHas('success');
+        $response->assertSessionHas('active_fiscal_year', 2027);
+
+        $activeSetting = MasterSetting::current();
+        $this->assertNotNull($activeSetting);
+        $this->assertSame(2027, $activeSetting->fiscal_year);
+        $this->assertTrue((bool) $activeSetting->is_active);
+
+        // 2026 is no longer the active setting
+        $setting2026 = MasterSetting::where('fiscal_year', 2026)->first();
+        if ($setting2026) {
+            $this->assertFalse((bool) $setting2026->is_active);
+        }
+    }
+
+    /**
+     * Test deleting a fiscal year permanently cascades transactions and settings.
+     */
+    public function test_deleting_fiscal_year_permanently_removes_data(): void
+    {
+        $testYear = 2029;
+
+        // Ensure active year is 2026
+        MasterSetting::query()->update(['is_active' => false]);
+        MasterSetting::where('fiscal_year', 2026)->update(['is_active' => true]);
+
+        // Seed dummy records for test year 2029
+        MasterSetting::create([
+            'fiscal_year' => $testYear,
+            'skpd_name' => 'SETWAN TEST',
+            'pa_kpa_name' => 'PA TEST',
+            'treasurer_name' => 'TREASURER TEST',
+            'is_active' => false,
+        ]);
+
+        AccountingPeriod::create([
+            'fiscal_year' => $testYear,
+            'month' => 1,
+            'name' => "Januari {$testYear}",
+            'is_closed' => false,
+        ]);
+
+        Transaction::create([
+            'transaction_date' => "{$testYear}-01-10",
+            'description' => 'Test Transaction to Delete',
+            'transaction_type' => 'debet_rekening',
+            'payment_method' => 'bank_transfer',
+            'amount_gross' => 1000000,
+            'amount_net' => 1000000,
+            'flow_direction' => 'disbursement',
+            'period_month' => 1,
+            'period_year' => $testYear,
+            'is_verified' => true,
+        ]);
+
+        $this->assertSame(1, Transaction::where('period_year', $testYear)->count());
+        $this->assertSame(1, AccountingPeriod::where('fiscal_year', $testYear)->count());
+        $this->assertSame(1, MasterSetting::where('fiscal_year', $testYear)->count());
+
+        // Perform delete
+        $response = $this->delete("/pengaturan/tahun/{$testYear}");
+        $response->assertRedirect('/pengaturan?year=2026');
+        $response->assertSessionHas('success');
+
+        // Records for 2029 must be completely gone
+        $this->assertSame(0, Transaction::where('period_year', $testYear)->count());
+        $this->assertSame(0, AccountingPeriod::where('fiscal_year', $testYear)->count());
+        $this->assertSame(0, MasterSetting::where('fiscal_year', $testYear)->count());
+    }
+
+    /**
+     * Test cannot delete the currently default active fiscal year.
+     */
+    public function test_cannot_delete_active_default_fiscal_year(): void
+    {
+        // 2026 is currently default active
+        MasterSetting::query()->update(['is_active' => false]);
+        MasterSetting::where('fiscal_year', 2026)->update(['is_active' => true]);
+
+        $response = $this->delete('/pengaturan/tahun/2026');
+        $response->assertSessionHas('error');
+
+        // 2026 data remains untouched
+        $this->assertGreaterThan(0, Transaction::where('period_year', 2026)->count());
+    }
 }

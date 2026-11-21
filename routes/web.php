@@ -117,10 +117,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/pptk/{pptk}', [PptkController::class, 'destroy'])->name('pptk.destroy');
         Route::post('/pptk/{pptk}/toggle-active', [PptkController::class, 'toggleActive'])->name('pptk.toggle-active');
 
-        // Manajemen PPTK (Tambah, Edit, Hapus, Status Aktif)
-        Route::post('/pptk', [PptkController::class, 'store'])->name('pptk.store');
-        Route::put('/pptk/{pptk}', [PptkController::class, 'update'])->name('pptk.update');
-        Route::delete('/pptk/{pptk}', [PptkController::class, 'destroy'])->name('pptk.destroy');
-        Route::post('/pptk/{pptk}/toggle-active', [PptkController::class, 'toggleActive'])->name('pptk.toggle-active');
+        // Manajemen Multi-Tahun Anggaran (Aktivasi & Penghapusan Bersih)
+        Route::post('/tahun/{year}/jadikan-aktif', [SettingController::class, 'setActiveFiscalYear'])->name('set-active-year');
+        Route::delete('/tahun/{year}', [SettingController::class, 'deleteFiscalYear'])->name('delete-year');
     });
 });

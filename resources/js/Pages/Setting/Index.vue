@@ -21,7 +21,8 @@ import {
     Plus,
     Pencil,
     X,
-    AlertTriangle
+    AlertTriangle,
+    CheckCircle2
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -82,6 +83,45 @@ const openNewFiscalYear = () => {
 
 const pruneOldBackups = () => {
     router.post('/pengaturan/bersihkan-backup', {}, { preserveScroll: true });
+};
+
+const showDeleteYearModal = ref(false);
+const yearToDelete = ref(null);
+const confirmYearInput = ref('');
+const isDeletingYear = ref(false);
+
+const openDeleteYearModal = (ys) => {
+    yearToDelete.value = ys;
+    confirmYearInput.value = '';
+    showDeleteYearModal.value = true;
+};
+
+const executeDeleteYear = () => {
+    if (!yearToDelete.value) return;
+    if (confirmYearInput.value !== String(yearToDelete.value.year)) return;
+
+    isDeletingYear.value = true;
+    router.delete(`/pengaturan/tahun/${yearToDelete.value.year}`, {
+        preserveScroll: false,
+        onSuccess: () => {
+            showDeleteYearModal.value = false;
+            yearToDelete.value = null;
+            confirmYearInput.value = '';
+            isDeletingYear.value = false;
+        },
+        onError: () => {
+            isDeletingYear.value = false;
+        },
+        onFinish: () => {
+            isDeletingYear.value = false;
+        },
+    });
+};
+
+const makeYearActive = (yr) => {
+    router.post(`/pengaturan/tahun/${yr}/jadikan-aktif`, {}, {
+        preserveScroll: false,
+    });
 };
 
 const passwordForm = useForm({
@@ -280,20 +320,48 @@ const togglePptkActive = (pptk) => {
                                             </span>
                                         </td>
                                         <td class="px-3 py-2 text-center">
-                                            <button
-                                                type="button"
-                                                @click="switchToYear(ys.year)"
-                                                :disabled="ys.year === active_year"
-                                                :class="[
-                                                    'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-2xs',
-                                                    ys.year === active_year
-                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
-                                                        : 'bg-white hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 cursor-pointer'
-                                                ]"
-                                            >
-                                                <span>{{ ys.year === active_year ? 'Sedang Dibuka' : 'Buka Data' }}</span>
-                                                <ArrowRight v-if="ys.year !== active_year" class="w-3 h-3" />
-                                            </button>
+                                            <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+                                                <!-- Buka Data -->
+                                                <button
+                                                    type="button"
+                                                    @click="switchToYear(ys.year)"
+                                                    :disabled="ys.year === active_year"
+                                                    :class="[
+                                                        'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-2xs',
+                                                        ys.year === active_year
+                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
+                                                            : 'bg-white hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 cursor-pointer'
+                                                    ]"
+                                                    :title="ys.year === active_year ? 'Tahun ini sedang dibuka' : 'Buka & lihat data pembukuan TA ' + ys.year"
+                                                >
+                                                    <span>{{ ys.year === active_year ? 'Dibuka' : 'Buka' }}</span>
+                                                    <ArrowRight v-if="ys.year !== active_year" class="w-3 h-3" />
+                                                </button>
+
+                                                <!-- Jadikan TA Aktif Utama -->
+                                                <button
+                                                    v-if="!ys.is_default"
+                                                    type="button"
+                                                    @click="makeYearActive(ys.year)"
+                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-800 border border-amber-300 transition-colors cursor-pointer shadow-2xs"
+                                                    :title="'Jadikan TA ' + ys.year + ' sebagai Tahun Anggaran Aktif Utama sistem'"
+                                                >
+                                                    <CheckCircle2 class="w-3 h-3" />
+                                                    <span>Jadikan Aktif</span>
+                                                </button>
+
+                                                <!-- Hapus TA Permanen -->
+                                                <button
+                                                    v-if="!ys.is_default"
+                                                    type="button"
+                                                    @click="openDeleteYearModal(ys)"
+                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-red-50 hover:bg-red-600 hover:text-white text-red-700 border border-red-300 transition-colors cursor-pointer shadow-2xs"
+                                                    :title="'Hapus permanen TA ' + ys.year + ' beserta seluruh datanya'"
+                                                >
+                                                    <Trash2 class="w-3 h-3" />
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -891,7 +959,7 @@ const togglePptkActive = (pptk) => {
                 v-if="showDeletePptkModal && pptkToDelete" 
                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
             >
-                <div class="bg-white rounded border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                     <div class="px-4 py-3 bg-red-800 text-white flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <AlertTriangle class="w-4 h-4 text-amber-300" />
@@ -911,7 +979,7 @@ const togglePptkActive = (pptk) => {
                             Apakah Anda yakin ingin menghapus PPTK <strong class="text-slate-900 font-bold">"{{ pptkToDelete.display_name }}"</strong> ({{ pptkToDelete.name }})?
                         </p>
                         
-                        <div class="p-3 bg-amber-50 border border-amber-200 rounded text-amber-900 space-y-1">
+                        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 space-y-1">
                             <p class="font-bold flex items-center gap-1 text-[11px]">
                                 <ShieldCheck class="w-3.5 h-3.5 text-amber-700 shrink-0" />
                                 <span>Perlindungan Riwayat Pembukuan:</span>
@@ -925,17 +993,95 @@ const togglePptkActive = (pptk) => {
                             <button 
                                 type="button" 
                                 @click="showDeletePptkModal = false"
-                                class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded font-semibold transition-colors cursor-pointer"
+                                class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-colors cursor-pointer"
                             >
                                 Batal
                             </button>
                             <button 
                                 type="button" 
                                 @click="executeDeletePptk"
-                                class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-bold transition-colors cursor-pointer shadow-xs"
+                                class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded-xl font-bold transition-colors cursor-pointer shadow-xs"
                             >
                                 <Trash2 class="w-3.5 h-3.5" />
                                 <span>Lanjutkan Hapus</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Konfirmasi Hapus Permanen Tahun Anggaran -->
+            <div 
+                v-if="showDeleteYearModal && yearToDelete" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-5 py-4 bg-red-900 text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <AlertTriangle class="w-5 h-5 text-amber-300 shrink-0" />
+                            <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wide">Hapus Permanen TA {{ yearToDelete.year }}</h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showDeleteYearModal = false"
+                            class="text-red-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div class="p-5 space-y-4 text-xs">
+                        <p class="text-slate-700 leading-relaxed">
+                            Tindakan ini akan <strong class="text-red-700 font-bold">menghapus secara permanen</strong> seluruh data pembukuan Tahun Anggaran <strong class="text-slate-900 font-bold font-mono">TA {{ yearToDelete.year }}</strong> dan tidak dapat dipulihkan:
+                        </p>
+                        
+                        <div class="p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5 text-xs text-red-950">
+                                <Trash2 class="w-4 h-4 text-red-700 shrink-0" />
+                                <span>Data yang akan dibersihkan tuntas:</span>
+                            </div>
+                            <ul class="list-disc pl-5 space-y-1 text-[11px] text-red-800">
+                                <li><strong class="font-semibold">{{ yearToDelete.tx_count.toLocaleString('id-ID') }} baris</strong> transaksi BKU &amp; Buku Bank</li>
+                                <li>Seluruh data realisasi pencairan pagu TA {{ yearToDelete.year }}</li>
+                                <li>Penguncian 12 periode bulan TA {{ yearToDelete.year }}</li>
+                                <li>Pengaturan master &amp; penyesuaian manual TA {{ yearToDelete.year }}</li>
+                            </ul>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-800">
+                                Ketik angka <span class="font-mono text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-200">{{ yearToDelete.year }}</span> untuk konfirmasi:
+                            </label>
+                            <input 
+                                v-model="confirmYearInput"
+                                type="text"
+                                :placeholder="`Ketik ${yearToDelete.year}`"
+                                class="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                @keyup.enter="confirmYearInput === String(yearToDelete.year) && executeDeleteYear()"
+                            />
+                        </div>
+
+                        <div class="pt-2 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showDeleteYearModal = false"
+                                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-colors cursor-pointer text-xs"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="executeDeleteYear"
+                                :disabled="confirmYearInput !== String(yearToDelete.year) || isDeletingYear"
+                                :class="[
+                                    'inline-flex items-center gap-1.5 px-4 py-2 text-white rounded-xl font-bold transition-all text-xs shadow-xs',
+                                    confirmYearInput === String(yearToDelete.year) && !isDeletingYear
+                                        ? 'bg-red-700 hover:bg-red-800 cursor-pointer'
+                                        : 'bg-slate-300 text-slate-500 cursor-not-allowed opacity-70'
+                                ]"
+                            >
+                                <Trash2 class="w-4 h-4" />
+                                <span>{{ isDeletingYear ? 'Menghapus Data...' : 'Hapus Permanen TA ' + yearToDelete.year }}</span>
                             </button>
                         </div>
                     </div>

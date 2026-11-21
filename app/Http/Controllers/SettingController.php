@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccountingPeriod;
+use App\Models\Activity;
 use App\Models\AuditLog;
+use App\Models\ManualAdjustment;
 use App\Models\MasterSetting;
+use App\Models\PaguRealization;
 use App\Models\Pptk;
 use App\Models\Subunit;
 use App\Models\Transaction;
@@ -237,6 +240,102 @@ class SettingController extends Controller
 
         return redirect("/pengaturan?year={$newYear}")
             ->with('success', "Tahun Anggaran baru {$newYear} berhasil dibuka!{$lockNote}");
+    }
+
+    /**
+     * Promote a fiscal year to become the system's default active year.
+     */
+    public function setActiveFiscalYear(int $year): RedirectResponse
+    {
+        if ($year < 2020 || $year > 2100) {
+            return back()->with('error', 'Tahun anggaran tidak valid.');
+        }
+
+        DB::transaction(function () use ($year) {
+            MasterSetting::query()->update(['is_active' => false]);
+
+            $existing = MasterSetting::where('fiscal_year', $year)->latest()->first();
+            if ($existing) {
+                $existing->update(['is_active' => true]);
+            } else {
+                $current = MasterSetting::latest('id')->first();
+                MasterSetting::create([
+                    'fiscal_year' => $year,
+                    'skpd_name' => $current?->skpd_name ?? 'SETWAN KABUPATEN BANYUMAS',
+                    'pa_kpa_name' => $current?->pa_kpa_name ?? 'ARIF TRIYANTO, S.Sos. M.Eng.',
+                    'pa_kpa_nip' => $current?->pa_kpa_nip,
+                    'treasurer_name' => $current?->treasurer_name ?? 'INDAH SETIYOWATI, A.Md.AB.',
+                    'treasurer_nip' => $current?->treasurer_nip,
+                    'is_active' => true,
+                ]);
+            }
+
+            FiscalYearContext::ensurePeriodsExist($year);
+        });
+
+        session(['active_fiscal_year' => $year]);
+
+        AuditLog::log(
+            'set_active_fiscal_year',
+            'MasterSetting',
+            null,
+            null,
+            ['active_year' => $year]
+        );
+
+        return redirect("/pengaturan?year={$year}")
+            ->with('success', "Tahun Anggaran {$year} sekarang berstatus sebagai TA Aktif utama sistem.");
+    }
+
+    /**
+     * Completely and permanently delete a fiscal year and its transactions.
+     */
+    public function deleteFiscalYear(int $year): RedirectResponse
+    {
+        if ($year < 2020 || $year > 2100) {
+            return back()->with('error', 'Tahun anggaran tidak valid.');
+        }
+
+        $defaultYear = FiscalYearContext::defaultYear();
+        if ($year === $defaultYear) {
+            return back()->with('error', "Tahun Anggaran {$year} tidak dapat dihapus karena saat ini berstatus sebagai TA Aktif utama sistem. Silakan jadikan tahun lain sebagai TA Aktif terlebih dahulu.");
+        }
+
+        $txCount = Transaction::where('period_year', $year)->count();
+        $paguCount = PaguRealization::where('period_year', $year)->count();
+
+        DB::transaction(function () use ($year) {
+            Transaction::where('period_year', $year)->delete();
+            PaguRealization::where('period_year', $year)->delete();
+            if ($year !== 2026) {
+                Activity::where('period_year', $year)->delete();
+            }
+            ManualAdjustment::where('period_year', $year)->delete();
+            AccountingPeriod::where('fiscal_year', $year)->delete();
+            MasterSetting::where('fiscal_year', $year)->delete();
+        });
+
+        // Reset viewing session if viewing the deleted year
+        if ((int) session('active_fiscal_year') === $year) {
+            session(['active_fiscal_year' => $defaultYear]);
+        }
+
+        AuditLog::log(
+            'delete_fiscal_year',
+            'MasterSetting',
+            null,
+            [
+                'deleted_year' => $year,
+                'deleted_tx_count' => $txCount,
+                'deleted_pagu_count' => $paguCount,
+            ],
+            ['executed_by' => auth()->id()]
+        );
+
+        $details = $txCount > 0 ? " (termasuk {$txCount} baris transaksi)" : '';
+
+        return redirect("/pengaturan?year={$defaultYear}")
+            ->with('success', "Tahun Anggaran {$year} beserta seluruh datanya{$details} berhasil dihapus permanen.");
     }
 
     /**
