@@ -314,29 +314,29 @@ class BookkeepingService
         $totalSisaPanjar = 0.0;
         $totalSisaRiil = 0.0;
 
-        $isYear2026 = ($year === 2026);
+        $hasHistorical2026 = ($year === 2026 && Transaction::where('period_year', 2026)->count() > 1000);
 
         foreach ($pptks as $idx => $p) {
             $pptkDebet = (float) ($matrix['debet'][$p->id]['total'] ?? 0.0);
             $pptkPanjar = (float) ($matrix['panjar'][$p->id]['total'] ?? 0.0);
             $pptkJml = $pptkDebet + $pptkPanjar;
 
-            // Fetch SPJ from transactions or verified benchmark matrix (for 2026)
+            // Fetch SPJ from transactions or verified benchmark matrix (for historical 2026)
             $pptkSpj = (float) Transaction::where('period_year', $year)
                 ->where('pptk_id', $p->id)
                 ->where('transaction_type', 'spj_realization')
                 ->sum('amount_net');
 
-            if ($isYear2026 && $pptkSpj == 0 && isset($matrix['fallback_spj'][$p->code])) {
+            if ($hasHistorical2026 && $pptkSpj == 0 && isset($matrix['fallback_spj'][$p->code])) {
                 $pptkSpj = (float) $matrix['fallback_spj'][$p->code];
             }
 
             // Total Hutang Panjar = Total Beban (Jml) - SPJ
             $hutangPanjar = $pptkJml - $pptkSpj;
 
-            // Sisa Bank & Tunai per PPTK (for 2026 from Excel matrix; for other years 0.0 unless recorded)
-            $sisaBank = $isYear2026 ? (float) ($matrix['fallback_bank'][$p->code] ?? 0.0) : 0.0;
-            $sisaTunai = $isYear2026 ? (float) ($matrix['fallback_tunai'][$p->code] ?? 0.0) : 0.0;
+            // Sisa Bank & Tunai per PPTK (for historical 2026 from Excel matrix; for other years 0.0 unless recorded)
+            $sisaBank = $hasHistorical2026 ? (float) ($matrix['fallback_bank'][$p->code] ?? 0.0) : 0.0;
+            $sisaTunai = $hasHistorical2026 ? (float) ($matrix['fallback_tunai'][$p->code] ?? 0.0) : 0.0;
             $spjLanjutan = 0.0;
             $sisaPanjarBersih = $sisaTunai - $spjLanjutan;
             $totalSisa = $sisaPanjarBersih + $sisaBank;
@@ -376,7 +376,7 @@ class BookkeepingService
         $bkuUp = $this->getBkuUp($year);
         $kasKecil = $this->getKasKecil($year);
 
-        if ($isYear2026) {
+        if ($hasHistorical2026) {
             $upAwal = 720000000.0;
             $sisaUp = (float) ($bkuUp['saldo_akhir'] ?? 335720241.0);
             $kasPanjar = $totalHutangPanjar; // Rp 364.179.759 (Kolom G13)
@@ -396,7 +396,7 @@ class BookkeepingService
             $selisihBank = $rekeningKoran - $totalBankBuku; // Rp 0.0 (I42)
             $kontrolAkhir = $sisaKontrolUp - $selisihBank; // Rp 0.0 (G44)
         } else {
-            // For year 2027+, dynamically derive from actual year transactions
+            // Dynamically derive from actual year transactions
             $upAwal = (float) Transaction::where('period_year', $year)
                 ->where('transaction_type', 'sp2d_up')
                 ->sum('amount_net');
@@ -499,6 +499,8 @@ class BookkeepingService
             'IRNA' => [1 => 0.0, 2 => 0.0, 3 => 0.0, 4 => 0.0, 5 => 0.0, 6 => 0.0, 7 => 0.0, 8 => 0.0, 9 => 0.0, 10 => 0.0, 11 => 0.0, 12 => 0.0],
         ];
 
+        $hasHistorical2026 = ($year === 2026 && Transaction::where('period_year', 2026)->count() > 1000);
+
         foreach ($pptks as $p) {
             $debetRow = ['pptk_name' => $p->display_name, 'pptk_code' => $p->code];
             $panjarRow = ['pptk_name' => $p->display_name, 'pptk_code' => $p->code];
@@ -506,7 +508,7 @@ class BookkeepingService
             $totalP = 0.0;
 
             for ($m = 1; $m <= 12; $m++) {
-                if ($year === 2026) {
+                if ($hasHistorical2026) {
                     $valD = $baselineDebet[$p->code][$m] ?? 0.0;
                     $valP = $baselinePanjar[$p->code][$m] ?? 0.0;
 
@@ -532,7 +534,7 @@ class BookkeepingService
                         $valP += $newPanjar;
                     }
                 } else {
-                    // For TA 2027 and other fiscal years: calculate dynamically strictly from that year's transactions
+                    // For active testing / custom imports: calculate dynamically strictly from that year's transactions
                     $valD = (float) Transaction::where('period_year', $year)
                         ->where('period_month', $m)
                         ->where('pptk_id', $p->id)
@@ -574,7 +576,7 @@ class BookkeepingService
             'debet' => $debetMatrix,
             'panjar' => $panjarMatrix,
             'month_names' => $monthNames,
-            'fallback_spj' => ($year === 2026) ? [
+            'fallback_spj' => $hasHistorical2026 ? [
                 'AUL_ETY' => 961145860.0,
                 'GAYA' => 341725100.0,
                 'RATMAN' => 767597219.0,
@@ -585,7 +587,7 @@ class BookkeepingService
                 'SRI_L' => 4642500.0,
                 'IRNA' => 0.0,
             ] : [],
-            'fallback_bank' => ($year === 2026) ? [
+            'fallback_bank' => $hasHistorical2026 ? [
                 'AUL_ETY' => 53475000.0,
                 'GAYA' => 10600000.0,
                 'RATMAN' => 246225459.0,
@@ -596,7 +598,7 @@ class BookkeepingService
                 'SRI_L' => 0.0,
                 'IRNA' => 0.0,
             ] : [],
-            'fallback_tunai' => ($year === 2026) ? [
+            'fallback_tunai' => $hasHistorical2026 ? [
                 'AUL_ETY' => 0.0,
                 'GAYA' => 4372000.0,
                 'RATMAN' => 22792500.0,

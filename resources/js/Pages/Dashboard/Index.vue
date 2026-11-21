@@ -226,7 +226,7 @@ const pengeluaranLinePath = computed(() => {
             </div>
 
             <!-- ================= SELISIH PEMBUKUAN BANNER ================= -->
-            <div class="bg-[#fff9eb] border border-[#fbd38d] rounded-xl px-4 py-3 flex items-center justify-between shadow-2xs">
+            <div v-if="hitungan_totals && Math.abs(hitungan_totals.kontrol_selisih) > 0.01" class="bg-[#fff9eb] border border-[#fbd38d] rounded-xl px-4 py-3 flex items-center justify-between shadow-2xs">
                 <div class="flex items-center gap-2.5 text-[#744210] font-bold text-xs sm:text-sm">
                     <AlertTriangle class="w-4 h-4 text-[#d69e2e] shrink-0" />
                     <span>Selisih pembukuan: <span class="font-black text-[#975a16]">{{ formatRupiah(hitungan_totals.kontrol_selisih) }}</span></span>

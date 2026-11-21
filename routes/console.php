@@ -29,3 +29,17 @@ Artisan::command('data:reset-transactions', function () {
     DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     $this->info('All transaction data has been successfully emptied.');
 })->purpose('Empty all financial transaction and realization tables for clean testing');
+
+Artisan::command('data:reset-transactions', function () {
+    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+    TransactionAllocation::truncate();
+    TaxDeduction::truncate();
+    Reconciliation::truncate();
+    Transaction::truncate();
+    ImportBatch::truncate();
+    ManualAdjustment::truncate();
+    PaguRealization::truncate();
+    AuditLog::truncate();
+    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    $this->info('All transaction data has been successfully emptied.');
+})->purpose('Empty all financial transaction and realization tables for clean testing');
