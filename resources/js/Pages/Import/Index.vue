@@ -236,65 +236,41 @@ const formatDateIndo = (dateStr) => {
 
 <template>
     <AppLayout>
-        <Head title="Impor Transaksi & Pembukuan Otomatis" />
+        <Head title="Smart Transaction Import & OCR" />
 
-        <div class="space-y-5 max-w-6xl mx-auto">
+        <div class="space-y-4">
             
-            <!-- 1. Header Banner with Joglo / DPRD Silhouette -->
-            <div class="bg-gradient-to-r from-emerald-50 via-green-50/70 to-emerald-100/50 border border-emerald-200/80 rounded-2xl p-6 relative overflow-hidden shadow-xs flex items-center justify-between">
-                <div class="relative z-10 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-800 shadow-xs shrink-0">
-                        <UploadCloud class="w-7 h-7 text-emerald-700" />
-                    </div>
-                    <div>
-                        <h1 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-                            Impor Transaksi
-                        </h1>
-                        <p class="text-xs md:text-sm text-slate-600 mt-0.5">
-                            Unggah file transaksi Anda, dan sistem akan membacanya secara otomatis.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Subtle DPRD / Joglo Silhouette Vector on Right -->
-                <div class="absolute right-0 top-0 bottom-0 w-80 pointer-events-none opacity-20 flex items-center justify-end pr-4 text-emerald-800">
-                    <svg viewBox="0 0 200 120" fill="currentColor" class="h-32 w-auto">
-                        <!-- Crown / Genteng joglo -->
-                        <polygon points="100,5 106,16 94,16" />
-                        <polygon points="100,16 160,50 40,50" />
-                        <polygon points="100,45 185,75 15,75" />
-                        <!-- Pillars / Tiang Pendopo -->
-                        <rect x="35" y="75" width="8" height="40" />
-                        <rect x="70" y="75" width="8" height="40" />
-                        <rect x="96" y="75" width="8" height="40" />
-                        <rect x="122" y="75" width="8" height="40" />
-                        <rect x="157" y="75" width="8" height="40" />
-                        <!-- Base / Lantai -->
-                        <rect x="20" y="115" width="160" height="5" rx="2" />
-                    </svg>
+            <!-- Standard KeuDPRD Page Title Card -->
+            <div class="bg-white border border-slate-200 rounded p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                    <h1 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                        <UploadCloud class="w-5 h-5 text-emerald-600" />
+                        Smart Transaction Import & Verifikasi Pembukuan
+                    </h1>
+                    <p class="text-xs text-slate-500">
+                        Otomatisasi pemindahan transaksi dari aplikasi resmi (SIPD RI / CMS Bank Jateng / SP2D / Excel / Foto Bukti Kas) dengan Deep Learning RapidOCR.
+                    </p>
                 </div>
             </div>
 
-            <!-- 2. Stepper Card (Tahapan 1 - 2 - 3) -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
-                <div class="flex items-center justify-center max-w-2xl mx-auto gap-2 md:gap-4 text-xs">
+            <!-- Stepper Indicator (Harmonized with KeuDPRD) -->
+            <div class="bg-white border border-slate-200 rounded p-3 shadow-sm">
+                <div class="flex items-center justify-center max-w-xl mx-auto text-xs">
                     
                     <!-- Step 1: Pilih Metode -->
                     <div class="flex items-center gap-2">
                         <span 
                             :class="[
-                                'w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all',
-                                currentStep >= 1 ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-200 text-slate-500'
+                                'w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs transition-colors',
+                                currentStep >= 1 ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500 border border-slate-300'
                             ]"
                         >
                             1
                         </span>
                         <span 
                             :class="[
-                                'px-3 py-1 rounded-full font-bold transition-all',
-                                currentStep === 1 
-                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                                    : 'text-slate-700 font-medium'
+                                'font-semibold transition-colors',
+                                currentStep === 1 ? 'text-emerald-800' : 'text-slate-700'
                             ]"
                         >
                             Pilih Metode
@@ -302,53 +278,45 @@ const formatDateIndo = (dateStr) => {
                     </div>
 
                     <!-- Connector Line 1 -->
-                    <div :class="['h-0.5 w-10 md:w-20 transition-colors', currentStep >= 2 ? 'bg-emerald-600' : 'bg-slate-200']"></div>
+                    <div :class="['h-0.5 w-8 sm:w-16 mx-2 transition-colors', currentStep >= 2 ? 'bg-emerald-600' : 'bg-slate-200']"></div>
 
-                    <!-- Step 2: Unggah File -->
+                    <!-- Step 2: Unggah Dokumen / Teks -->
                     <div class="flex items-center gap-2">
                         <span 
                             :class="[
-                                'w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all',
-                                currentStep >= 2 
-                                    ? 'bg-emerald-700 text-white shadow-xs' 
-                                    : 'border-2 border-slate-300 text-slate-500 bg-white'
+                                'w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs transition-colors',
+                                currentStep >= 2 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300'
                             ]"
                         >
                             2
                         </span>
                         <span 
                             :class="[
-                                'px-3 py-1 rounded-full font-bold transition-all',
-                                currentStep === 2 
-                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                                    : 'text-slate-500 font-medium'
+                                'font-semibold transition-colors',
+                                currentStep === 2 ? 'text-emerald-800' : 'text-slate-500'
                             ]"
                         >
-                            {{ activeInputTab === 'file' ? 'Unggah File' : 'Tempel Teks' }}
+                            {{ activeInputTab === 'file' ? 'Unggah Dokumen' : 'Tempel Teks' }}
                         </span>
                     </div>
 
                     <!-- Connector Line 2 -->
-                    <div :class="['h-0.5 w-10 md:w-20 transition-colors', currentStep >= 3 ? 'bg-emerald-600' : 'bg-slate-200']"></div>
+                    <div :class="['h-0.5 w-8 sm:w-16 mx-2 transition-colors', currentStep >= 3 ? 'bg-emerald-600' : 'bg-slate-200']"></div>
 
                     <!-- Step 3: Periksa & Simpan -->
                     <div class="flex items-center gap-2">
                         <span 
                             :class="[
-                                'w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all',
-                                currentStep >= 3 
-                                    ? 'bg-emerald-700 text-white shadow-xs' 
-                                    : 'border-2 border-slate-300 text-slate-400 bg-white'
+                                'w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs transition-colors',
+                                currentStep >= 3 ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400 border border-slate-300'
                             ]"
                         >
                             3
                         </span>
                         <span 
                             :class="[
-                                'px-3 py-1 rounded-full font-bold transition-all',
-                                currentStep === 3 
-                                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                                    : 'text-slate-400 font-medium'
+                                'font-semibold transition-colors',
+                                currentStep === 3 ? 'text-emerald-800' : 'text-slate-400'
                             ]"
                         >
                             Periksa & Simpan
@@ -358,44 +326,42 @@ const formatDateIndo = (dateStr) => {
                 </div>
             </div>
 
-            <!-- 3. MAIN WIZARD BODY -->
-
-            <!-- STAGE A: SELECTION & UPLOAD (Step 1 & 2) -->
+            <!-- STAGE 1 & 2: INPUT SELECTION & PROCESS -->
             <div v-if="currentStep < 3" class="space-y-4">
                 
-                <!-- Method Selection Cards (2 Column Side-by-Side) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Method Selection Cards (Harmonious with KeuDPRD Cards) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     
                     <!-- Card 1: Unggah File (Disarankan) -->
                     <div 
                         @click="activeInputTab = 'file'"
                         :class="[
-                            'p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-xs',
+                            'p-3.5 rounded border transition-all cursor-pointer flex items-center justify-between gap-3 shadow-sm',
                             activeInputTab === 'file'
-                                ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/20'
-                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                                ? 'border-emerald-600 bg-emerald-50/40 ring-1 ring-emerald-500/20'
+                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
                         ]"
                     >
-                        <div class="flex items-center gap-3.5">
+                        <div class="flex items-center gap-3">
                             <div 
                                 :class="[
-                                    'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-colors',
+                                    'w-9 h-9 rounded flex items-center justify-center shrink-0 border transition-colors',
                                     activeInputTab === 'file' 
                                         ? 'bg-emerald-100 border-emerald-300 text-emerald-800' 
                                         : 'bg-slate-100 border-slate-200 text-slate-500'
                                 ]"
                             >
-                                <Upload class="w-5 h-5 text-emerald-700" />
+                                <Upload class="w-4 h-4 text-emerald-700" />
                             </div>
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-slate-900 text-sm">Unggah File</h3>
-                                    <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <div class="flex items-center gap-1.5">
+                                    <h3 class="font-bold text-slate-900 text-xs">Unggah Dokumen</h3>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                         Disarankan
                                     </span>
                                 </div>
-                                <p class="text-xs text-slate-500 mt-0.5">
-                                    Pilih file transaksi dari komputer Anda.
+                                <p class="text-[11px] text-slate-500 mt-0.5">
+                                    Pilih file PDF, Excel, Word, CSV, atau Foto Scan Kwitansi.
                                 </p>
                             </div>
                         </div>
@@ -404,13 +370,13 @@ const formatDateIndo = (dateStr) => {
                         <div class="shrink-0">
                             <div 
                                 v-if="activeInputTab === 'file'"
-                                class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs"
+                                class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs"
                             >
-                                <Check class="w-3.5 h-3.5 stroke-[3]" />
+                                <Check class="w-3 h-3 stroke-[3]" />
                             </div>
                             <div 
                                 v-else
-                                class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white"
+                                class="w-5 h-5 rounded-full border border-slate-300 bg-white"
                             ></div>
                         </div>
                     </div>
@@ -419,27 +385,27 @@ const formatDateIndo = (dateStr) => {
                     <div 
                         @click="activeInputTab = 'paste'"
                         :class="[
-                            'p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-between gap-3 shadow-xs',
+                            'p-3.5 rounded border transition-all cursor-pointer flex items-center justify-between gap-3 shadow-sm',
                             activeInputTab === 'paste'
-                                ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/20'
-                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                                ? 'border-emerald-600 bg-emerald-50/40 ring-1 ring-emerald-500/20'
+                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
                         ]"
                     >
-                        <div class="flex items-center gap-3.5">
+                        <div class="flex items-center gap-3">
                             <div 
                                 :class="[
-                                    'w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-colors',
+                                    'w-9 h-9 rounded flex items-center justify-center shrink-0 border transition-colors',
                                     activeInputTab === 'paste' 
                                         ? 'bg-emerald-100 border-emerald-300 text-emerald-800' 
                                         : 'bg-slate-100 border-slate-200 text-slate-500'
                                 ]"
                             >
-                                <Clipboard class="w-5 h-5 text-slate-600" />
+                                <Clipboard class="w-4 h-4 text-slate-600" />
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-sm">Tempel Data</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">
-                                    Salin dan tempel data transaksi dari Excel atau tabel.
+                                <h3 class="font-bold text-slate-900 text-xs">Tempel Data (Copy-Paste)</h3>
+                                <p class="text-[11px] text-slate-500 mt-0.5">
+                                    Salin dan tempel data tabel transaksi dari SIPD, Bank, atau WA.
                                 </p>
                             </div>
                         </div>
@@ -448,21 +414,21 @@ const formatDateIndo = (dateStr) => {
                         <div class="shrink-0">
                             <div 
                                 v-if="activeInputTab === 'paste'"
-                                class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs"
+                                class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs"
                             >
-                                <Check class="w-3.5 h-3.5 stroke-[3]" />
+                                <Check class="w-3 h-3 stroke-[3]" />
                             </div>
                             <div 
                                 v-else
-                                class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white"
+                                class="w-5 h-5 rounded-full border border-slate-300 bg-white"
                             ></div>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- Input Box Method 1: Unggah File -->
-                <div v-if="activeInputTab === 'file'" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-5">
+                <!-- Input Box Method 1: Unggah Dokumen -->
+                <div v-if="activeInputTab === 'file'" class="bg-white border border-slate-200 rounded p-4 shadow-sm space-y-4">
                     
                     <!-- Hidden native file input -->
                     <input 
@@ -476,30 +442,28 @@ const formatDateIndo = (dateStr) => {
                     <!-- Dashed Dropzone Box -->
                     <div 
                         @click="triggerFileInput"
-                        class="border-2 border-dashed border-emerald-400/80 rounded-2xl p-8 md:p-10 text-center bg-emerald-50/10 hover:bg-emerald-50/30 transition-all cursor-pointer group"
+                        class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-lg p-6 text-center hover:bg-slate-50/60 transition-colors cursor-pointer group"
                     >
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
-                            <UploadCloud class="w-8 h-8 text-emerald-600" />
-                        </div>
+                        <UploadCloud class="w-8 h-8 text-emerald-600 mx-auto mb-2 group-hover:scale-105 transition-transform" />
                         
-                        <p class="text-sm md:text-base font-bold text-slate-800">
+                        <p class="text-xs font-bold text-slate-800">
                             Pilih file transaksi dari komputer Anda
                         </p>
 
-                        <div class="mt-3">
+                        <div class="mt-2.5">
                             <button 
                                 type="button"
                                 @click.stop="triggerFileInput"
-                                class="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl text-xs shadow-xs inline-flex items-center gap-2 transition-all cursor-pointer"
+                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded text-xs shadow-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                             >
                                 <Upload class="w-3.5 h-3.5" />
-                                Pilih File
+                                Pilih File Dokumen
                             </button>
                         </div>
 
                         <!-- Selected File Preview if chosen -->
-                        <div v-if="selectedFile" class="mt-4 inline-flex items-center gap-3 px-4 py-2 bg-white border border-emerald-300 rounded-xl shadow-xs">
-                            <span :class="['px-2 py-0.5 rounded text-[10px] font-bold border', getFileBadgeColor(selectedFile.name)]">
+                        <div v-if="selectedFile" class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-emerald-300 rounded shadow-xs">
+                            <span :class="['px-1.5 py-0.5 rounded text-[10px] font-bold border', getFileBadgeColor(selectedFile.name)]">
                                 {{ selectedFile.name.split('.').pop().toUpperCase() }}
                             </span>
                             <span class="text-xs font-bold text-slate-800 font-mono">{{ selectedFile.name }}</span>
@@ -507,37 +471,45 @@ const formatDateIndo = (dateStr) => {
                             <button 
                                 type="button" 
                                 @click.stop="removeSelectedFile" 
-                                class="text-slate-400 hover:text-rose-600 p-0.5 rounded-full hover:bg-slate-100 transition-colors"
+                                class="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors"
                                 title="Batal pilih file"
                             >
-                                <X class="w-4 h-4" />
+                                <X class="w-3.5 h-3.5" />
                             </button>
                         </div>
 
-                        <p v-else class="text-[11px] text-slate-400 mt-3 font-medium">
-                            Format: PDF, Excel, Word, CSV, Foto | Maks. 25 MB
+                        <p v-else class="text-[11px] text-slate-400 mt-2">
+                            Format didukung: PDF, Excel, Word, CSV, Foto Scan | Maks. 25 MB
                         </p>
                     </div>
 
-                    <!-- CTA Action Button: Mulai Baca File -->
-                    <div class="text-center pt-1">
+                    <!-- Action Button Row -->
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="text-[11px] text-slate-500">
+                            <span v-if="isProcessing" class="font-medium text-emerald-700 flex items-center gap-1.5">
+                                <span class="animate-spin w-3.5 h-3.5 border-2 border-emerald-600 border-t-transparent rounded-full"></span>
+                                {{ processingMessage }}
+                            </span>
+                            <span v-else>Mesin OCR RapidOCR otomatis aktif jika mengunggah file foto atau dokumen hasil scan.</span>
+                        </div>
+
                         <button
                             @click="processFileUpload"
                             :disabled="isProcessing || !selectedFile"
-                            class="w-full max-w-md mx-auto py-3.5 px-8 bg-emerald-800 hover:bg-emerald-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                            class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
-                            <span v-if="isProcessing" class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-                            <ArrowRight v-else class="w-4 h-4" />
-                            <span>{{ isProcessing ? processingMessage : 'Mulai Baca File' }}</span>
+                            <span v-if="isProcessing" class="animate-spin w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full"></span>
+                            <ArrowRight v-else class="w-3.5 h-3.5" />
+                            <span>{{ isProcessing ? 'Sedang Membaca...' : 'Mulai Baca File' }}</span>
                         </button>
                     </div>
 
                 </div>
 
                 <!-- Input Box Method 2: Tempel Data -->
-                <div v-else-if="activeInputTab === 'paste'" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+                <div v-else-if="activeInputTab === 'paste'" class="bg-white border border-slate-200 rounded p-4 shadow-sm space-y-3">
                     
-                    <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2.5">
+                    <div class="p-2.5 bg-emerald-50/70 border border-emerald-200 rounded text-xs text-emerald-900 flex items-start gap-2">
                         <Sparkles class="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                         <div>
                             <span class="font-bold">Algoritma Auto-Converter Aktif:</span>
@@ -548,24 +520,22 @@ const formatDateIndo = (dateStr) => {
                     <textarea
                         v-model="rawPasteText"
                         rows="7"
-                        placeholder="Tempel teks tabel transaksi di sini (Ctrl+V)... Parser akan otomatis membersihkan header, menyatukan baris berantakan, mendeteksi nominal, dan memetakan PPTK."
-                        class="w-full p-3 font-mono text-xs border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50/50"
+                        placeholder="Tempel teks tabel transaksi di sini (Ctrl+V)... Parser otomatis membersihkan header, menyatukan baris berantakan, mendeteksi nominal, dan memetakan PPTK."
+                        class="w-full p-2.5 font-mono text-xs border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50/50"
                     ></textarea>
 
-                    <div class="flex items-center justify-between text-[11px] text-slate-500">
-                        <span>Mendukung multi-transaksi, tab-delimited, format tanggal Indonesia (15 Oktober 2026), dan mutasi debet/kredit.</span>
-                    </div>
+                    <!-- Action Button Row -->
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-[11px] text-slate-500">Mendukung format tanggal Indonesia (15 Oktober 2026), tab-delimited, dan mutasi debet/kredit.</span>
 
-                    <!-- CTA Action Button: Mulai Ekstraksi Teks -->
-                    <div class="text-center pt-2">
                         <button
                             @click="processPasteText"
                             :disabled="isProcessing || !rawPasteText.trim()"
-                            class="w-full max-w-md mx-auto py-3.5 px-8 bg-emerald-800 hover:bg-emerald-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+                            class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
-                            <span v-if="isProcessing" class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-                            <ArrowRight v-else class="w-4 h-4" />
-                            <span>{{ isProcessing ? processingMessage : 'Mulai Ekstraksi Teks' }}</span>
+                            <span v-if="isProcessing" class="animate-spin w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full"></span>
+                            <ArrowRight v-else class="w-3.5 h-3.5" />
+                            <span>{{ isProcessing ? 'Sedang Memproses...' : 'Mulai Ekstraksi Teks' }}</span>
                         </button>
                     </div>
 
@@ -573,22 +543,22 @@ const formatDateIndo = (dateStr) => {
 
             </div>
 
-            <!-- STAGE B: STEP 3 - VERIFIKASI & SIMPAN (When Transactions Parsed) -->
-            <div v-else class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden space-y-0">
+            <!-- STAGE 3: PERIKSA & SIMPAN (Preview Table) -->
+            <div v-else class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden space-y-0">
                 
                 <!-- Step 3 Action Header -->
-                <div class="px-5 py-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
+                <div class="px-4 py-3 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2">
                     <div>
                         <div class="flex items-center gap-2">
                             <button 
                                 @click="resetToStepOne"
-                                class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                                class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                             >
-                                <ArrowLeft class="w-3.5 h-3.5" /> Unggah File Lain
+                                <ArrowLeft class="w-3 h-3" /> Unggah Dokumen Lain
                             </button>
-                            <h2 class="text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-400">
+                            <h2 class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-400">
                                 <CheckCircle2 class="w-4 h-4 text-emerald-400" />
-                                Hasil Ekstraksi Transaksi ({{ parsedResults.length }} Transaksi Ditemukan)
+                                Hasil Ekstraksi Transaksi ({{ parsedResults.length }} Transaksi Terdeteksi)
                             </h2>
                         </div>
                         <p class="text-[11px] text-slate-400 mt-1">
@@ -601,14 +571,14 @@ const formatDateIndo = (dateStr) => {
                             v-if="parsedResults.some(r => r.is_duplicate)"
                             @click="removeDuplicateItems"
                             type="button"
-                            class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                            class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                             title="Hapus semua baris yang terdeteksi dobel dari daftar impor"
                         >
                             <Trash2 class="w-3.5 h-3.5" /> Hapus {{ parsedResults.filter(r => r.is_duplicate).length }} Baris Dobel
                         </button>
                         <button
                             @click="commitTransactions"
-                            class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+                            class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                             <Check class="w-4 h-4" /> Setujui & Simpan ke Pembukuan Aktif
                         </button>
@@ -616,7 +586,7 @@ const formatDateIndo = (dateStr) => {
                 </div>
 
                 <!-- Preview Table -->
-                <div class="overflow-x-auto excel-scroll p-3">
+                <div class="overflow-x-auto excel-scroll p-2">
                     <table class="w-full excel-table text-xs">
                         <thead>
                             <tr class="excel-header-row">
@@ -695,72 +665,47 @@ const formatDateIndo = (dateStr) => {
 
             </div>
 
-            <!-- 4. Riwayat Impor Terakhir (Matching Mockup Design) -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
-                <div class="px-5 py-3.5 bg-white border-b border-slate-100 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <Clock class="w-5 h-5 text-emerald-600" />
-                        <h2 class="text-sm md:text-base font-bold text-slate-900">
-                            Riwayat Impor Terakhir
-                        </h2>
-                    </div>
-                    <span class="text-xs font-semibold text-slate-500 hover:text-emerald-700 cursor-pointer flex items-center gap-1 transition-colors">
-                        Lihat Semua <ChevronRight class="w-3.5 h-3.5" />
-                    </span>
+            <!-- Riwayat Batch Impor Transaksi (Standard KeuDPRD Card) -->
+            <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
+                        <History class="w-4 h-4 text-slate-500" /> Riwayat Batch Impor Transaksi
+                    </h2>
+                    <span class="text-[11px] text-slate-500">Mencegah transaksi diimpor berulang kali</span>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs">
-                        <thead>
-                            <tr class="bg-emerald-50/60 text-slate-700 font-semibold border-b border-emerald-100/80">
-                                <th class="px-4 py-2.5 text-left">Nama File</th>
-                                <th class="px-4 py-2.5 text-left">Tanggal Impor</th>
-                                <th class="px-4 py-2.5 text-center">Jumlah Transaksi</th>
-                                <th class="px-4 py-2.5 text-center">Status</th>
+                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="px-3 py-2 text-left">No Batch</th>
+                                <th class="px-3 py-2 text-left">Metode</th>
+                                <th class="px-3 py-2 text-left">File / Sumber</th>
+                                <th class="px-3 py-2 text-center">Jumlah Record</th>
+                                <th class="px-3 py-2 text-center">Status</th>
+                                <th class="px-3 py-2 text-left">Waktu Impor</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             <tr v-if="recent_batches.length === 0">
-                                <td colspan="4" class="px-4 py-6 text-center text-slate-400 text-xs">
-                                    Belum ada riwayat impor transaksi sebelumnya.
+                                <td colspan="6" class="px-3 py-4 text-center text-slate-400 text-xs">
+                                    Belum ada transaksi yang pernah diimpor.
                                 </td>
                             </tr>
-                            <tr v-for="b in recent_batches" :key="b.id" class="hover:bg-slate-50/80 transition-colors">
-                                <!-- Nama File with Format Badge -->
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2.5">
-                                        <span 
-                                            :class="[
-                                                'w-6 h-6 rounded flex items-center justify-center font-bold text-[10px] font-mono shrink-0',
-                                                b.original_filename?.endsWith('.xlsx') || b.original_filename?.endsWith('.xls') || b.import_type === 'excel_historical'
-                                                    ? 'bg-emerald-600 text-white'
-                                                    : (b.original_filename?.endsWith('.pdf') ? 'bg-rose-600 text-white' : 'bg-blue-600 text-white')
-                                            ]"
-                                        >
-                                            {{ getFileIconType(b.original_filename) }}
-                                        </span>
-                                        <span class="font-bold text-slate-800">
-                                            {{ b.original_filename || (b.import_type === 'paste_text' ? 'Tempel Teks SIPD' : 'Dokumen Impor') }}
-                                        </span>
-                                    </div>
+                            <tr v-for="b in recent_batches" :key="b.id" class="hover:bg-slate-50">
+                                <td class="px-3 py-2 font-mono font-semibold text-slate-800">{{ b.batch_number }}</td>
+                                <td class="px-3 py-2">
+                                    <span v-if="b.import_type === 'excel_historical'" class="px-2 py-0.5 bg-purple-100 text-purple-800 rounded font-medium text-[10px]">Excel Historis</span>
+                                    <span v-else-if="b.import_type === 'paste_text'" class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-medium text-[10px]">Tempel Teks Cerdas</span>
+                                    <span v-else-if="b.import_type === 'file_ocr'" class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded font-medium text-[10px]">Dokumen & OCR</span>
+                                    <span v-else class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded font-medium text-[10px]">Upload PDF</span>
                                 </td>
-
-                                <!-- Tanggal Impor -->
-                                <td class="px-4 py-3 text-slate-600 font-medium">
-                                    {{ formatDateIndo(b.created_at) }}
+                                <td class="px-3 py-2 text-slate-600 font-medium">{{ b.original_filename || (b.import_type === 'paste_text' ? 'Tempel Teks SIPD' : 'Dokumen Impor') }}</td>
+                                <td class="px-3 py-2 text-center font-mono font-bold">{{ Number(b.parsed_count || 0).toLocaleString('id-ID') }} Record</td>
+                                <td class="px-3 py-2 text-center">
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-medium text-[10px] uppercase font-mono">Dibukukan</span>
                                 </td>
-
-                                <!-- Jumlah Transaksi -->
-                                <td class="px-4 py-3 text-center font-mono font-bold text-slate-800 text-sm">
-                                    {{ Number(b.parsed_count || 0).toLocaleString('id-ID') }}
-                                </td>
-
-                                <!-- Status Badge -->
-                                <td class="px-4 py-3 text-center">
-                                    <span class="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                        <Check class="w-3 h-3 stroke-[2.5]" /> Berhasil
-                                    </span>
-                                </td>
+                                <td class="px-3 py-2 text-slate-500 font-mono text-[11px]">{{ formatDateIndo(b.created_at) }}</td>
                             </tr>
                         </tbody>
                     </table>
