@@ -7,6 +7,8 @@ use App\Models\PaguRealization;
 use App\Models\Pptk;
 use App\Services\FiscalYearContext;
 use App\Services\PaguRealizationService;
+use App\Services\SmartSipdParser;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -213,24 +215,132 @@ class PaguController extends Controller
         $totalActivities = Activity::where('period_year', $year)->count();
         $totalPagu = (float) Activity::where('period_year', $year)->sum('pagu_budget');
         $totalSpj = (float) Activity::where('period_year', $year)->sum('spj_sipd_total');
+        $pptks = Pptk::where('is_active', true)->orderBy('sort_order')->get();
 
         return Inertia::render('Pagu/Import', [
             'year' => $year,
             'total_activities' => $totalActivities,
             'total_pagu' => $totalPagu,
             'total_spj' => $totalSpj,
+            'pptks' => $pptks,
         ]);
     }
 
     /**
-     * Proses Impor File Excel SIPD Fungsional.
+     * Preview / Parse File Dokumen atau Tempel Teks SIPD Fungsional.
+     */
+    public function parse(Request $request, SmartSipdParser $parser): JsonResponse
+    {
+        $this->ensureNotPptk();
+
+        $mode = $request->input('mode', 'file'); // 'file' or 'text'
+        $year = FiscalYearContext::resolve($request);
+        $items = [];
+
+        if ($mode === 'text') {
+            $request->validate([
+                'raw_text' => 'required|string|min:5',
+            ]);
+            $items = $parser->parseText($request->input('raw_text'), $year);
+        } else {
+            $request->validate([
+                'document_file' => 'nullable|file|max:25600',
+                'file' => 'nullable|file|max:25600',
+            ]);
+            $uploaded = $request->file('document_file') ?? $request->file('file');
+            if (! $uploaded) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File dokumen tidak ditemukan atau melebihi batas 25 MB.',
+                ], 422);
+            }
+
+            $items = $parser->parseFile(
+                $uploaded->getRealPath(),
+                $uploaded->getClientOriginalName(),
+                $uploaded->getMimeType(),
+                $year
+            );
+        }
+
+        $totalPagu = array_sum(array_column($items, 'pagu_budget'));
+        $totalSpj = array_sum(array_column($items, 'spj_sipd_total'));
+
+        return response()->json([
+            'success' => true,
+            'total_parsed' => count($items),
+            'items' => $items,
+            'total_pagu' => $totalPagu,
+            'total_spj' => $totalSpj,
+        ]);
+    }
+
+    /**
+     * Commit Verified Subkegiatan Data from SIPD into database.
+     */
+    public function commit(Request $request): RedirectResponse
+    {
+        $this->ensureNotPptk();
+
+        $validated = $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.code' => 'required|string',
+            'items.*.name' => 'required|string',
+            'items.*.program_code' => 'nullable|string',
+            'items.*.program_name' => 'nullable|string',
+            'items.*.pagu_budget' => 'required|numeric|min:0',
+            'items.*.spj_sipd_total' => 'nullable|numeric|min:0',
+            'items.*.sisa_pagu_sipd' => 'nullable|numeric',
+            'items.*.pptk_id' => 'nullable|exists:pptks,id',
+        ]);
+
+        $year = FiscalYearContext::resolve($request);
+        $importedCount = 0;
+        $totalPagu = 0.0;
+        $totalSpj = 0.0;
+
+        foreach ($validated['items'] as $item) {
+            $activity = Activity::where('code', $item['code'])
+                ->where('period_year', $year)
+                ->first();
+
+            if (! $activity) {
+                $activity = new Activity;
+                $activity->code = $item['code'];
+                $activity->period_year = $year;
+            }
+
+            $activity->name = $item['name'];
+            $activity->program_code = $item['program_code'] ?? '4.02.01';
+            $activity->program_name = $item['program_name'] ?? 'PROGRAM PENUNJANG URUSAN PEMERINTAHAN DAERAH KABUPATEN/KOTA';
+            $activity->pagu_budget = $item['pagu_budget'];
+            $activity->spj_sipd_total = $item['spj_sipd_total'] ?? 0;
+            $activity->sisa_pagu_sipd = $item['sisa_pagu_sipd'] ?? ($item['pagu_budget'] - ($item['spj_sipd_total'] ?? 0));
+            if (! empty($item['pptk_id'])) {
+                $activity->pptk_id = $item['pptk_id'];
+            }
+            $activity->save();
+
+            $importedCount++;
+            $totalPagu += (float) $item['pagu_budget'];
+            $totalSpj += (float) ($item['spj_sipd_total'] ?? 0);
+        }
+
+        return redirect()->route('pagu.index')->with(
+            'success',
+            "Berhasil menyinkronkan {$importedCount} subkegiatan dari SIPD! Total Pagu: Rp ".number_format($totalPagu, 0, ',', '.')
+        );
+    }
+
+    /**
+     * Proses Impor File Excel SIPD Fungsional (Legacy Form Support).
      */
     public function import(Request $request, PaguRealizationService $service): RedirectResponse
     {
         $this->ensureNotPptk();
 
         $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls|max:20480',
+            'file' => 'required|file|max:25600',
         ]);
 
         $year = FiscalYearContext::resolve($request);
@@ -242,7 +352,7 @@ class PaguController extends Controller
 
             return redirect()->route('pagu.index')->with('success', "Berhasil menyinkronkan {$result['imported_count']} subkegiatan dari SIPD! Total Pagu: Rp ".number_format($result['total_pagu'], 0, ',', '.'));
         } catch (\Throwable $e) {
-            return redirect()->back()->withErrors(['file' => 'Gagal membaca file Excel SIPD: '.$e->getMessage()]);
+            return redirect()->back()->withErrors(['file' => 'Gagal membaca file SIPD: '.$e->getMessage()]);
         }
     }
 

@@ -87,6 +87,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/subkegiatan/{activity}/assign-pptk', [PaguController::class, 'assignPptk'])->name('activities.assign-pptk');
         Route::get('/impor', [PaguController::class, 'importView'])->name('import');
         Route::post('/impor', [PaguController::class, 'import'])->name('import.post');
+        Route::post('/impor/parse', [PaguController::class, 'parse'])->name('import.parse');
+        Route::post('/impor/commit', [PaguController::class, 'commit'])->name('import.commit');
     });
 
     // Pencarian Global (Global Search)
