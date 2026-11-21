@@ -247,15 +247,18 @@
 
     <!-- Floating Top Toolbar on Screen (Hidden on Print) -->
     <div class="print-toolbar">
-        <div style="font-size: 13px; font-weight: 600;">
-            📄 Dokumen Cetak BKU: <b>{{ $title }}</b> (TA {{ $year }})
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.85;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Dokumen Cetak BKU: <b>{{ $title }}</b> (TA {{ $year }})</span>
         </div>
         <div style="display: flex; gap: 8px;">
             <button onclick="window.print()" class="btn btn-print">
-                🖨️ Cetak Dokumen / Simpan PDF
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+                <span>Cetak Dokumen / Simpan PDF</span>
             </button>
             <button onclick="window.close()" class="btn btn-close">
-                ✖️ Tutup Tab
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <span>Tutup Tab</span>
             </button>
         </div>
     </div>
@@ -264,7 +267,7 @@
     <div class="doc-header">
         @if(!empty($withNotes))
             <div style="display: inline-block; background-color: #fef3c7; color: #92400e; border: 1px solid #f59e0b; padding: 2px 10px; font-size: 8pt; font-weight: bold; border-radius: 4px; margin-bottom: 6px; letter-spacing: 0.5px;">
-                📝 DRAFT / LEMBAR KERJA RAPAT INTERNAL (DENGAN MEMO & CATATAN)
+                DRAFT / LEMBAR KERJA RAPAT INTERNAL (DENGAN MEMO &amp; CATATAN)
             </div>
         @endif
         <h2>PEMERINTAH KABUPATEN BANYUMAS</h2>
