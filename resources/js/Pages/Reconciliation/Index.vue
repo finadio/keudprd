@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import { 
@@ -24,6 +24,8 @@ const props = defineProps({
 
 const searchQuery = ref('');
 const statusFilter = ref('all');
+const currentPage = ref(1);
+const perPage = ref(20);
 
 const switchMonth = (m) => {
     router.get('/rekonsiliasi', { month: m, year: props.year }, { preserveState: true, preserveScroll: true });
@@ -39,11 +41,11 @@ const formatRupiah = (val) => {
 };
 
 const filteredItems = computed(() => {
-    return props.items.filter(item => {
+    return (props.items || []).filter(item => {
         const matchesSearch = !searchQuery.value || 
-            item.uraian.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            item.tanggal.includes(searchQuery.value) ||
-            item.pptk_name.toLowerCase().includes(searchQuery.value.toLowerCase());
+            (item.uraian && item.uraian.toLowerCase().includes(searchQuery.value.toLowerCase())) ||
+            (item.tanggal && item.tanggal.includes(searchQuery.value)) ||
+            (item.pptk_name && item.pptk_name.toLowerCase().includes(searchQuery.value.toLowerCase()));
 
         const matchesStatus = statusFilter.value === 'all' || 
             (statusFilter.value === 'cocok' && item.status_rekonsiliasi === 'cocok') ||
@@ -52,28 +54,37 @@ const filteredItems = computed(() => {
         return matchesSearch && matchesStatus;
     });
 });
-</script>
 
-<script>
-import { computed } from 'vue';
-export default {
-    computed: {
-        filteredItems() {
-            return this.items.filter(item => {
-                const matchesSearch = !this.searchQuery || 
-                    item.uraian.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                    item.tanggal.includes(this.searchQuery) ||
-                    item.pptk_name.toLowerCase().includes(this.searchQuery.toLowerCase());
+const totalPages = computed(() => {
+    if (perPage.value === 'all' || !filteredItems.value.length) return 1;
+    return Math.ceil(filteredItems.value.length / perPage.value);
+});
 
-                const matchesStatus = this.statusFilter === 'all' || 
-                    (this.statusFilter === 'cocok' && item.status_rekonsiliasi === 'cocok') ||
-                    (this.statusFilter === 'perlu_periksa' && item.status_rekonsiliasi === 'perlu_periksa');
+const paginatedItems = computed(() => {
+    if (perPage.value === 'all') return filteredItems.value;
+    const start = (currentPage.value - 1) * perPage.value;
+    return filteredItems.value.slice(start, start + perPage.value);
+});
 
-                return matchesSearch && matchesStatus;
-            });
-        }
+const displayedPages = computed(() => {
+    const total = totalPages.value;
+    const current = currentPage.value;
+    if (total <= 7) {
+        return Array.from({ length: total }, (_, i) => i + 1);
     }
-}
+    const pages = [1];
+    if (current > 3) pages.push('...');
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (current < total - 2) pages.push('...');
+    pages.push(total);
+    return pages;
+});
+
+watch([searchQuery, statusFilter, () => props.current_month], () => {
+    currentPage.value = 1;
+});
 </script>
 
 <template>
@@ -197,14 +208,16 @@ export default {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(item, idx) in filteredItems"
+                                v-for="(item, idx) in paginatedItems"
                                 :key="item.bank_id"
                                 :class="[
                                     'hover:bg-slate-50',
                                     item.status_rekonsiliasi === 'perlu_periksa' ? 'bg-amber-50/40' : 'bg-white'
                                 ]"
                             >
-                                <td class="text-center font-mono text-slate-500">{{ idx + 1 }}</td>
+                                <td class="text-center font-mono text-slate-500">
+                                    {{ (perPage === 'all' ? 0 : (currentPage - 1) * perPage) + idx + 1 }}
+                                </td>
                                 <td class="text-center font-mono text-slate-700 whitespace-nowrap">{{ item.tanggal }}</td>
                                 <td class="text-slate-900 font-medium">{{ item.uraian }}</td>
                                 <td 
@@ -239,8 +252,82 @@ export default {
                                 </td>
                                 <td class="text-slate-600 text-[11px]">{{ item.catatan }}</td>
                             </tr>
+                            <tr v-if="filteredItems.length === 0">
+                                <td colspan="8" class="text-center py-8 text-slate-400">
+                                    Tidak ada transaksi rekonsiliasi yang cocok dengan pencarian / filter.
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Table Pagination Controls matching BKU Standard -->
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs select-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 print:hidden no-print">
+                <!-- Left: Rows per page selector & Count info -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-slate-500 font-medium">Tampilkan:</span>
+                        <div class="inline-flex rounded-md shadow-2xs">
+                            <button
+                                v-for="size in [10, 20, 50, 100, 'all']"
+                                :key="size"
+                                @click="perPage = size; currentPage = 1"
+                                :class="[
+                                    'px-2.5 py-1 text-xs font-semibold border first:rounded-l-md last:rounded-r-md -ml-px transition-colors cursor-pointer',
+                                    perPage === size
+                                        ? 'bg-[#107c41] border-[#107c41] text-white z-10'
+                                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                                ]"
+                            >
+                                {{ size === 'all' ? 'Semua' : size }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <span class="text-slate-300">|</span>
+
+                    <span class="text-slate-600">
+                        Menampilkan 
+                        <strong class="text-slate-900 font-mono">{{ filteredItems.length === 0 ? 0 : (perPage === 'all' ? 1 : (currentPage - 1) * perPage + 1) }}</strong> - 
+                        <strong class="text-slate-900 font-mono">{{ perPage === 'all' ? filteredItems.length : Math.min(currentPage * perPage, filteredItems.length) }}</strong> 
+                        dari <strong class="text-slate-900 font-mono">{{ filteredItems.length }}</strong> data
+                    </span>
+                </div>
+
+                <!-- Right: Page navigation buttons -->
+                <div v-if="perPage !== 'all' && totalPages > 1" class="flex items-center gap-1">
+                    <button
+                        @click="currentPage--"
+                        :disabled="currentPage <= 1"
+                        class="px-2.5 py-1 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-white text-slate-700 border border-slate-200 rounded-md font-medium text-xs transition-colors cursor-pointer disabled:cursor-not-allowed"
+                    >
+                        Sebelumnya
+                    </button>
+
+                    <template v-for="(p, i) in displayedPages" :key="'p-' + i">
+                        <span v-if="p === '...'" class="px-2 text-slate-400">...</span>
+                        <button
+                            v-else
+                            @click="currentPage = p"
+                            :class="[
+                                'min-w-[28px] h-7 px-2 text-xs font-semibold rounded-md border transition-colors cursor-pointer',
+                                currentPage === p
+                                    ? 'bg-[#107c41] border-[#107c41] text-white shadow-2xs'
+                                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                            ]"
+                        >
+                            {{ p }}
+                        </button>
+                    </template>
+
+                    <button
+                        @click="currentPage++"
+                        :disabled="currentPage >= totalPages"
+                        class="px-2.5 py-1 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-white text-slate-700 border border-slate-200 rounded-md font-medium text-xs transition-colors cursor-pointer disabled:cursor-not-allowed"
+                    >
+                        Berikutnya
+                    </button>
                 </div>
             </div>
 
