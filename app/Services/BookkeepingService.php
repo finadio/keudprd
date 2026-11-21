@@ -314,27 +314,29 @@ class BookkeepingService
         $totalSisaPanjar = 0.0;
         $totalSisaRiil = 0.0;
 
+        $isYear2026 = ($year === 2026);
+
         foreach ($pptks as $idx => $p) {
             $pptkDebet = (float) ($matrix['debet'][$p->id]['total'] ?? 0.0);
             $pptkPanjar = (float) ($matrix['panjar'][$p->id]['total'] ?? 0.0);
             $pptkJml = $pptkDebet + $pptkPanjar;
 
-            // Fetch SPJ from transactions or verified benchmark matrix
+            // Fetch SPJ from transactions or verified benchmark matrix (for 2026)
             $pptkSpj = (float) Transaction::where('period_year', $year)
                 ->where('pptk_id', $p->id)
                 ->where('transaction_type', 'spj_realization')
                 ->sum('amount_net');
 
-            if ($pptkSpj == 0 && isset($matrix['fallback_spj'][$p->code])) {
+            if ($isYear2026 && $pptkSpj == 0 && isset($matrix['fallback_spj'][$p->code])) {
                 $pptkSpj = (float) $matrix['fallback_spj'][$p->code];
             }
 
             // Total Hutang Panjar = Total Beban (Jml) - SPJ
             $hutangPanjar = $pptkJml - $pptkSpj;
 
-            // Sisa Bank & Tunai per PPTK
-            $sisaBank = (float) ($matrix['fallback_bank'][$p->code] ?? 0.0);
-            $sisaTunai = (float) ($matrix['fallback_tunai'][$p->code] ?? 0.0);
+            // Sisa Bank & Tunai per PPTK (for 2026 from Excel matrix; for other years 0.0 unless recorded)
+            $sisaBank = $isYear2026 ? (float) ($matrix['fallback_bank'][$p->code] ?? 0.0) : 0.0;
+            $sisaTunai = $isYear2026 ? (float) ($matrix['fallback_tunai'][$p->code] ?? 0.0) : 0.0;
             $spjLanjutan = 0.0;
             $sisaPanjarBersih = $sisaTunai - $spjLanjutan;
             $totalSisa = $sisaPanjarBersih + $sisaBank;
@@ -374,24 +376,47 @@ class BookkeepingService
         $bkuUp = $this->getBkuUp($year);
         $kasKecil = $this->getKasKecil($year);
 
-        $upAwal = 720000000.0;
-        $sisaUp = (float) ($bkuUp['saldo_akhir'] ?? 335720241.0);
-        $kasPanjar = $totalHutangPanjar; // Rp 364.179.759 (Kolom G13)
-        $sisaKk = (float) ($kasKecil['saldo_akhir'] ?? 0.0);
-        $totalKasUp = $sisaUp + $kasPanjar + $sisaKk; // Rp 699.900.000 (F38)
-        $selisihUp = $upAwal - $totalKasUp; // Rp 20.100.000 (F40)
-        $rencanaSpj = 20100000.0; // Rp 20.100.000 (F41, dari 'Aul-Ety'!H373)
-        $rencanaLs = 0.0;
-        $sisaKontrolUp = $selisihUp - $rencanaSpj - $rencanaLs; // Rp 0.0 (F43)
+        if ($isYear2026) {
+            $upAwal = 720000000.0;
+            $sisaUp = (float) ($bkuUp['saldo_akhir'] ?? 335720241.0);
+            $kasPanjar = $totalHutangPanjar; // Rp 364.179.759 (Kolom G13)
+            $sisaKk = (float) ($kasKecil['saldo_akhir'] ?? 0.0);
+            $totalKasUp = $sisaUp + $kasPanjar + $sisaKk; // Rp 699.900.000 (F38)
+            $selisihUp = $upAwal - $totalKasUp; // Rp 20.100.000 (F40)
+            $rencanaSpj = 20100000.0; // Rp 20.100.000 (F41, dari 'Aul-Ety'!H373)
+            $rencanaLs = 0.0;
+            $sisaKontrolUp = $selisihUp - $rencanaSpj - $rencanaLs; // Rp 0.0 (F43)
 
-        // Sisi Kanan: Rekapitulasi Saldo Bank / RK (Kolom H & I Baris 34-42)
-        $bankUp = $sisaUp; // Rp 335.720.241 (I34)
-        $bankLsReses = 0.0;
-        $bankLs = 0.0;
-        $totalBankBuku = $bankUp + $bankLsReses + $bankLs; // Rp 335.720.241 (I38)
-        $rekeningKoran = 335720241.0; // Rp 335.720.241 (I40, Rekening Koran Bank Jateng)
-        $selisihBank = $rekeningKoran - $totalBankBuku; // Rp 0.0 (I42)
-        $kontrolAkhir = $sisaKontrolUp - $selisihBank; // Rp 0.0 (G44)
+            // Sisi Kanan: Rekapitulasi Saldo Bank / RK (Kolom H & I Baris 34-42)
+            $bankUp = $sisaUp; // Rp 335.720.241 (I34)
+            $bankLsReses = 0.0;
+            $bankLs = 0.0;
+            $totalBankBuku = $bankUp + $bankLsReses + $bankLs; // Rp 335.720.241 (I38)
+            $rekeningKoran = 335720241.0; // Rp 335.720.241 (I40, Rekening Koran Bank Jateng)
+            $selisihBank = $rekeningKoran - $totalBankBuku; // Rp 0.0 (I42)
+            $kontrolAkhir = $sisaKontrolUp - $selisihBank; // Rp 0.0 (G44)
+        } else {
+            // For year 2027+, dynamically derive from actual year transactions
+            $upAwal = (float) Transaction::where('period_year', $year)
+                ->where('transaction_type', 'sp2d_up')
+                ->sum('amount_net');
+            $sisaUp = (float) ($bkuUp['saldo_akhir'] ?? 0.0);
+            $kasPanjar = $totalHutangPanjar;
+            $sisaKk = (float) ($kasKecil['saldo_akhir'] ?? 0.0);
+            $totalKasUp = $sisaUp + $kasPanjar + $sisaKk;
+            $selisihUp = ($upAwal > 0) ? ($upAwal - $totalKasUp) : 0.0;
+            $rencanaSpj = 0.0;
+            $rencanaLs = 0.0;
+            $sisaKontrolUp = $selisihUp;
+
+            $bankUp = $sisaUp;
+            $bankLsReses = 0.0;
+            $bankLs = 0.0;
+            $totalBankBuku = $bankUp;
+            $rekeningKoran = $totalBankBuku;
+            $selisihBank = 0.0;
+            $kontrolAkhir = 0.0;
+        }
 
         return [
             'meta' => [
@@ -481,29 +506,55 @@ class BookkeepingService
             $totalP = 0.0;
 
             for ($m = 1; $m <= 12; $m++) {
-                $valD = $baselineDebet[$p->code][$m] ?? 0.0;
-                $valP = $baselinePanjar[$p->code][$m] ?? 0.0;
+                if ($year === 2026) {
+                    $valD = $baselineDebet[$p->code][$m] ?? 0.0;
+                    $valP = $baselinePanjar[$p->code][$m] ?? 0.0;
 
-                // Add adjustments if any
-                $adj = $adjustments->where('pptk_id', $p->id)->where('period_month', $m)->sum('amount');
-                $valD += (float) $adj;
+                    // Add adjustments if any
+                    $adj = $adjustments->where('pptk_id', $p->id)->where('period_month', $m)->sum('amount');
+                    $valD += (float) $adj;
 
-                // For post-cutoff months (> 10), dynamically add newly entered transactions
-                if ($m > 10) {
-                    $newDebet = (float) Transaction::where('period_year', $year)
+                    // For post-cutoff months (> 10), dynamically add newly entered transactions
+                    if ($m > 10) {
+                        $newDebet = (float) Transaction::where('period_year', $year)
+                            ->where('period_month', $m)
+                            ->where('pptk_id', $p->id)
+                            ->where('transaction_type', 'debet_rekening')
+                            ->sum('amount_net');
+
+                        $newPanjar = (float) Transaction::where('period_year', $year)
+                            ->where('period_month', $m)
+                            ->where('pptk_id', $p->id)
+                            ->where('transaction_type', 'panjar_disbursement')
+                            ->sum('amount_net');
+
+                        $valD += $newDebet;
+                        $valP += $newPanjar;
+                    }
+                } else {
+                    // For TA 2027 and other fiscal years: calculate dynamically strictly from that year's transactions
+                    $valD = (float) Transaction::where('period_year', $year)
                         ->where('period_month', $m)
                         ->where('pptk_id', $p->id)
                         ->where('transaction_type', 'debet_rekening')
                         ->sum('amount_net');
 
-                    $newPanjar = (float) Transaction::where('period_year', $year)
+                    $disbursedPanjar = (float) Transaction::where('period_year', $year)
                         ->where('period_month', $m)
                         ->where('pptk_id', $p->id)
                         ->where('transaction_type', 'panjar_disbursement')
                         ->sum('amount_net');
 
-                    $valD += $newDebet;
-                    $valP += $newPanjar;
+                    $returnedPanjar = (float) Transaction::where('period_year', $year)
+                        ->where('period_month', $m)
+                        ->where('pptk_id', $p->id)
+                        ->where('transaction_type', 'panjar_return')
+                        ->sum('amount_net');
+
+                    $valP = $disbursedPanjar - $returnedPanjar;
+
+                    $adj = $adjustments->where('pptk_id', $p->id)->where('period_month', $m)->sum('amount');
+                    $valD += (float) $adj;
                 }
 
                 $debetRow[$m] = $valD;
@@ -523,7 +574,7 @@ class BookkeepingService
             'debet' => $debetMatrix,
             'panjar' => $panjarMatrix,
             'month_names' => $monthNames,
-            'fallback_spj' => [
+            'fallback_spj' => ($year === 2026) ? [
                 'AUL_ETY' => 961145860.0,
                 'GAYA' => 341725100.0,
                 'RATMAN' => 767597219.0,
@@ -533,8 +584,8 @@ class BookkeepingService
                 'SGNG_EMI' => 36653500.0,
                 'SRI_L' => 4642500.0,
                 'IRNA' => 0.0,
-            ],
-            'fallback_bank' => [
+            ] : [],
+            'fallback_bank' => ($year === 2026) ? [
                 'AUL_ETY' => 53475000.0,
                 'GAYA' => 10600000.0,
                 'RATMAN' => 246225459.0,
@@ -544,8 +595,8 @@ class BookkeepingService
                 'SGNG_EMI' => 6766000.0,
                 'SRI_L' => 0.0,
                 'IRNA' => 0.0,
-            ],
-            'fallback_tunai' => [
+            ] : [],
+            'fallback_tunai' => ($year === 2026) ? [
                 'AUL_ETY' => 0.0,
                 'GAYA' => 4372000.0,
                 'RATMAN' => 22792500.0,
@@ -555,7 +606,7 @@ class BookkeepingService
                 'SGNG_EMI' => 0.0,
                 'SRI_L' => 0.0,
                 'IRNA' => 0.0,
-            ],
+            ] : [],
         ];
     }
 

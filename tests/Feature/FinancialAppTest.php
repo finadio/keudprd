@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Mail\BackupArchiveMail;
+use App\Models\AccountingPeriod;
+use App\Models\MasterSetting;
 use App\Models\Pptk;
 use App\Models\Transaction;
 use App\Models\User;
@@ -19,6 +21,10 @@ class FinancialAppTest extends TestCase
         $user = User::first();
         $this->assertNotNull($user);
         $this->actingAs($user);
+
+        MasterSetting::query()->update(['is_active' => false]);
+        MasterSetting::where('fiscal_year', 2026)->update(['is_active' => true]);
+        AccountingPeriod::where('fiscal_year', 2026)->update(['is_closed' => false]);
     }
 
     /**

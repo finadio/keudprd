@@ -7,6 +7,7 @@ use App\Models\MasterSetting;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\BackupExportService;
+use App\Services\BookkeepingService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\File;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -23,6 +24,10 @@ class MultiYearFiscalTest extends TestCase
         $user = User::first();
         $this->assertNotNull($user);
         $this->actingAs($user);
+
+        MasterSetting::query()->update(['is_active' => false]);
+        MasterSetting::where('fiscal_year', 2026)->update(['is_active' => true]);
+        AccountingPeriod::where('fiscal_year', 2026)->update(['is_closed' => false]);
     }
 
     /**
@@ -155,5 +160,29 @@ class MultiYearFiscalTest extends TestCase
         } finally {
             File::deleteDirectory($tempDir);
         }
+    }
+
+    /**
+     * Test newly opened fiscal year without transactions has strictly zero values in all bookkeeping summaries.
+     */
+    public function test_new_fiscal_year_isolates_from_prior_year_benchmarks(): void
+    {
+        $service = app(BookkeepingService::class);
+
+        // 2026 maintains verified historical benchmark
+        $summary2026 = $service->getHitunganSummary(2026);
+        $this->assertGreaterThan(0, $summary2026['totals']['debet']);
+        $this->assertGreaterThan(0, $summary2026['totals']['panjar']);
+        $this->assertGreaterThan(0, $summary2026['totals']['spj']);
+        $this->assertSame(0.0, $summary2026['totals']['kontrol_selisih']);
+
+        // 2027 (clean year without transactions) must be strictly 0 across all summary cards
+        $summary2027 = $service->getHitunganSummary(2027);
+        $this->assertSame(0.0, $summary2027['totals']['debet']);
+        $this->assertSame(0.0, $summary2027['totals']['panjar']);
+        $this->assertSame(0.0, $summary2027['totals']['jml']);
+        $this->assertSame(0.0, $summary2027['totals']['spj']);
+        $this->assertSame(0.0, $summary2027['totals']['total_hutang_panjar']);
+        $this->assertSame(0.0, $summary2027['totals']['kontrol_selisih']);
     }
 }
