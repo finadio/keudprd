@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {
@@ -80,6 +80,38 @@ const resetFilters = () => {
     filterType.value = '';
     filterSpj.value = '';
     applyFilters();
+};
+
+const currentPerPage = computed(() => {
+    return Number(props.filters?.per_page || 15);
+});
+
+const changePerPage = (size) => {
+    const val = size === 'all' ? 99999 : size;
+    router.get('/pagu/transaksi', {
+        search: search.value || undefined,
+        pptk_id: filterPptk.value || undefined,
+        activity_id: filterActivity.value || undefined,
+        type: filterType.value || undefined,
+        is_spj_submitted: filterSpj.value !== '' ? filterSpj.value : undefined,
+        per_page: val,
+        page: 1,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+const cleanPaginationLabel = (label) => {
+    if (!label) return '';
+    const clean = String(label).trim();
+    if (clean.includes('Previous') || clean.includes('previous') || clean.includes('&laquo;')) {
+        return 'Sebelumnya';
+    }
+    if (clean.includes('Next') || clean.includes('next') || clean.includes('&raquo;')) {
+        return 'Berikutnya';
+    }
+    return clean;
 };
 
 // Modal State
@@ -398,19 +430,63 @@ const toggleSpj = (tx) => {
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <div v-if="transactions.links && transactions.links.length > 3" class="p-4 border-t border-slate-200 flex justify-center gap-1 text-xs">
-                    <Link
-                        v-for="(link, i) in transactions.links"
-                        :key="i"
-                        :href="link.url || '#'"
-                        v-html="link.label"
-                        class="px-3 py-1.5 rounded-lg border text-xs"
-                        :class="[
-                            link.active ? 'bg-emerald-600 text-white font-bold border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50',
-                            !link.url ? 'opacity-40 pointer-events-none' : ''
-                        ]"
-                    />
+                <!-- Table Pagination Controls matching BKU & Buku Bank Standard -->
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs select-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 print:hidden no-print">
+                    <!-- Left: Rows per page selector & Count info -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-500 font-medium">Tampilkan:</span>
+                            <div class="inline-flex rounded-md shadow-2xs">
+                                <button
+                                    v-for="size in [10, 20, 50, 100, 'all']"
+                                    :key="size"
+                                    @click="changePerPage(size)"
+                                    :class="[
+                                        'px-2.5 py-1 text-xs font-semibold border first:rounded-l-md last:rounded-r-md -ml-px transition-colors cursor-pointer',
+                                        (size === 'all' && currentPerPage >= 9999) || currentPerPage === size
+                                            ? 'bg-[#107c41] border-[#107c41] text-white z-10'
+                                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                                    ]"
+                                >
+                                    {{ size === 'all' ? 'Semua' : size }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <span class="text-slate-300">|</span>
+
+                        <span class="text-slate-600">
+                            Menampilkan 
+                            <strong class="text-slate-900 font-mono">{{ transactions.total === 0 ? 0 : (transactions.from || 1) }}</strong> - 
+                            <strong class="text-slate-900 font-mono">{{ transactions.to || transactions.total }}</strong> 
+                            dari <strong class="text-slate-900 font-mono">{{ transactions.total }}</strong> data
+                        </span>
+                    </div>
+
+                    <!-- Right: Page navigation links -->
+                    <div v-if="transactions.links && transactions.links.length > 3" class="flex items-center gap-1">
+                        <template v-for="(link, idx) in transactions.links" :key="idx">
+                            <span v-if="link.label === '...'" class="px-2 text-slate-400">...</span>
+                            <Link
+                                v-else-if="link.url"
+                                :href="link.url"
+                                :class="[
+                                    'min-w-[28px] h-7 px-2.5 flex items-center justify-center text-xs font-semibold rounded-md border transition-colors shadow-2xs cursor-pointer',
+                                    link.active
+                                        ? 'bg-[#107c41] border-[#107c41] text-white shadow-2xs'
+                                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                                ]"
+                            >
+                                {{ cleanPaginationLabel(link.label) }}
+                            </Link>
+                            <span
+                                v-else
+                                class="min-w-[28px] h-7 px-2.5 flex items-center justify-center text-xs font-medium rounded-md border border-slate-200 bg-white text-slate-400 opacity-50 cursor-not-allowed"
+                            >
+                                {{ cleanPaginationLabel(link.label) }}
+                            </span>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
