@@ -308,7 +308,12 @@ class ReportController extends Controller
         try {
             $backup = $backupService->emailBackupZip($email, $year, $operator);
 
-            return back()->with('success', "Arsip cadangan ZIP ({$backup['filename']}) berhasil dikirim ke {$email}!");
+            $isLogMode = config('mail.default') === 'log';
+            $msg = $isLogMode
+                ? "Arsip cadangan ZIP ({$backup['filename']}) berhasil dibuat (Mode simulasi/LOG aktif di .env. Untuk mengirim ke email asli, aktifkan akun SMTP di .env)."
+                : "Arsip cadangan ZIP ({$backup['filename']}) berhasil dikirim ke {$email}!";
+
+            return back()->with('success', $msg);
         } catch (\Throwable $e) {
             return back()->with('error', 'Gagal mengirim email: '.$e->getMessage());
         }
