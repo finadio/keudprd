@@ -139,6 +139,7 @@ class SmartTransactionParser
     /**
      * Parse Excel spreadsheet into transactions using PhpSpreadsheet.
      * Efficiently reads multi-sheet workbooks (Buku Bank and BKU per PPTK).
+     * Extracts exact Receipt (Penerimaan) vs Disbursement (Pengeluaran) from column headers.
      */
     protected function parseExcelFile(string $filePath): array
     {
@@ -170,50 +171,199 @@ class SmartTransactionParser
                 }
 
                 $rows = $sheet->toArray(null, true, false, false);
+                if (count($rows) < 5) {
+                    continue;
+                }
 
-                foreach ($rows as $rIdx => $row) {
-                    $cells = [];
-                    foreach ($row as $val) {
-                        if ($val !== null && trim((string) $val) !== '') {
-                            // Translate Excel numeric serial dates to d/m/Y format
-                            if (is_numeric($val) && (int) $val >= 43831 && (int) $val <= 55000 && (float) $val == (int) $val) {
-                                try {
-                                    $val = Date::excelToDateTimeObject((int) $val)->format('d/m/Y');
-                                } catch (\Throwable $e) {
-                                }
-                            }
-                            $cells[] = trim((string) $val);
+                // 1. Detect header row & column indexes
+                $headerRowIdx = null;
+                $colDate = null;
+                $colDesc = null;
+                $colDocNo = null;
+                $colReceipt = null;
+                $colDisb = null;
+                $colDebet = null;
+                $colPanjar = null;
+                $colSpj = null;
+
+                for ($r = 0; $r < min(15, count($rows)); $r++) {
+                    $rowVals = array_map(fn ($v) => strtolower(trim((string) $v)), $rows[$r]);
+                    foreach ($rowVals as $cIdx => $cVal) {
+                        if ($colDate === null && in_array($cVal, ['tanggal', 'tgl', 'date'])) {
+                            $colDate = $cIdx;
+                        }
+                        if ($colDesc === null && in_array($cVal, ['uraian', 'keterangan', 'transaksi', 'description'])) {
+                            $colDesc = $cIdx;
+                        }
+                        if ($colDocNo === null && in_array($cVal, ['no bku', 'no. bku', 'no bukti', 'no dokumen', 'no. dokumen'])) {
+                            $colDocNo = $cIdx;
+                        }
+                        if ($colReceipt === null && in_array($cVal, ['penerimaan', 'kredit', 'masuk', 'terima'])) {
+                            $colReceipt = $cIdx;
+                        }
+                        if ($colDisb === null && in_array($cVal, ['pengeluaran', 'keluar'])) {
+                            $colDisb = $cIdx;
+                        }
+                        if ($colDebet === null && $cVal === 'debet') {
+                            $colDebet = $cIdx;
+                        }
+                        if ($colPanjar === null && $cVal === 'panjar') {
+                            $colPanjar = $cIdx;
+                        }
+                        if ($colSpj === null && $cVal === 'spj') {
+                            $colSpj = $cIdx;
                         }
                     }
+                    if ($colDate !== null && ($colReceipt !== null || $colDisb !== null || $colDebet !== null)) {
+                        $headerRowIdx = $r;
+                        break;
+                    }
+                }
 
-                    if (count($cells) < 2) {
+                // Fine-tune header positions if found
+                if ($headerRowIdx !== null) {
+                    foreach ($rows[$headerRowIdx] as $cIdx => $val) {
+                        $v = strtolower(trim((string) $val));
+                        if (in_array($v, ['penerimaan', 'masuk', 'kredit'])) {
+                            $colReceipt = $cIdx;
+                        }
+                        if (in_array($v, ['pengeluaran', 'keluar'])) {
+                            $colDisb = $cIdx;
+                        }
+                        if ($v === 'debet' && $cIdx > 5) {
+                            $colDebet = $cIdx;
+                        }
+                        if ($v === 'panjar') {
+                            $colPanjar = $cIdx;
+                        }
+                        if ($v === 'spj') {
+                            $colSpj = $cIdx;
+                        }
+                    }
+                }
+
+                $startRow = ($headerRowIdx !== null) ? $headerRowIdx + 1 : 10;
+                for ($r = $startRow; $r < count($rows); $r++) {
+                    $row = $rows[$r];
+
+                    // Extract date
+                    $rawDate = $row[$colDate ?? 1] ?? null;
+                    if ($rawDate === null || trim((string) $rawDate) === '') {
                         continue;
                     }
 
-                    $rowLine = implode(" \t ", $cells);
-                    $lowerLine = strtolower($rowLine);
-
-                    // Skip summary / header lines
-                    if (str_contains($lowerLine, 'saldo bulan lalu') ||
-                        str_contains($lowerLine, 'jumlah periode ini') ||
-                        str_contains($lowerLine, 'jumlah sampai periode') ||
-                        str_contains($lowerLine, 'sisa kas') ||
-                        str_contains($lowerLine, 'penerimaan | pengeluaran')) {
+                    $dateStr = null;
+                    if (is_numeric($rawDate) && (int) $rawDate >= 43831 && (int) $rawDate <= 55000) {
+                        try {
+                            $dateStr = Date::excelToDateTimeObject((int) $rawDate)->format('Y-m-d');
+                        } catch (\Throwable $e) {
+                        }
+                    } elseif (preg_match('/\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})\b/', (string) $rawDate, $m)) {
+                        $d = (int) $m[1];
+                        $mo = (int) $m[2];
+                        $y = (int) $m[3];
+                        if ($y < 100) {
+                            $y += 2000;
+                        }
+                        $dateStr = sprintf('%04d-%02d-%02d', $y, $mo, $d);
+                    }
+                    if (! $dateStr) {
                         continue;
                     }
 
-                    $txItems = $this->parseText($rowLine);
-                    if (! empty($txItems)) {
-                        foreach ($txItems as $item) {
-                            if ($sheetPptk && empty($item['pptk_id'])) {
-                                $item['pptk_id'] = $sheetPptk->id;
-                                $item['pptk_code'] = $sheetPptk->code;
-                                $item['pptk_name'] = $sheetPptk->display_name;
-                            }
-                            $item['temp_id'] = 'TMP-'.(count($allTransactions) + 1);
-                            $allTransactions[] = $item;
+                    // Extract description
+                    $desc = trim((string) ($row[$colDesc ?? 2] ?? ''));
+                    $lowerDesc = strtolower($desc);
+                    if (str_contains($lowerDesc, 'saldo bulan lalu') ||
+                        str_contains($lowerDesc, 'jumlah periode ini') ||
+                        str_contains($lowerDesc, 'jumlah sampai periode') ||
+                        str_contains($lowerDesc, 'sisa kas') ||
+                        str_contains($lowerDesc, 'penerimaan | pengeluaran')) {
+                        continue;
+                    }
+
+                    // Extract exact Receipt & Disbursement amounts from columns
+                    $valReceipt = 0.0;
+                    if ($colReceipt !== null && isset($row[$colReceipt])) {
+                        $clean = preg_replace('/[^\d\.\,\-]/', '', (string) $row[$colReceipt]);
+                        if (str_contains($clean, ',') && str_contains($clean, '.')) {
+                            $clean = str_replace('.', '', str_replace(',', '.', $clean));
+                        } elseif (str_contains($clean, ',')) {
+                            $clean = str_replace(',', '.', $clean);
+                        }
+                        $valReceipt = abs((float) $clean);
+                    }
+
+                    $valDisb = 0.0;
+                    if ($colDisb !== null && isset($row[$colDisb])) {
+                        $clean = preg_replace('/[^\d\.\,\-]/', '', (string) $row[$colDisb]);
+                        if (str_contains($clean, ',') && str_contains($clean, '.')) {
+                            $clean = str_replace('.', '', str_replace(',', '.', $clean));
+                        } elseif (str_contains($clean, ',')) {
+                            $clean = str_replace(',', '.', $clean);
+                        }
+                        $valDisb = abs((float) $clean);
+                    }
+
+                    // For BKU per PPTK sheets where Debet/Panjar/SPJ may be in dedicated subcolumns
+                    if ($valReceipt <= 0 && $valDisb <= 0) {
+                        if ($colDebet !== null && ! empty($row[$colDebet])) {
+                            $valDisb = abs((float) preg_replace('/[^\d\.\,\-]/', '', (string) $row[$colDebet]));
+                        } elseif ($colPanjar !== null && ! empty($row[$colPanjar])) {
+                            $valDisb = abs((float) preg_replace('/[^\d\.\,\-]/', '', (string) $row[$colPanjar]));
+                        } elseif ($colSpj !== null && ! empty($row[$colSpj])) {
+                            $valReceipt = abs((float) preg_replace('/[^\d\.\,\-]/', '', (string) $row[$colSpj]));
                         }
                     }
+
+                    if ($valReceipt <= 0 && $valDisb <= 0) {
+                        continue;
+                    }
+
+                    // Absolute direction based on column
+                    $direction = ($valReceipt > 0) ? 'receipt' : 'disbursement';
+                    $amount = ($valReceipt > 0) ? $valReceipt : $valDisb;
+
+                    // Detect transaction type
+                    $type = 'general';
+                    if ($colDebet !== null && ! empty($row[$colDebet]) && (float) $row[$colDebet] > 0) {
+                        $type = 'debet_rekening';
+                    } elseif ($colPanjar !== null && ! empty($row[$colPanjar]) && (float) $row[$colPanjar] > 0) {
+                        $type = 'panjar_disbursement';
+                    } elseif ($colSpj !== null && ! empty($row[$colSpj]) && (float) $row[$colSpj] > 0) {
+                        $type = 'spj_realization';
+                    } else {
+                        $type = $this->guessType($desc);
+                    }
+
+                    // Extract doc number if available
+                    $docNo = null;
+                    if ($colDocNo !== null && ! empty($row[$colDocNo])) {
+                        $docNo = trim((string) $row[$colDocNo]);
+                    } elseif (preg_match('/(\b\d{3,}\/[A-Z0-9\/\.\-]+\b|\b[A-Z]{2,}\/\d+\/[A-Z0-9\/\.\-]+\b)/i', $desc, $dm)) {
+                        $docNo = $dm[1];
+                    }
+
+                    // Resolve matched PPTK
+                    $matchedPptk = $sheetPptk ?? $this->matchPptk($desc, $pptks);
+
+                    $allTransactions[] = [
+                        'temp_id' => 'TMP-'.(count($allTransactions) + 1),
+                        'transaction_date' => $dateStr,
+                        'document_number' => $docNo,
+                        'description' => $desc ?: ('Transaksi '.$dateStr),
+                        'amount_gross' => $amount,
+                        'amount_tax' => 0.0,
+                        'amount_net' => $amount,
+                        'flow_direction' => $direction,
+                        'transaction_type' => $type,
+                        'payment_method' => 'bank_transfer',
+                        'pptk_id' => $matchedPptk?->id,
+                        'pptk_code' => $matchedPptk?->code,
+                        'pptk_name' => $matchedPptk?->display_name,
+                        'status' => 'draft',
+                        'confidence' => 'high',
+                    ];
                 }
             }
 
