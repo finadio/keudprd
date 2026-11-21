@@ -210,23 +210,23 @@ const togglePptkActive = (pptk) => {
     <AppLayout>
         <Head title="Pengaturan & Master Data" />
 
-        <div class="space-y-4">
+        <div class="space-y-5">
             
-            <!-- Page Title -->
-            <div class="bg-white border border-slate-200 rounded p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <!-- Page Title (Harmonized KeuDPRD Card) -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                        <Settings class="w-5 h-5 text-slate-700" />
-                        Pengaturan Sistem & Data Master Keuangan
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <Settings class="w-6 h-6 text-slate-700" />
+                        Pengaturan Sistem &amp; Data Master Keuangan
                     </h1>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
                         Kelola identitas instansi, pejabat berwenang (PA/Bendahara), master 9 PPTK, penguncian periode buku, dan rekam jejak audit (*audit trail*).
                     </p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                     <a 
                         :href="`/laporan/backup-zip?year=${active_year || form.fiscal_year || 2026}`"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#04331a] hover:bg-emerald-800 text-white rounded text-xs font-bold transition-colors shadow-2xs"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors shadow-xs"
                         title="Unduh seluruh arsip pembukuan Excel & database dalam bentuk ZIP"
                     >
                         <Archive class="w-4 h-4 text-emerald-300" />
@@ -238,20 +238,20 @@ const togglePptkActive = (pptk) => {
             <!-- Multi-Year Fiscal Switcher & Storage Capacity Guard -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- Card: Pergantian Tahun Anggaran & Arsip Tahun Lama -->
-                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-emerald-950 text-white flex items-center justify-between">
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-3.5 bg-emerald-950 text-white flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <CalendarPlus class="w-4 h-4 text-emerald-300" />
-                            <h2 class="text-xs font-bold uppercase tracking-wide">Manajemen Multi-Tahun Anggaran &amp; Arsip</h2>
+                            <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wide">Manajemen Multi-Tahun Anggaran &amp; Arsip</h2>
                         </div>
-                        <span class="px-2 py-0.5 bg-emerald-800 text-emerald-200 rounded text-[10px] font-mono font-bold">
+                        <span class="px-2.5 py-0.5 bg-emerald-800 text-emerald-200 rounded-md text-[10px] font-mono font-bold">
                             Aktif: TA {{ default_year || 2026 }}
                         </span>
                     </div>
 
-                    <div class="p-4 space-y-4 text-xs">
+                    <div class="p-4 sm:p-5 space-y-4 text-xs">
                         <!-- Daftar Tahun Tersimpan -->
-                        <div class="overflow-x-auto border border-slate-200 rounded">
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
                             <table class="w-full text-xs">
                                 <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                                     <tr>
@@ -285,7 +285,7 @@ const togglePptkActive = (pptk) => {
                                                 @click="switchToYear(ys.year)"
                                                 :disabled="ys.year === active_year"
                                                 :class="[
-                                                    'inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold transition-colors',
+                                                    'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-2xs',
                                                     ys.year === active_year
                                                         ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
                                                         : 'bg-white hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 cursor-pointer'
@@ -301,8 +301,8 @@ const togglePptkActive = (pptk) => {
                         </div>
 
                         <!-- Form Buka Tahun Anggaran Baru -->
-                        <form @submit.prevent="openNewFiscalYear" class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-lg space-y-2.5">
-                            <div class="font-bold text-emerald-950">Buka Tahun Anggaran Baru (Data Tahun Lama Tetap Tersimpan Aman)</div>
+                        <form @submit.prevent="openNewFiscalYear" class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-3">
+                            <div class="font-bold text-emerald-950 text-xs sm:text-sm">Buka Tahun Anggaran Baru (Data Tahun Lama Tetap Tersimpan Aman)</div>
                             <div class="flex flex-wrap items-end gap-3">
                                 <div class="w-32">
                                     <label class="block text-[11px] font-semibold text-slate-700 mb-1">Tahun Baru</label>
@@ -312,10 +312,10 @@ const togglePptkActive = (pptk) => {
                                         min="2020"
                                         max="2100"
                                         required
-                                        class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded text-xs font-mono font-bold"
+                                        class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500"
                                     />
                                 </div>
-                                <label class="flex items-center gap-2 text-[11px] text-slate-700 cursor-pointer pb-1.5 flex-1 min-w-[220px]">
+                                <label class="flex items-center gap-2 text-[11px] text-slate-700 cursor-pointer pb-2 flex-1 min-w-[220px]">
                                     <input
                                         v-model="newYearForm.lock_previous_year"
                                         type="checkbox"
@@ -326,7 +326,7 @@ const togglePptkActive = (pptk) => {
                                 <button
                                     type="submit"
                                     :disabled="isOpeningNewYear"
-                                    class="px-3.5 py-1.5 bg-[#107c41] hover:bg-[#0c6334] disabled:opacity-50 text-white rounded font-bold text-xs shadow-2xs transition-colors cursor-pointer"
+                                    class="px-4 py-2 bg-[#107c41] hover:bg-[#0c6334] disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xs transition-colors cursor-pointer"
                                 >
                                     {{ isOpeningNewYear ? 'Memproses...' : 'Buka Tahun Baru' }}
                                 </button>
@@ -336,20 +336,20 @@ const togglePptkActive = (pptk) => {
                 </div>
 
                 <!-- Card: Pemantauan Kapasitas Penyimpanan Jangka Panjang -->
-                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <Database class="w-4 h-4 text-blue-600" />
-                            <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Kapasitas Penyimpanan Jangka Panjang</h2>
+                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Kapasitas Penyimpanan Jangka Panjang</h2>
                         </div>
-                        <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
                             Status: Aman &amp; Ringan
                         </span>
                     </div>
 
-                    <div class="p-4 space-y-3 text-xs">
+                    <div class="p-4 sm:p-5 space-y-3.5 text-xs">
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                            <div class="p-3.5 bg-slate-50 border border-slate-200/90 rounded-xl">
                                 <div class="text-[11px] text-slate-500 font-medium">Total Transaksi (Semua Tahun)</div>
                                 <div class="text-base font-black text-slate-900 font-mono mt-0.5">
                                     {{ (storage_stats?.total_transactions || 0).toLocaleString('id-ID') }}
@@ -359,7 +359,7 @@ const togglePptkActive = (pptk) => {
                                 </div>
                             </div>
 
-                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                            <div class="p-3.5 bg-slate-50 border border-slate-200/90 rounded-xl">
                                 <div class="text-[11px] text-slate-500 font-medium">Ukuran Database Aktif</div>
                                 <div class="text-base font-black text-emerald-800 font-mono mt-0.5">
                                     {{ storage_stats?.db_size_mb !== null && storage_stats?.db_size_mb !== undefined ? storage_stats.db_size_mb + ' MB' : 'Tersedia' }}
@@ -369,7 +369,7 @@ const togglePptkActive = (pptk) => {
                                 </div>
                             </div>
 
-                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg col-span-2 sm:col-span-1">
+                            <div class="p-3.5 bg-slate-50 border border-slate-200/90 rounded-xl col-span-2 sm:col-span-1">
                                 <div class="text-[11px] text-slate-500 font-medium">File ZIP di Server</div>
                                 <div class="text-base font-black text-blue-800 font-mono mt-0.5">
                                     {{ storage_stats?.backup_files_count || 0 }} File ({{ storage_stats?.backup_size_mb || 0 }} MB)
@@ -380,15 +380,15 @@ const togglePptkActive = (pptk) => {
                             </div>
                         </div>
 
-                        <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-lg text-[11px] text-blue-950 leading-relaxed">
+                        <div class="p-3.5 bg-blue-50/70 border border-blue-200 rounded-xl text-[11px] text-blue-950 leading-relaxed">
                             <strong>Mengapa aman jangka panjang?</strong> Tabel transaksi telah diindeks berdasarkan tahun anggaran (`period_year`), sehingga menyimpan 10–20 tahun data hanya memakan ±30–60 MB dan tidak memperlambat aplikasi. File cadangan ZIP otomatis dipangkas agar hanya menyimpan <b>5 arsip terbaru</b> di server.
                         </div>
 
-                        <div class="flex justify-end">
+                        <div class="flex justify-end pt-1">
                             <button
                                 type="button"
                                 @click="pruneOldBackups"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded text-xs font-semibold transition-colors cursor-pointer"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
                             >
                                 <Trash2 class="w-3.5 h-3.5 text-slate-500" />
                                 <span>Bersihkan File ZIP Lama Sekarang</span>
@@ -402,10 +402,10 @@ const togglePptkActive = (pptk) => {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 
                 <!-- Card 1: Konfigurasi Identitas SKPD & Pejabat -->
-                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
                         <Building2 class="w-4 h-4 text-emerald-600" />
-                        <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Identitas SKPD & Pejabat Berwenang</h2>
+                        <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Identitas SKPD &amp; Pejabat Berwenang</h2>
                     </div>
 
                     <form @submit.prevent="saveSettings" class="p-4 space-y-3 text-xs">
@@ -448,7 +448,7 @@ const togglePptkActive = (pptk) => {
                         </div>
 
                         <div class="pt-3 flex justify-end">
-                            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                            <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer text-xs">
                                 <Save class="w-4 h-4" /> Simpan Konfigurasi
                             </button>
                         </div>
@@ -456,11 +456,11 @@ const togglePptkActive = (pptk) => {
                 </div>
 
                 <!-- Card 2: Penguncian Periode Buku (Lock Periods) -->
-                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <Lock class="w-4 h-4 text-amber-600" />
-                            <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Penguncian Periode Pembukuan (TA {{ active_year || form.fiscal_year }})</h2>
+                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Penguncian Periode Pembukuan (TA {{ active_year || form.fiscal_year }})</h2>
                         </div>
                         <span class="text-[11px] text-slate-500">Mencegah perubahan data pada bulan yang sudah ditutup</span>
                     </div>
@@ -480,13 +480,13 @@ const togglePptkActive = (pptk) => {
                                     <td class="px-3 py-1.5 text-center">
                                         <span 
                                             v-if="p.is_closed" 
-                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 font-mono"
+                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-800 font-mono"
                                         >
                                             <Lock class="w-3 h-3" /> DIKUNCI
                                         </span>
                                         <span 
                                             v-else 
-                                            class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 font-mono"
+                                            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 font-mono"
                                         >
                                             <Unlock class="w-3 h-3" /> TERBUKA
                                         </span>
@@ -495,7 +495,7 @@ const togglePptkActive = (pptk) => {
                                         <button 
                                             @click="toggleLock(p.id)"
                                             :class="[
-                                                'px-2 py-1 rounded text-[11px] font-semibold transition-colors cursor-pointer',
+                                                'px-3 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer',
                                                 p.is_closed
                                                     ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
                                                     : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300'
@@ -513,16 +513,16 @@ const togglePptkActive = (pptk) => {
             </div>
 
             <!-- Card 3: Keamanan Akun & Ganti Password -->
-            <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <KeyRound class="w-4 h-4 text-rose-600" />
-                        <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Keamanan Akun &amp; Ubah Password Login</h2>
+                        <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Keamanan Akun &amp; Ubah Password Login</h2>
                     </div>
                     <span class="text-[11px] text-rose-700 font-semibold">Wajib diganti sebelum diakses publik</span>
                 </div>
 
-                <form @submit.prevent="submitPasswordChange" class="p-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-end text-xs">
+                <form @submit.prevent="submitPasswordChange" class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-4 gap-3.5 items-end text-xs">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Password Saat Ini</label>
                         <input
@@ -531,7 +531,7 @@ const togglePptkActive = (pptk) => {
                             required
                             autocomplete="current-password"
                             placeholder="••••••••"
-                            class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs"
+                            class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
                         />
                         <p v-if="passwordForm.errors.current_password" class="mt-1 text-[11px] text-rose-600 font-medium">
                             {{ passwordForm.errors.current_password }}
@@ -546,7 +546,7 @@ const togglePptkActive = (pptk) => {
                             minlength="8"
                             autocomplete="new-password"
                             placeholder="Minimal 8 karakter"
-                            class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs"
+                            class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
                         />
                         <p v-if="passwordForm.errors.password" class="mt-1 text-[11px] text-rose-600 font-medium">
                             {{ passwordForm.errors.password }}
@@ -561,14 +561,14 @@ const togglePptkActive = (pptk) => {
                             minlength="8"
                             autocomplete="new-password"
                             placeholder="Ulangi password baru"
-                            class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs"
+                            class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
                         />
                     </div>
                     <div>
                         <button
                             type="submit"
                             :disabled="passwordForm.processing"
-                            class="w-full px-4 py-1.5 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                            class="w-full px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xs transition-colors cursor-pointer"
                         >
                             {{ passwordForm.processing ? 'Menyimpan...' : 'Simpan Password Baru' }}
                         </button>
@@ -577,12 +577,12 @@ const togglePptkActive = (pptk) => {
             </div>
 
             <!-- Card 4: Master PPTK Management -->
-            <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
                         <Users class="w-4 h-4 text-emerald-700" />
                         <div>
-                            <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Daftar PPTK Sekretariat DPRD Banyumas</h2>
+                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Daftar PPTK Sekretariat DPRD Banyumas</h2>
                             <p class="text-[11px] text-slate-500">
                                 Tambah, ubah identitas pejabat/gelar, atau nonaktifkan PPTK ketika pergantian periode anggaran baru.
                             </p>
@@ -595,7 +595,7 @@ const togglePptkActive = (pptk) => {
                         <button 
                             type="button"
                             @click="openCreatePptkModal"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#04331a] hover:bg-emerald-800 text-white rounded text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
                         >
                             <Plus class="w-3.5 h-3.5" />
                             <span>Tambah PPTK Baru</span>

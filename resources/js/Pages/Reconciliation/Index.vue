@@ -80,16 +80,16 @@ export default {
     <AppLayout>
         <Head title="Rekonsiliasi Buku Bank & BKU" />
 
-        <div class="space-y-4">
+        <div class="space-y-5">
             
-            <!-- Page Title -->
-            <div class="bg-white border border-slate-200 rounded p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <!-- Page Title (Harmonized KeuDPRD Card) -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                        <ArrowLeftRight class="w-5 h-5 text-indigo-600" />
+                    <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+                        <ArrowLeftRight class="w-6 h-6 text-indigo-600" />
                         Rekonsiliasi Buku Bank vs BKU Per PPTK
                     </h1>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
                         Pencocokan mutasi bank giro dengan bukti pertanggungjawaban BKU untuk memastikan tidak ada transaksi yang terlewat atau selisih alokasi.
                     </p>
                 </div>
@@ -97,53 +97,53 @@ export default {
                 <!-- Month Selector -->
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-semibold text-slate-600">Bulan:</span>
-                    <select :value="current_month" @change="switchMonth($event.target.value)" class="px-2.5 py-1 text-xs border border-slate-300 rounded bg-white font-medium">
+                    <select :value="current_month" @change="switchMonth($event.target.value)" class="px-3 py-1.5 text-xs border border-slate-300 rounded-xl bg-white font-medium focus:ring-2 focus:ring-indigo-500">
                         <option v-for="m in 12" :key="m" :value="m">Bulan {{ m }}</option>
                     </select>
                 </div>
             </div>
 
             <!-- Stats KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div class="bg-white border border-slate-200 rounded p-3 shadow-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3.5">
+                <div class="bg-white border border-slate-200/90 rounded-xl p-4 shadow-2xs">
                     <div class="text-xs text-slate-500 font-medium">Total Mutasi Bank</div>
-                    <div class="text-xl font-bold font-mono text-slate-900 mt-1">{{ stats.total_bank }} <span class="text-xs font-normal text-slate-500">Transaksi</span></div>
+                    <div class="text-2xl font-black font-sans text-slate-900 tracking-tight mt-1">{{ stats.total_bank }} <span class="text-sm font-normal text-slate-500">Transaksi</span></div>
                 </div>
 
-                <div class="bg-white border border-emerald-200 rounded p-3 shadow-sm bg-emerald-50/30">
+                <div class="bg-white border border-emerald-200 rounded-xl p-4 shadow-2xs bg-emerald-50/30">
                     <div class="text-xs text-emerald-800 font-medium flex items-center justify-between">
                         <span>Sudah Cocok</span>
                         <CheckCircle2 class="w-4 h-4 text-emerald-600" />
                     </div>
-                    <div class="text-xl font-bold font-mono text-emerald-800 mt-1">{{ stats.matched }}</div>
+                    <div class="text-2xl font-black font-sans text-emerald-800 tracking-tight mt-1">{{ stats.matched }}</div>
                 </div>
 
-                <div class="bg-white border border-amber-200 rounded p-3 shadow-sm bg-amber-50/30">
+                <div class="bg-white border border-amber-200 rounded-xl p-4 shadow-2xs bg-amber-50/30">
                     <div class="text-xs text-amber-800 font-medium flex items-center justify-between">
                         <span>Perlu Pemeriksaan</span>
                         <AlertTriangle class="w-4 h-4 text-amber-600" />
                     </div>
-                    <div class="text-xl font-bold font-mono text-amber-800 mt-1">{{ stats.unmatched }}</div>
+                    <div class="text-2xl font-black font-sans text-amber-800 tracking-tight mt-1">{{ stats.unmatched }}</div>
                 </div>
 
-                <div class="bg-white border border-rose-200 rounded p-3 shadow-sm bg-rose-50/30">
+                <div class="bg-white border border-rose-200 rounded-xl p-4 shadow-2xs bg-rose-50/30">
                     <div class="text-xs text-rose-800 font-medium flex items-center justify-between">
                         <span>Belum Ada PPTK</span>
                         <HelpCircle class="w-4 h-4 text-rose-600" />
                     </div>
-                    <div class="text-xl font-bold font-mono text-rose-800 mt-1">{{ stats.missing_pptk }}</div>
+                    <div class="text-2xl font-black font-sans text-rose-800 tracking-tight mt-1">{{ stats.missing_pptk }}</div>
                 </div>
             </div>
 
             <!-- Filter & Search Toolbar -->
-            <div class="bg-white border border-slate-200 rounded p-3 shadow-sm flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div class="flex items-center gap-2">
                     <span class="font-semibold text-slate-700">Filter Status:</span>
                     <button
                         @click="statusFilter = 'all'"
                         :class="[
-                            'px-2.5 py-1 rounded text-xs font-medium border transition-colors',
-                            statusFilter === 'all' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-300'
+                            'px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer',
+                            statusFilter === 'all' ? 'bg-slate-800 text-white border-slate-800 shadow-xs' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                         ]"
                     >
                         Semua
@@ -151,8 +151,8 @@ export default {
                     <button
                         @click="statusFilter = 'perlu_periksa'"
                         :class="[
-                            'px-2.5 py-1 rounded text-xs font-medium border transition-colors',
-                            statusFilter === 'perlu_periksa' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-slate-600 border-slate-300'
+                            'px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer',
+                            statusFilter === 'perlu_periksa' ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                         ]"
                     >
                         Perlu Periksa
@@ -160,8 +160,8 @@ export default {
                     <button
                         @click="statusFilter = 'cocok'"
                         :class="[
-                            'px-2.5 py-1 rounded text-xs font-medium border transition-colors',
-                            statusFilter === 'cocok' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-300'
+                            'px-3 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer',
+                            statusFilter === 'cocok' ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                         ]"
                     >
                         Cocok
@@ -169,18 +169,18 @@ export default {
                 </div>
 
                 <div class="relative">
-                    <Search class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" />
+                    <Search class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                         v-model="searchQuery"
                         type="text"
                         placeholder="Cari transaksi / PPTK..."
-                        class="pl-8 pr-3 py-1 bg-white border border-slate-300 rounded text-xs w-60"
+                        class="pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs w-64 focus:ring-2 focus:ring-indigo-500"
                     />
                 </div>
             </div>
 
             <!-- Reconciliation Table -->
-            <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
                 <div class="overflow-x-auto excel-scroll">
                     <table class="w-full excel-table text-xs">
                         <thead>
