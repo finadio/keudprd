@@ -77,11 +77,7 @@ const isPptkUser = computed(() => {
 
 const financeNavItems = computed(() => {
     if (isPptkUser.value) {
-        return [
-            { name: 'Dashboard Keuangan', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
-            { name: 'BKU Pembantu Saya', href: '/bku', routeName: 'bku.*', icon: BookOpen },
-            { name: 'Laporan Pembukuan', href: '/laporan', routeName: 'laporan.*', icon: Printer },
-        ];
+        return [];
     }
     return [
         { name: 'Dashboard', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
@@ -150,6 +146,7 @@ const isPaguRouteActive = computed(() => {
 
 const getInitialFinanceAccordionState = () => {
     if (typeof window === 'undefined') return true;
+    if (isPptkUser.value) return false;
     if (isFinanceRouteActive.value) return true;
     const saved = localStorage.getItem('keudprd_finance_acc_open');
     return saved !== null ? saved === 'true' : true;
@@ -157,6 +154,7 @@ const getInitialFinanceAccordionState = () => {
 
 const getInitialPaguAccordionState = () => {
     if (typeof window === 'undefined') return true;
+    if (isPptkUser.value) return true;
     if (isPaguRouteActive.value) return true;
     const saved = localStorage.getItem('keudprd_pagu_acc_open');
     return saved !== null ? saved === 'true' : false;
@@ -356,6 +354,7 @@ const jumpToResult = (url) => {
                             <span class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-emerald-300">▼</span>
                         </div>
                         <Link
+                            v-if="!isPptkUser"
                             href="/pengaturan"
                             class="px-2 py-1 bg-emerald-900/70 hover:bg-emerald-700 text-emerald-200 border border-emerald-700/60 rounded-lg text-[10px] font-bold transition-colors shrink-0"
                             title="Kelola & Buka Tahun Anggaran Baru"
@@ -367,8 +366,8 @@ const jumpToResult = (url) => {
 
                 <!-- Navigation Links -->
                 <nav class="flex-1 px-3 py-2 space-y-2 text-xs overflow-y-auto no-scrollbar">
-                    <!-- Parent Accordion: Penatausahaan Keuangan -->
-                    <div class="space-y-1">
+                    <!-- Parent Accordion: Penatausahaan Keuangan (Khusus Admin / Bendahara / Operator) -->
+                    <div v-if="!isPptkUser" class="space-y-1">
                         <button
                             type="button"
                             @click="toggleFinanceAccordion"
@@ -432,8 +431,11 @@ const jumpToResult = (url) => {
                             title="Klik untuk membuka / menutup menu navigasi Pantauan Realisasi Pagu"
                         >
                             <div class="flex items-center gap-2 min-w-0">
-                                <FolderKanban class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
-                                <span class="truncate tracking-tight font-semibold text-[11px]" title="Pantauan Realisasi Pagu">Pantauan Realisasi Pagu</span>
+                                <PieChart v-if="isPptkUser" class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
+                                <FolderKanban v-else class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
+                                <span class="truncate tracking-tight font-semibold text-[11px]" :title="isPptkUser ? 'Portal Realisasi Pagu PPTK' : 'Pantauan Realisasi Pagu'">
+                                    {{ isPptkUser ? 'Portal Realisasi Pagu PPTK' : 'Pantauan Realisasi Pagu' }}
+                                </span>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">

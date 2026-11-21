@@ -114,4 +114,31 @@ class PaguRealizationTest extends TestCase
         $settingResponse = $this->actingAs($pptkUser)->get('/pengaturan');
         $settingResponse->assertRedirect('/pagu');
     }
+
+    public function test_pptk_user_is_forbidden_from_accessing_bku_finance_modules(): void
+    {
+        $pptkUser = User::where('role', 'pptk')->first();
+        if (! $pptkUser) {
+            $pptk = Pptk::first();
+            $pptkUser = User::factory()->create([
+                'role' => 'pptk',
+                'pptk_id' => $pptk->id,
+            ]);
+        }
+
+        // 1. /dashboard redirects to /pagu
+        $this->actingAs($pptkUser)->get('/dashboard')->assertRedirect('/pagu');
+
+        // 2. /bku redirects to /pagu
+        $this->actingAs($pptkUser)->get('/bku')->assertRedirect('/pagu');
+
+        // 3. /buku-bank redirects to /pagu
+        $this->actingAs($pptkUser)->get('/buku-bank')->assertRedirect('/pagu');
+
+        // 4. /impor redirects to /pagu
+        $this->actingAs($pptkUser)->get('/impor')->assertRedirect('/pagu');
+
+        // 5. /laporan redirects to /pagu
+        $this->actingAs($pptkUser)->get('/laporan')->assertRedirect('/pagu');
+    }
 }

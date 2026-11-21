@@ -38,7 +38,9 @@ class AuthController extends Controller
                 'name' => Auth::user()->name,
             ]);
 
-            return redirect()->intended('/dashboard')->with('success', 'Selamat datang kembali, '.Auth::user()->name.'!');
+            $targetUrl = strtolower(Auth::user()->role) === 'pptk' ? '/pagu' : '/dashboard';
+
+            return redirect()->intended($targetUrl)->with('success', 'Selamat datang kembali, '.Auth::user()->name.'!');
         }
 
         return back()->withErrors([
