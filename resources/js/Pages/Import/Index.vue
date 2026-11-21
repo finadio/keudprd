@@ -6,6 +6,7 @@ import {
     UploadCloud, 
     Clipboard, 
     FileText, 
+    FileSpreadsheet,
     CheckCircle2, 
     AlertTriangle, 
     Plus, 
@@ -15,7 +16,10 @@ import {
     ArrowRight,
     Search,
     ShieldAlert,
-    History
+    History,
+    Sparkles,
+    FileCheck,
+    Image as ImageIcon
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -23,10 +27,11 @@ const props = defineProps({
     pptks: Array,
 });
 
-const activeInputTab = ref('paste'); // 'paste', 'pdf', 'manual'
+const activeInputTab = ref('paste'); // 'paste', 'file'
 const rawPasteText = ref('');
-const selectedPdfFile = ref(null);
+const selectedFile = ref(null);
 const isProcessing = ref(false);
+const processingMessage = ref('');
 const parsedResults = ref([]);
 const selectAll = ref(true);
 
@@ -38,6 +43,7 @@ const processPasteText = async () => {
     }
 
     isProcessing.value = true;
+    processingMessage.value = 'Menganalisis teks & merapikan struktur data berantakan...';
     try {
         const response = await fetch('/impor/parse', {
             method: 'POST',
@@ -57,31 +63,51 @@ const processPasteText = async () => {
                 ...item,
                 selected: item.selected !== false,
             }));
+            if (data.items.length === 0) {
+                alert('Tidak ada transaksi yang terdeteksi dari teks yang ditempel. Pastikan teks memuat tanggal dan nominal.');
+            }
         } else {
-            alert('Gagal membaca transaksi dari teks.');
+            alert(data.message || 'Gagal membaca transaksi dari teks.');
         }
     } catch (e) {
         alert('Terjadi kesalahan saat memproses teks.');
     } finally {
         isProcessing.value = false;
+        processingMessage.value = '';
     }
 };
 
-// Process Upload PDF
+// Process Upload File (All types: PDF, Excel, Word, CSV, Images/Scan with RapidOCR)
 const handleFileChange = (e) => {
-    selectedPdfFile.value = e.target.files[0];
+    const file = e.target.files[0];
+    if (file) {
+        selectedFile.value = file;
+    }
 };
 
-const processPdfUpload = async () => {
-    if (!selectedPdfFile.value) {
-        alert('Pilih file PDF terlebih dahulu.');
+const getFileBadgeColor = (filename) => {
+    if (!filename) return 'bg-slate-100 text-slate-700';
+    const ext = filename.split('.').pop().toLowerCase();
+    if (['xlsx', 'xls', 'csv'].includes(ext)) return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    if (['pdf'].includes(ext)) return 'bg-rose-100 text-rose-800 border-rose-300';
+    if (['docx', 'doc'].includes(ext)) return 'bg-blue-100 text-blue-800 border-blue-300';
+    if (['png', 'jpg', 'jpeg', 'webp'].includes(ext)) return 'bg-amber-100 text-amber-800 border-amber-300';
+    return 'bg-slate-100 text-slate-800 border-slate-300';
+};
+
+const processFileUpload = async () => {
+    if (!selectedFile.value) {
+        alert('Pilih file dokumen terlebih dahulu.');
         return;
     }
 
     isProcessing.value = true;
+    processingMessage.value = 'Membaca dokumen & menjalankan RapidOCR jika diperlukan...';
+
     const formData = new FormData();
-    formData.append('mode', 'pdf');
-    formData.append('pdf_file', selectedPdfFile.value);
+    formData.append('mode', 'file');
+    formData.append('document_file', selectedFile.value);
+    formData.append('pdf_file', selectedFile.value); // backward compatibility
 
     try {
         const response = await fetch('/impor/parse', {
@@ -98,13 +124,17 @@ const processPdfUpload = async () => {
                 ...item,
                 selected: item.selected !== false,
             }));
+            if (data.items.length === 0) {
+                alert('Dokumen berhasil dibaca namun tidak ada baris transaksi valid (tanggal & nominal) yang ditemukan.');
+            }
         } else {
-            alert('Gagal mengekstraksi transaksi dari PDF.');
+            alert(data.message || 'Gagal mengekstraksi transaksi dari file dokumen.');
         }
     } catch (e) {
-        alert('Terjadi kesalahan saat memproses file PDF.');
+        alert('Terjadi kesalahan saat memproses file dokumen.');
     } finally {
         isProcessing.value = false;
+        processingMessage.value = '';
     }
 };
 
@@ -131,13 +161,13 @@ const commitTransactions = () => {
     }
 
     router.post('/impor/commit', {
-        import_type: activeInputTab.value === 'paste' ? 'paste_text' : 'pdf_upload',
+        import_type: activeInputTab.value === 'paste' ? 'paste_text' : 'file_ocr',
         items: selectedItems,
     }, {
         onSuccess: () => {
             parsedResults.value = [];
             rawPasteText.value = '';
-            selectedPdfFile.value = null;
+            selectedFile.value = null;
         }
     });
 };
@@ -150,7 +180,7 @@ const formatRupiah = (val) => {
 
 <template>
     <AppLayout>
-        <Head title="Smart Transaction Import" />
+        <Head title="Smart Transaction Import & OCR" />
 
         <div class="space-y-4">
             
@@ -162,7 +192,7 @@ const formatRupiah = (val) => {
                         Smart Transaction Import & Verifikasi Pembukuan
                     </h1>
                     <p class="text-xs text-slate-500">
-                        Otomatisasi pemindahan transaksi dari aplikasi keuangan resmi (SIPD RI / CMS Bank Jateng / SP2D) tanpa perlu mengetik ulang satu per satu.
+                        Otomatisasi pemindahan transaksi dari aplikasi resmi (SIPD RI / CMS Bank Jateng / SP2D / Excel / Foto Bukti Kas) dengan Deep Learning RapidOCR.
                     </p>
                 </div>
             </div>
@@ -173,46 +203,49 @@ const formatRupiah = (val) => {
                     <button
                         @click="activeInputTab = 'paste'"
                         :class="[
-                            'py-2.5 px-4 font-semibold border-b-2 flex items-center gap-1.5 transition-colors',
+                            'py-2.5 px-4 font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer',
                             activeInputTab === 'paste'
-                                ? 'border-emerald-600 text-emerald-800 bg-white'
+                                ? 'border-emerald-600 text-emerald-800 bg-white shadow-xs'
                                 : 'border-transparent text-slate-600 hover:text-slate-900'
                         ]"
                     >
                         <Clipboard class="w-4 h-4 text-emerald-600" />
-                        METODE A — Tempel Teks (Copy-Paste)
+                        METODE A — Tempel Teks Cerdas (Copy-Paste Berantakan / Tabel / WA)
                     </button>
 
                     <button
-                        @click="activeInputTab = 'pdf'"
+                        @click="activeInputTab = 'file'"
                         :class="[
-                            'py-2.5 px-4 font-semibold border-b-2 flex items-center gap-1.5 transition-colors',
-                            activeInputTab === 'pdf'
-                                ? 'border-emerald-600 text-emerald-800 bg-white'
+                            'py-2.5 px-4 font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer',
+                            activeInputTab === 'file'
+                                ? 'border-emerald-600 text-emerald-800 bg-white shadow-xs'
                                 : 'border-transparent text-slate-600 hover:text-slate-900'
                         ]"
                     >
-                        <FileText class="w-4 h-4 text-blue-600" />
-                        METODE B — Upload PDF (Print to PDF)
+                        <Sparkles class="w-4 h-4 text-blue-600" />
+                        METODE B — Unggah Dokumen & OCR AI (PDF, Excel, Word, Scan/Foto Kwitansi)
                     </button>
                 </div>
 
                 <!-- Method A: Copy-Paste Area -->
                 <div v-if="activeInputTab === 'paste'" class="p-4 space-y-3">
-                    <div class="text-xs text-slate-600">
-                        <span class="font-semibold text-slate-800">Petunjuk Penggunaan:</span>
-                        Buka halaman daftar transaksi pada aplikasi SIPD atau mutasi rekening CMS Bank Jateng, sorot (blok) seluruh tabel transaksi, salin (<kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px]">Ctrl+C</kbd>), lalu tempelkan (<kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px]">Ctrl+V</kbd>) ke dalam kotak di bawah ini.
+                    <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded text-xs text-emerald-900 flex items-start gap-2">
+                        <Sparkles class="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                        <div>
+                            <span class="font-bold">Algoritma Auto-Converter Aktif:</span>
+                            Tidak masalah jika hasil copy-paste berantakan, terpotong banyak baris, atau berasal dari tabel SIPD, chat WhatsApp, maupun mutasi CMS Bank Jateng. Sistem secara cerdas akan menyaring kop laporan, menyatukan baris terpotong, serta mendeteksi tanggal, nomor dokumen, uraian, PPTK, dan nominal.
+                        </div>
                     </div>
 
                     <textarea
                         v-model="rawPasteText"
-                        rows="6"
-                        placeholder="Tempel teks tabel transaksi di sini... Parser akan memisahkan baris, nomor dokumen, tanggal, uraian, potongan pajak, dan nominal secara otomatis."
+                        rows="7"
+                        placeholder="Tempel teks tabel transaksi di sini (Ctrl+V)... Parser akan otomatis membersihkan header, menyatukan baris berantakan, mendeteksi nominal, dan memetakan PPTK."
                         class="w-full p-3 font-mono text-xs border border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50/50"
                     ></textarea>
 
                     <div class="flex items-center justify-between">
-                        <span class="text-[11px] text-slate-500">Mendukung multi-transaksi, format tabel tab-delimited, baris SP2D, dan mutasi giro.</span>
+                        <span class="text-[11px] text-slate-500">Mendukung multi-transaksi, tabel tab-delimited, format tanggal Indonesia (15 Oktober 2026 / 15-Okt-26), dan mutasi debet/kredit.</span>
                         <button
                             @click="processPasteText"
                             :disabled="isProcessing || !rawPasteText.trim()"
@@ -225,34 +258,63 @@ const formatRupiah = (val) => {
                     </div>
                 </div>
 
-                <!-- Method B: Upload PDF Area -->
-                <div v-else-if="activeInputTab === 'pdf'" class="p-4 space-y-3">
-                    <div class="text-xs text-slate-600">
-                        <span class="font-semibold text-slate-800">Petunjuk Penggunaan:</span>
-                        Pada browser saat membuka laporan keuangan resmi, gunakan menu <kbd class="px-1 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px]">Cetak (Ctrl+P) &rarr; Simpan sebagai PDF</kbd>, kemudian unggah file PDF tersebut di bawah ini.
+                <!-- Method B: Upload Universal Document & OCR Area -->
+                <div v-else-if="activeInputTab === 'file'" class="p-4 space-y-3">
+                    <div class="p-3 bg-blue-50/70 border border-blue-200 rounded text-xs text-blue-900 flex items-start gap-2">
+                        <Sparkles class="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <div>
+                            <span class="font-bold">Didukung Mesin Pembaca Multi-Format & Deep Learning RapidOCR:</span>
+                            Unggah berbagai tipe dokumen tanpa perlu mengubah format secara manual. Mesin akan membaca file digital maupun gambar hasil foto/scan kwitansi, SP2D, rekening koran koran bank, dokumen Word, dan spreadsheet Excel.
+                        </div>
                     </div>
 
+                    <!-- Supported Format Badges -->
+                    <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+                        <span class="text-slate-500 font-semibold mr-1">Format Didukung:</span>
+                        <span class="px-2 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-700 font-medium">PDF (Digital & Scan OCR)</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 font-medium">Excel (.xlsx, .xls)</span>
+                        <span class="px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 font-medium">Word (.docx)</span>
+                        <span class="px-2 py-0.5 rounded bg-cyan-50 border border-cyan-200 text-cyan-700 font-medium">CSV / TXT</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 font-medium">Foto & Scan (.png, .jpg, .webp)</span>
+                    </div>
+
+                    <!-- Dropzone -->
                     <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors">
-                        <FileText class="w-8 h-8 text-blue-500 mx-auto mb-2" />
+                        <UploadCloud class="w-9 h-9 text-blue-500 mx-auto mb-2" />
                         <label class="cursor-pointer">
-                            <span class="text-xs font-semibold text-blue-600 hover:underline">Pilih file PDF dari komputer</span>
-                            <input type="file" accept=".pdf" @change="handleFileChange" class="hidden" />
+                            <span class="text-xs font-bold text-blue-600 hover:underline">Pilih file dokumen atau gambar dari komputer</span>
+                            <input 
+                                type="file" 
+                                accept=".pdf,.xlsx,.xls,.csv,.txt,.docx,.png,.jpg,.jpeg,.webp,.bmp,.tiff" 
+                                @change="handleFileChange" 
+                                class="hidden" 
+                            />
                         </label>
-                        <p v-if="selectedPdfFile" class="text-xs font-bold text-slate-800 mt-2 font-mono">
-                            File terpilih: {{ selectedPdfFile.name }} ({{ (selectedPdfFile.size / 1024).toFixed(1) }} KB)
+                        <p v-if="selectedFile" class="text-xs font-bold mt-2 font-mono flex items-center justify-center gap-2">
+                            <span :class="['px-2 py-0.5 border rounded text-[11px]', getFileBadgeColor(selectedFile.name)]">
+                                {{ selectedFile.name.split('.').pop().toUpperCase() }}
+                            </span>
+                            <span class="text-slate-800">{{ selectedFile.name }}</span>
+                            <span class="text-slate-400 font-normal">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
                         </p>
-                        <p v-else class="text-[11px] text-slate-400 mt-1">Maksimal ukuran 10 MB. PDF teks asli (bukan gambar scan foto).</p>
+                        <p v-else class="text-[11px] text-slate-400 mt-1">Maksimal ukuran 25 MB. Termasuk hasil scan foto kamera HP atau screenshot CMS.</p>
                     </div>
 
-                    <div class="flex items-center justify-end">
+                    <div class="flex items-center justify-between">
+                        <div class="text-[11px] text-slate-500">
+                            <span v-if="isProcessing" class="font-medium text-blue-700 flex items-center gap-1.5">
+                                <span class="animate-spin w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full"></span>
+                                {{ processingMessage }}
+                            </span>
+                        </div>
                         <button
-                            @click="processPdfUpload"
-                            :disabled="isProcessing || !selectedPdfFile"
+                            @click="processFileUpload"
+                            :disabled="isProcessing || !selectedFile"
                             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                         >
                             <span v-if="isProcessing" class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
                             <Check v-else class="w-4 h-4" />
-                            Baca & Ekstraksi Teks PDF
+                            Baca & Ekstraksi Dokumen / OCR
                         </button>
                     </div>
                 </div>
@@ -394,7 +456,8 @@ const formatRupiah = (val) => {
                                 <td class="px-3 py-2 font-mono font-semibold text-slate-800">{{ b.batch_number }}</td>
                                 <td class="px-3 py-2">
                                     <span v-if="b.import_type === 'excel_historical'" class="px-2 py-0.5 bg-purple-100 text-purple-800 rounded font-medium text-[10px]">Excel Historis</span>
-                                    <span v-else-if="b.import_type === 'paste_text'" class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-medium text-[10px]">Tempel Teks</span>
+                                    <span v-else-if="b.import_type === 'paste_text'" class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-medium text-[10px]">Tempel Teks Cerdas</span>
+                                    <span v-else-if="b.import_type === 'file_ocr'" class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded font-medium text-[10px]">Dokumen & OCR</span>
                                     <span v-else class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded font-medium text-[10px]">Upload PDF</span>
                                 </td>
                                 <td class="px-3 py-2 text-slate-600">{{ b.original_filename || 'Tempel Teks SIPD' }}</td>

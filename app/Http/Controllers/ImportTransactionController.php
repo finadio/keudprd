@@ -37,7 +37,7 @@ class ImportTransactionController extends Controller
      */
     public function parse(Request $request, SmartTransactionParser $parser)
     {
-        $mode = $request->input('mode', 'text'); // 'text' or 'pdf'
+        $mode = $request->input('mode', 'text'); // 'text', 'file', or 'pdf'
         $parsedItems = [];
 
         if ($mode === 'text') {
@@ -45,12 +45,22 @@ class ImportTransactionController extends Controller
                 'raw_text' => 'required|string|min:5',
             ]);
             $parsedItems = $parser->parseText($request->input('raw_text'));
-        } elseif ($mode === 'pdf') {
+        } elseif ($mode === 'file' || $mode === 'pdf') {
             $request->validate([
-                'pdf_file' => 'required|file|mimes:pdf|max:10240',
+                'document_file' => 'nullable|file|max:25600',
+                'pdf_file' => 'nullable|file|max:25600',
             ]);
-            $filePath = $request->file('pdf_file')->getRealPath();
-            $parsedItems = $parser->parsePdf($filePath);
+            $uploadedFile = $request->file('document_file') ?? $request->file('pdf_file');
+            if (! $uploadedFile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File dokumen tidak ditemukan atau melebihi batas ukuran (25MB).',
+                ], 422);
+            }
+            $filePath = $uploadedFile->getRealPath();
+            $originalName = $uploadedFile->getClientOriginalName();
+            $mimeType = $uploadedFile->getMimeType();
+            $parsedItems = $parser->parseFile($filePath, $originalName, $mimeType);
         }
 
         // Enhanced Duplicate Check against existing database transactions and within batch
