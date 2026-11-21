@@ -298,20 +298,20 @@ const togglePptkActive = (pptk) => {
                                         <th class="px-3 py-2 text-left">Tahun</th>
                                         <th class="px-3 py-2 text-right">Transaksi</th>
                                         <th class="px-3 py-2 text-center">Bulan Dikunci</th>
-                                        <th class="px-3 py-2 text-center">Status</th>
-                                        <th class="px-3 py-2 text-center">Aksi</th>
+                                        <th class="px-3 py-2 text-center whitespace-nowrap">Status</th>
+                                        <th class="px-3 py-2 text-center whitespace-nowrap">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     <tr v-for="ys in (year_summaries || [])" :key="ys.year" class="hover:bg-slate-50">
-                                        <td class="px-3 py-2 font-mono font-bold text-slate-900">TA {{ ys.year }}</td>
-                                        <td class="px-3 py-2 text-right font-mono text-slate-700">{{ ys.tx_count.toLocaleString('id-ID') }} baris</td>
-                                        <td class="px-3 py-2 text-center font-mono">
+                                        <td class="px-3 py-2 font-mono font-bold text-slate-900 whitespace-nowrap">TA {{ ys.year }}</td>
+                                        <td class="px-3 py-2 text-right font-mono text-slate-700 whitespace-nowrap">{{ ys.tx_count.toLocaleString('id-ID') }} baris</td>
+                                        <td class="px-3 py-2 text-center font-mono whitespace-nowrap">
                                             <span :class="ys.closed_months === 12 ? 'text-amber-700 font-bold' : 'text-slate-600'">
                                                 {{ ys.closed_months }} / {{ ys.total_months || 12 }}
                                             </span>
                                         </td>
-                                        <td class="px-3 py-2 text-center">
+                                        <td class="px-3 py-2 text-center whitespace-nowrap">
                                             <span v-if="ys.is_default" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                                                 TA Aktif
                                             </span>
@@ -319,15 +319,15 @@ const togglePptkActive = (pptk) => {
                                                 Arsip
                                             </span>
                                         </td>
-                                        <td class="px-3 py-2 text-center">
-                                            <div class="inline-flex items-center justify-center gap-1.5 flex-wrap">
+                                        <td class="px-3 py-2 text-center whitespace-nowrap">
+                                            <div class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
                                                 <!-- Buka Data -->
                                                 <button
                                                     type="button"
                                                     @click="switchToYear(ys.year)"
                                                     :disabled="ys.year === active_year"
                                                     :class="[
-                                                        'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors shadow-2xs',
+                                                        'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors shadow-2xs whitespace-nowrap',
                                                         ys.year === active_year
                                                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
                                                             : 'bg-white hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 cursor-pointer'
@@ -343,11 +343,11 @@ const togglePptkActive = (pptk) => {
                                                     v-if="!ys.is_default"
                                                     type="button"
                                                     @click="makeYearActive(ys.year)"
-                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-800 border border-amber-300 transition-colors cursor-pointer shadow-2xs"
+                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-800 border border-amber-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                                                     :title="'Jadikan TA ' + ys.year + ' sebagai Tahun Anggaran Aktif Utama sistem'"
                                                 >
                                                     <CheckCircle2 class="w-3 h-3" />
-                                                    <span>Jadikan Aktif</span>
+                                                    <span>Aktifkan</span>
                                                 </button>
 
                                                 <!-- Hapus TA Permanen -->
@@ -355,7 +355,7 @@ const togglePptkActive = (pptk) => {
                                                     v-if="!ys.is_default"
                                                     type="button"
                                                     @click="openDeleteYearModal(ys)"
-                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-red-50 hover:bg-red-600 hover:text-white text-red-700 border border-red-300 transition-colors cursor-pointer shadow-2xs"
+                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-red-50 hover:bg-red-600 hover:text-white text-red-700 border border-red-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
                                                     :title="'Hapus permanen TA ' + ys.year + ' beserta seluruh datanya'"
                                                 >
                                                     <Trash2 class="w-3 h-3" />
