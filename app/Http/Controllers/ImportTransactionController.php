@@ -66,7 +66,7 @@ class ImportTransactionController extends Controller
         // Enhanced Duplicate Check against existing database transactions and within batch
         $seenInBatch = [];
         foreach ($parsedItems as &$item) {
-            $sig = ($item['transaction_date'] ?? '').'_'.(int) ($item['amount_net'] ?? 0);
+            $sig = ($item['transaction_date'] ?? '').'_'.($item['document_number'] ?? '').'_'.substr(trim($item['description'] ?? ''), 0, 30).'_'.(int) ($item['amount_net'] ?? 0);
             $inBatchDup = isset($seenInBatch[$sig]);
             $seenInBatch[$sig] = true;
 
@@ -79,9 +79,10 @@ class ImportTransactionController extends Controller
                     $dbReason = 'No Dokumen '.$item['document_number'].' sudah ada di sistem';
                 }
             }
-            if (! $dbDup && ! empty($item['transaction_date']) && ! empty($item['amount_net'])) {
+            if (! $dbDup && ! empty($item['transaction_date']) && ! empty($item['amount_net']) && ! empty($item['description'])) {
                 $existsDateAmount = Transaction::where('transaction_date', $item['transaction_date'])
                     ->where('amount_net', $item['amount_net'])
+                    ->where('description', $item['description'])
                     ->first();
                 if ($existsDateAmount) {
                     $dbDup = true;

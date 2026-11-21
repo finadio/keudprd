@@ -150,9 +150,16 @@ const processFileUpload = async () => {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
             },
             body: formData,
         });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            alert(errData.message || `Gagal membaca berkas (HTTP ${response.status}: ${response.statusText}).`);
+            return;
+        }
 
         const data = await response.json();
         if (data.success) {
@@ -167,7 +174,7 @@ const processFileUpload = async () => {
             alert(data.message || 'Gagal mengekstraksi transaksi dari file dokumen.');
         }
     } catch (e) {
-        alert('Terjadi kesalahan saat memproses file dokumen.');
+        alert('Terjadi kesalahan saat memproses file dokumen: ' + (e.message || e));
     } finally {
         isProcessing.value = false;
         processingMessage.value = '';

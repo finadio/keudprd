@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Pptk;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Smalot\PdfParser\Parser as PdfParser;
 
 class SmartTransactionParser
@@ -136,40 +138,89 @@ class SmartTransactionParser
 
     /**
      * Parse Excel spreadsheet into transactions using PhpSpreadsheet.
+     * Efficiently reads multi-sheet workbooks (Buku Bank and BKU per PPTK).
      */
     protected function parseExcelFile(string $filePath): array
     {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(180);
+
         try {
-            $spreadsheet = IOFactory::load($filePath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $maxRow = min($sheet->getHighestRow(), 1500); // safety cap
+            $reader = IOFactory::createReaderForFile($filePath);
+            $reader->setReadDataOnly(true);
+            $reader->setReadEmptyCells(false);
+            $spreadsheet = $reader->load($filePath);
+
             $pptks = Pptk::all();
-            $transactions = [];
+            $allTransactions = [];
+            $skipSheets = ['hitungan', 'jml deb rek', 'cover', 'rekap', 'dashboard'];
 
-            for ($row = 1; $row <= $maxRow; $row++) {
-                $cells = [];
-                for ($col = 'A'; $col <= 'Z'; $col++) {
-                    $val = trim((string) $sheet->getCell("{$col}{$row}")->getFormattedValue());
-                    if ($val !== '') {
-                        $cells[] = $val;
-                    }
-                }
-
-                if (count($cells) < 2) {
+            foreach ($spreadsheet->getAllSheets() as $sheet) {
+                $title = $sheet->getTitle();
+                if (in_array(strtolower(trim($title)), $skipSheets)) {
                     continue;
                 }
 
-                $rowLine = implode(" \t ", $cells);
-                if ($this->hasDate($rowLine) && $this->hasAmount($rowLine)) {
-                    $tx = $this->parseSingleLine($rowLine, count($transactions) + 1, $pptks);
-                    if ($tx) {
-                        $transactions[] = $tx;
+                $sheetPptk = null;
+                foreach ($pptks as $p) {
+                    if (strcasecmp($p->sheet_name, $title) === 0 || strcasecmp($p->display_name, $title) === 0 || stripos($title, $p->code) !== false) {
+                        $sheetPptk = $p;
+                        break;
+                    }
+                }
+
+                $rows = $sheet->toArray(null, true, false, false);
+
+                foreach ($rows as $rIdx => $row) {
+                    $cells = [];
+                    foreach ($row as $val) {
+                        if ($val !== null && trim((string) $val) !== '') {
+                            // Translate Excel numeric serial dates to d/m/Y format
+                            if (is_numeric($val) && (int) $val >= 43831 && (int) $val <= 55000 && (float) $val == (int) $val) {
+                                try {
+                                    $val = Date::excelToDateTimeObject((int) $val)->format('d/m/Y');
+                                } catch (\Throwable $e) {
+                                }
+                            }
+                            $cells[] = trim((string) $val);
+                        }
+                    }
+
+                    if (count($cells) < 2) {
+                        continue;
+                    }
+
+                    $rowLine = implode(" \t ", $cells);
+                    $lowerLine = strtolower($rowLine);
+
+                    // Skip summary / header lines
+                    if (str_contains($lowerLine, 'saldo bulan lalu') ||
+                        str_contains($lowerLine, 'jumlah periode ini') ||
+                        str_contains($lowerLine, 'jumlah sampai periode') ||
+                        str_contains($lowerLine, 'sisa kas') ||
+                        str_contains($lowerLine, 'penerimaan | pengeluaran')) {
+                        continue;
+                    }
+
+                    $txItems = $this->parseText($rowLine);
+                    if (! empty($txItems)) {
+                        foreach ($txItems as $item) {
+                            if ($sheetPptk && empty($item['pptk_id'])) {
+                                $item['pptk_id'] = $sheetPptk->id;
+                                $item['pptk_code'] = $sheetPptk->code;
+                                $item['pptk_name'] = $sheetPptk->display_name;
+                            }
+                            $item['temp_id'] = 'TMP-'.(count($allTransactions) + 1);
+                            $allTransactions[] = $item;
+                        }
                     }
                 }
             }
 
-            return $transactions;
+            return $allTransactions;
         } catch (\Throwable $e) {
+            Log::error('parseExcelFile failed: '.$e->getMessage());
+
             return [];
         }
     }
