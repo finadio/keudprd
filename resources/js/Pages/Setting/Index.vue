@@ -22,7 +22,8 @@ import {
     Pencil,
     X,
     AlertTriangle,
-    CheckCircle2
+    CheckCircle2,
+    FolderOpen
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -320,22 +321,21 @@ const togglePptkActive = (pptk) => {
                                             </span>
                                         </td>
                                         <td class="px-3 py-2 text-center whitespace-nowrap">
-                                            <div class="inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                            <div class="flex items-center justify-center gap-1">
                                                 <!-- Buka Data -->
                                                 <button
                                                     type="button"
                                                     @click="switchToYear(ys.year)"
                                                     :disabled="ys.year === active_year"
                                                     :class="[
-                                                        'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors shadow-2xs whitespace-nowrap',
+                                                        'p-1.5 rounded-lg transition-colors cursor-pointer',
                                                         ys.year === active_year
-                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
-                                                            : 'bg-white hover:bg-emerald-600 hover:text-white text-slate-700 border border-slate-300 cursor-pointer'
+                                                            ? 'text-emerald-700 bg-emerald-50 cursor-default'
+                                                            : 'text-slate-500 hover:text-emerald-700 hover:bg-emerald-50'
                                                     ]"
-                                                    :title="ys.year === active_year ? 'Tahun ini sedang dibuka' : 'Buka & lihat data pembukuan TA ' + ys.year"
+                                                    :title="ys.year === active_year ? 'Tahun ini sedang dibuka di layar' : 'Buka & lihat data pembukuan TA ' + ys.year"
                                                 >
-                                                    <span>{{ ys.year === active_year ? 'Dibuka' : 'Buka' }}</span>
-                                                    <ArrowRight v-if="ys.year !== active_year" class="w-3 h-3" />
+                                                    <FolderOpen class="w-3.5 h-3.5" />
                                                 </button>
 
                                                 <!-- Jadikan TA Aktif Utama -->
@@ -343,11 +343,10 @@ const togglePptkActive = (pptk) => {
                                                     v-if="!ys.is_default"
                                                     type="button"
                                                     @click="makeYearActive(ys.year)"
-                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-800 border border-amber-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+                                                    class="p-1.5 rounded-lg text-slate-400 hover:text-amber-700 hover:bg-amber-50 transition-colors cursor-pointer"
                                                     :title="'Jadikan TA ' + ys.year + ' sebagai Tahun Anggaran Aktif Utama sistem'"
                                                 >
-                                                    <CheckCircle2 class="w-3 h-3" />
-                                                    <span>Aktifkan</span>
+                                                    <CheckCircle2 class="w-3.5 h-3.5" />
                                                 </button>
 
                                                 <!-- Hapus TA Permanen -->
@@ -355,11 +354,10 @@ const togglePptkActive = (pptk) => {
                                                     v-if="!ys.is_default"
                                                     type="button"
                                                     @click="openDeleteYearModal(ys)"
-                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-red-50 hover:bg-red-600 hover:text-white text-red-700 border border-red-300 transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
+                                                    class="p-1.5 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
                                                     :title="'Hapus permanen TA ' + ys.year + ' beserta seluruh datanya'"
                                                 >
-                                                    <Trash2 class="w-3 h-3" />
-                                                    <span>Hapus</span>
+                                                    <Trash2 class="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
                                         </td>
