@@ -20,13 +20,28 @@ class GajiModuleTest extends TestCase
         parent::setUp();
 
         $this->admin = User::firstOrCreate(
-            ['email' => 'admin_gaji@example.com'],
+            ['email' => 'admin@dprd.banyumaskab.go.id'],
             [
-                'name' => 'Admin Keuangan Test',
-                'role' => 'admin',
+                'name' => 'Administrator Keuangan',
+                'role' => 'superadmin',
                 'password' => bcrypt('password'),
             ]
         );
+    }
+
+    public function test_pptk_cannot_access_gaji_module(): void
+    {
+        $pptk = User::firstOrCreate(
+            ['email' => 'pptk.irna@dprd.banyumaskab.go.id'],
+            [
+                'name' => 'IRNAWATINGRUM, S.S.TP., M.Si.',
+                'role' => 'pptk',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        $response = $this->actingAs($pptk)->get('/gaji');
+        $response->assertRedirect('/pagu');
     }
 
     public function test_can_access_gaji_dashboard(): void
