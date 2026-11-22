@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../../Layouts/AppLayout.vue';
 import { 
     Settings, 
@@ -12,7 +12,13 @@ import {
     X,
     FileText,
     Coins,
-    Building2
+    Building2,
+    RefreshCw,
+    Sliders,
+    Plus,
+    Trash2,
+    Sparkles,
+    AlertCircle
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -26,7 +32,18 @@ const formatRupiah = (val) => {
     return 'Rp ' + Number(val).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 };
 
-// Edit Allocation Modal
+// ================= 1. SINKRONISASI KE SELURUH DATA =================
+const syncForm = useForm({
+    year: props.year,
+});
+
+const handleSyncAll = () => {
+    if (confirm(`Apakah Anda yakin ingin menyinkronkan seluruh formula, komposisi persentase, dan tarif terbaru ke SEMUA data penggajian dan simulasi di Tahun Anggaran ${props.year}?\n\nSistem akan menghitung ulang seluruh item penerima secara otomatis tanpa perlu input manual.`)) {
+        syncForm.post('/gaji/pengaturan/sync-all');
+    }
+};
+
+// ================= 2. EDIT ALOKASI PLAFON KONTROL ANGGARAN =================
 const isAllocModalOpen = ref(false);
 const editingAlloc = ref(null);
 const allocForm = useForm({
@@ -54,30 +71,145 @@ const submitAllocForm = () => {
         },
     });
 };
+
+// ================= 3. EDIT FORMULA & KOMPOSISI PERSENTASE =================
+const isConfigModalOpen = ref(false);
+const editingConfig = ref(null);
+const configForm = useForm({
+    name: '',
+    legal_reference: '',
+    config_value: {},
+});
+
+const newParamKey = ref('');
+const newParamValue = ref('');
+
+const paramLabels = {
+    uang_representasi_ketua: { label: 'Uang Representasi Ketua DPRD', type: 'currency', desc: 'Dasar 100% Gaji Pokok Bupati' },
+    pct_wakil_ketua: { label: 'Persentase Uang Rep. Wakil Ketua', type: 'percent', desc: '80% dari Ketua' },
+    pct_anggota: { label: 'Persentase Uang Rep. Anggota DPRD', type: 'percent', desc: '75% dari Ketua' },
+    pct_uang_paket: { label: 'Uang Paket Dewan', type: 'percent', desc: '10% dari Uang Representasi' },
+    pct_tunj_jabatan: { label: 'Tunjangan Jabatan DPRD', type: 'percent', desc: '145% dari Uang Representasi' },
+    tki_multiplier: { label: 'Multiplier TKI (Komunikasi Intensif)', type: 'multiplier', desc: '7x Uang Rep Ketua (Kemampuan Tinggi)' },
+    pct_akd_ketua: { label: 'Tunjangan Ketua AKD (Komisi/Banggar/Banmus)', type: 'percent', desc: '7,5% dari Tunj. Jabatan Ketua' },
+    pct_akd_wakil: { label: 'Tunjangan Wakil Ketua AKD', type: 'percent', desc: '5% dari Tunj. Jabatan Ketua' },
+    pct_akd_sekretaris: { label: 'Tunjangan Sekretaris AKD', type: 'percent', desc: '4% dari Tunj. Jabatan Ketua' },
+    pct_akd_anggota: { label: 'Tunjangan Anggota AKD', type: 'percent', desc: '3% dari Tunj. Jabatan Ketua' },
+    housing_ketua: { label: 'Tunjangan Perumahan Ketua DPRD', type: 'currency', desc: 'Jika tidak menempati Rumah Negara' },
+    housing_wakil_ketua: { label: 'Tunjangan Perumahan Wakil Ketua', type: 'currency', desc: 'Jika tidak menempati Rumah Negara' },
+    housing_anggota: { label: 'Tunjangan Perumahan Anggota', type: 'currency', desc: 'Perda 6/2017 jo Perbup 9/2024' },
+    transport_anggota: { label: 'Tunjangan Transportasi Anggota', type: 'currency', desc: 'Pimpinan difasilitasi mobil dinas' },
+    transport_pimpinan: { label: 'Tunjangan Transportasi Pimpinan', type: 'currency', desc: 'Jika mobil dinas tidak tersedia' },
+    reses_per_event: { label: 'Tunjangan Reses per Kegiatan', type: 'currency', desc: 'Diberikan saat masa reses' },
+    pct_pph21: { label: 'Tarif Potongan PPh 21 Final', type: 'percent', desc: 'Tarif PPh Pasal 17' },
+    pct_bpjs: { label: 'Tarif Potongan BPJS Kesehatan', type: 'percent', desc: '1% tanggungan dewan' },
+
+    // Formula ASN
+    pct_spouse: { label: 'Tunjangan Suami / Istri ASN', type: 'percent', desc: '10% dari Gaji Pokok' },
+    pct_child: { label: 'Tunjangan Anak per Jiwa', type: 'percent', desc: '2% dari Gaji Pokok (Max 2 Anak)' },
+    rice_per_person: { label: 'Tunjangan Beras / Pangan per Jiwa', type: 'currency', desc: '10 kg beras (Rp 7.242 / kg) max 4 jiwa' },
+    tpp_prod_weight: { label: 'Bobot Produktivitas Kerja TPP', type: 'percent', desc: 'Maksimal 70% dari TPP Dasar' },
+    tpp_disp_weight: { label: 'Bobot Disiplin Kehadiran TPP', type: 'percent', desc: 'Maksimal 30% dari TPP Dasar' },
+    pppk_paruh_waktu_default: { label: 'Standar Gaji PPPK Paruh Waktu', type: 'currency', desc: 'Gaji kesepakatan perjanjian kerja' },
+    iwp_pct: { label: 'Iuran Wajib Pegawai (IWP)', type: 'percent', desc: '1% dari (Gapok + Tunjangan Keluarga)' },
+    bpjs_pct: { label: 'Iuran BPJS Kesehatan ASN', type: 'percent', desc: '4% tanggungan iuran' },
+
+    // TPP Class Banyumas
+    class_14: { label: 'TPP Kelas 14 (Sekretaris DPRD)', type: 'currency', desc: 'Eselon II.a' },
+    class_12: { label: 'TPP Kelas 12 (Kepala Bagian)', type: 'currency', desc: 'Eselon III.a' },
+    class_9: { label: 'TPP Kelas 9 (Kasubbag / Subkoordinator)', type: 'currency', desc: 'Eselon IV.a' },
+    class_8: { label: 'TPP Kelas 8 (Fungsional Ahli Pertama)', type: 'currency', desc: 'Jabatan Fungsional' },
+    class_7: { label: 'TPP Kelas 7 (Pelaksana / Fungsional Mahir)', type: 'currency', desc: 'Staf Pelaksana' },
+    class_6: { label: 'TPP Kelas 6 (Pelaksana / Fungsional Terampil)', type: 'currency', desc: 'Staf Pelaksana' },
+    class_5: { label: 'TPP Kelas 5 (Pelaksana / Fungsional Pemula)', type: 'currency', desc: 'Staf Pelaksana' },
+    class_3: { label: 'TPP Kelas 3 (Pelaksana Operasional)', type: 'currency', desc: 'Staf Operasional' },
+    class_1: { label: 'TPP Kelas 1 (Pelaksana Umum)', type: 'currency', desc: 'Staf Umum' },
+    pppk_penuh_waktu: { label: 'TPP PPPK Penuh Waktu', type: 'currency', desc: 'Besaran Flat Perbup 104/2025' },
+    pppk_paruh_waktu: { label: 'TPP PPPK Paruh Waktu', type: 'currency', desc: 'Rp 0 (Dikecualikan Pasal 18 huruf l)' },
+};
+
+const openEditConfig = (cfg) => {
+    editingConfig.value = cfg;
+    configForm.name = cfg.name;
+    configForm.legal_reference = cfg.legal_reference || '';
+    configForm.config_value = { ...(cfg.config_value || {}) };
+    newParamKey.value = '';
+    newParamValue.value = '';
+    isConfigModalOpen.value = true;
+};
+
+const addNewParam = () => {
+    if (!newParamKey.value.trim()) return;
+    const key = newParamKey.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    configForm.config_value[key] = isNaN(newParamValue.value) ? newParamValue.value : Number(newParamValue.value);
+    newParamKey.value = '';
+    newParamValue.value = '';
+};
+
+const removeParam = (key) => {
+    if (confirm(`Hapus parameter "${key}" dari formula ini?`)) {
+        delete configForm.config_value[key];
+    }
+};
+
+const submitConfigForm = (syncImmediately = false) => {
+    configForm.put(`/gaji/pengaturan/config/${editingConfig.value.id}`, {
+        onSuccess: () => {
+            isConfigModalOpen.value = false;
+            if (syncImmediately) {
+                syncForm.post('/gaji/pengaturan/sync-all');
+            }
+        },
+    });
+};
 </script>
 
 <template>
     <AppLayout>
-        <Head title="Pengaturan Tarif & Regulasi Acuan - Keuangan Setwan" />
+        <Head title="Pengaturan Formula & Tarif Gaji - Keuangan Setwan" />
 
         <div class="space-y-6 pb-12">
-            <!-- Header & Sub Navigation -->
+            <!-- Header & Action Bar -->
             <div class="bg-white rounded-xl shadow-xs border border-slate-200/80 p-5">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                                Konfigurasi & Regulasi
+                                Konfigurasi & Regulasi Fleksibel
                             </span>
                             <span class="text-xs text-slate-400">•</span>
                             <span class="text-xs font-medium text-slate-500">Dasar Perhitungan Resmi</span>
                         </div>
                         <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight mt-1">
-                            Dasar Regulasi, Tarif Acuan & Plafon Anggaran
+                            Formula Perhitungan, Tarif Acuan & Plafon Anggaran
                         </h1>
                         <p class="text-xs md:text-sm text-slate-500 mt-0.5">
-                            Semua rumus dan nominal acuan disimpan di database sehingga dapat dikonfigurasi admin secara fleksibel apabila ada perubahan kebijakan baru.
+                            Semua rumus, persentase komposisi, dan tarif disimpan di database agar staf dapat menyesuaikan setiap ada kebijakan baru dan langsung menyinkronkannya ke seluruh data.
                         </p>
+                    </div>
+
+                    <!-- Tombol Utama: Sinkronkan ke Semua Data -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button
+                            type="button"
+                            @click="handleSyncAll"
+                            :disabled="syncForm.processing"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#107c41] hover:bg-[#0e6b37] text-white text-xs md:text-sm font-bold rounded-lg shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                            title="Terapkan formula dan tarif terbaru ke seluruh data penggajian"
+                        >
+                            <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': syncForm.processing }" />
+                            <span>{{ syncForm.processing ? 'Menyinkronkan Data...' : 'Sinkronkan ke Seluruh Perhitungan' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Box Banner Sinkronisasi -->
+                <div class="mt-4 p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-lg flex items-center justify-between gap-3 text-xs text-emerald-900">
+                    <div class="flex items-center gap-2.5">
+                        <Sparkles class="w-4 h-4 text-emerald-700 shrink-0" />
+                        <span>
+                            <strong>Otomatisasi Sinkron:</strong> Apabila ada perubahan peraturan bupati, persentase tunjangan, atau penambahan komponen baru, Anda cukup mengedit formulanya di bawah lalu klik tombol <strong>Sinkronkan</strong> untuk mengkalibrasi ulang seluruh perhitungan penerima secara instan.
+                        </span>
                     </div>
                 </div>
             </div>
@@ -138,105 +270,94 @@ const submitAllocForm = () => {
                 </div>
             </div>
 
-            <!-- Bagian 2: Daftar Konfigurasi Tarif Acuan & Regulasi -->
-            <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-4">
+            <!-- Bagian 2: Daftar Formula & Konfigurasi Tarif Acuan -->
+            <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-xs space-y-5">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                             <ShieldCheck class="w-4 h-4 text-emerald-600" />
-                            <span>Regulasi & Tarif Dasar Acuan Otomatisasi</span>
+                            <span>Formula Perhitungan & Komposisi Tarif Acuan</span>
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Besaran yang digunakan sistem berasal langsung dari peraturan perundang-undangan resmi yang berlaku di Kabupaten Banyumas.
+                            Klik tombol <strong>Ubah Formula & Tarif</strong> pada setiap kartu untuk mengubah persentase, nominal acuan, atau menambahkan variabel perhitungan baru.
                         </p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                    <!-- Kartu 1: Hak Keuangan DPRD -->
-                    <div class="p-4 rounded-xl border border-slate-200/80 bg-white space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-800 text-sm">Hak Keuangan DPRD (PP 18/2017 jo Perbup 9/2024)</h4>
-                            <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded">DPRD</span>
-                        </div>
-                        <ul class="space-y-1.5 text-slate-600 text-[11.5px]">
-                            <li class="flex justify-between">
-                                <span>Uang Representasi Ketua:</span>
-                                <strong class="text-slate-800">Rp 2.100.000 (100% Gaji Pokok Bupati)</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Uang Representasi Wakil Ketua:</span>
-                                <strong class="text-slate-800">Rp 1.680.000 (80%)</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Uang Representasi Anggota:</span>
-                                <strong class="text-slate-800">Rp 1.575.000 (75%)</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Uang Paket:</span>
-                                <strong class="text-slate-800">10% Uang Representasi</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Tunjangan Jabatan:</span>
-                                <strong class="text-slate-800">145% Uang Representasi</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Tunjangan Komunikasi Intensif (TKI):</span>
-                                <strong class="text-slate-800">Rp 14.700.000 / orang / bulan (7x)</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Tunjangan Perumahan Ketua / Waka / Anggota:</span>
-                                <strong class="text-slate-800">Rp 42,6jt / Rp 34,6jt / Rp 23,6jt</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Tunjangan Transportasi Anggota:</span>
-                                <strong class="text-slate-800">Rp 13.500.000 / bulan</strong>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 text-xs">
+                    <div 
+                        v-for="cfg in configs" 
+                        :key="cfg.id"
+                        class="rounded-xl border border-slate-200/80 bg-white flex flex-col justify-between shadow-2xs overflow-hidden"
+                    >
+                        <!-- Header Kartu -->
+                        <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-start justify-between gap-3">
+                            <div>
+                                <span 
+                                    class="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
+                                    :class="cfg.category === 'dprd' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'"
+                                >
+                                    {{ cfg.category.toUpperCase() }}
+                                </span>
+                                <h4 class="font-bold text-slate-800 text-sm mt-1.5">{{ cfg.name }}</h4>
+                                <span class="text-[11px] text-slate-500 block mt-0.5">{{ cfg.legal_reference }}</span>
+                            </div>
 
-                    <!-- Kartu 2: TPP ASN Setwan -->
-                    <div class="p-4 rounded-xl border border-slate-200/80 bg-white space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-800 text-sm">TPP ASN Setwan (Perbup Banyumas 104/2025)</h4>
-                            <span class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded">ASN</span>
+                            <button
+                                type="button"
+                                @click="openEditConfig(cfg)"
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white hover:bg-slate-100 text-emerald-700 hover:text-emerald-800 font-semibold rounded-lg border border-slate-200 shadow-2xs text-[11px] cursor-pointer shrink-0 transition-colors"
+                            >
+                                <Edit2 class="w-3 h-3" />
+                                <span>Ubah Formula</span>
+                            </button>
                         </div>
-                        <ul class="space-y-1.5 text-slate-600 text-[11.5px]">
-                            <li class="flex justify-between">
-                                <span>Sekretaris DPRD (Kelas 14):</span>
-                                <strong class="text-slate-800">Rp 15.000.000 / bulan</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Kepala Bagian (Kelas 12):</span>
-                                <strong class="text-slate-800">Rp 8.500.000 / bulan</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Kepala Subbagian (Kelas 9):</span>
-                                <strong class="text-slate-800">Rp 5.250.000 / bulan</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Fungsional Ahli Muda (Kelas 9-10):</span>
-                                <strong class="text-slate-800">Rp 4.900.000 - Rp 5.000.000</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>Pelaksana Kelas 7 / 6 / 5:</span>
-                                <strong class="text-slate-800">Rp 3.300.000 / Rp 2.800.000 / Rp 2.700.000</strong>
-                            </li>
-                            <li class="flex justify-between">
-                                <span>PPPK Penuh Waktu:</span>
-                                <strong class="text-slate-800">Rp 1.600.000 / bulan</strong>
-                            </li>
-                            <li class="flex justify-between text-amber-700 font-medium">
-                                <span>PPPK Paruh Waktu:</span>
-                                <strong>Dikecualikan (Pasal 18 huruf l)</strong>
-                            </li>
-                        </ul>
+
+                        <!-- Daftar Komponen Parameter -->
+                        <div class="p-4 flex-1">
+                            <ul class="space-y-2 text-slate-600 text-[11.5px] max-h-96 overflow-y-auto pr-1">
+                                <li 
+                                    v-for="(val, key) in cfg.config_value" 
+                                    :key="key"
+                                    class="flex items-center justify-between py-1 border-b border-slate-50 gap-2"
+                                >
+                                    <div class="min-w-0">
+                                        <span class="font-medium text-slate-700 block truncate" :title="paramLabels[key]?.label || key">
+                                            {{ paramLabels[key]?.label || key }}
+                                        </span>
+                                        <span v-if="paramLabels[key]?.desc" class="text-[10px] text-slate-400 block truncate">
+                                            {{ paramLabels[key].desc }}
+                                        </span>
+                                    </div>
+                                    <div class="font-bold text-slate-800 shrink-0 text-right">
+                                        <span v-if="paramLabels[key]?.type === 'percent'">
+                                            {{ val }}%
+                                        </span>
+                                        <span v-else-if="paramLabels[key]?.type === 'multiplier'">
+                                            {{ val }}x
+                                        </span>
+                                        <span v-else-if="paramLabels[key]?.type === 'currency' || !isNaN(val)">
+                                            {{ formatRupiah(val) }}
+                                        </span>
+                                        <span v-else>
+                                            {{ val }}
+                                        </span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Footer Kartu -->
+                        <div class="p-3 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                            <span>{{ Object.keys(cfg.config_value || {}).length }} Komponen Formula</span>
+                            <span class="text-emerald-700 font-medium">Aktif</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Edit Allocation Modal -->
+        <!-- ================= MODAL EDIT ALOKASI PLAFON ================= -->
         <div v-if="isAllocModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
             <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 text-xs">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
@@ -258,29 +379,178 @@ const submitAllocForm = () => {
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Pagu Anggaran Tahunan (Rp) *</label>
-                        <input v-model="allocForm.annual_pagu" type="number" required min="0" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 font-mono font-bold" />
+                        <label class="block font-semibold text-slate-700 mb-1">Pagu APBD Tahunan (Rp) *</label>
+                        <input v-model.number="allocForm.annual_pagu" type="number" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300" />
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">{{ formatRupiah(allocForm.annual_pagu) }}</span>
                     </div>
 
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Plafon Kas Bulanan (Rp) *</label>
-                        <input v-model="allocForm.monthly_allocation" type="number" required min="0" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 font-mono font-bold text-emerald-700" />
+                        <input v-model.number="allocForm.monthly_allocation" type="number" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300" />
+                        <span class="text-[10px] text-slate-400 mt-0.5 block">{{ formatRupiah(allocForm.monthly_allocation) }}</span>
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Catatan / Dasar Regulasi</label>
+                        <label class="block font-semibold text-slate-700 mb-1">Catatan / Regulasi Acuan</label>
                         <textarea v-model="allocForm.notes" rows="2" class="w-full px-3 py-1.5 rounded-lg border border-slate-300"></textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-                        <button type="button" @click="isAllocModalOpen = false" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg">
+                        <button type="button" @click="isAllocModalOpen = false" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">
                             Batal
                         </button>
-                        <button type="submit" :disabled="allocForm.processing" class="px-4 py-1.5 bg-[#107c41] hover:bg-[#0e6b37] text-white rounded-lg font-bold">
+                        <button type="submit" :disabled="allocForm.processing" class="px-4 py-1.5 rounded-lg bg-[#107c41] text-white font-bold hover:bg-[#0e6b37]">
                             Simpan Perubahan
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL EDIT FORMULA & TARIF DINAMIS ================= -->
+        <div v-if="isConfigModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col p-5 text-xs">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4 shrink-0">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Editor Formula & Komposisi Tarif</span>
+                        <h3 class="font-bold text-slate-800 text-base">{{ editingConfig?.name }}</h3>
+                    </div>
+                    <button type="button" @click="isConfigModalOpen = false" class="text-slate-400 hover:text-slate-600">
+                        <X class="w-4 h-4" />
+                    </button>
+                </div>
+
+                <!-- Form Content (Scrollable) -->
+                <form @submit.prevent="submitConfigForm(false)" class="flex-1 overflow-y-auto space-y-4 pr-1">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Judul Konfigurasi *</label>
+                            <input v-model="configForm.name" type="text" required class="w-full px-3 py-1.5 rounded-lg border border-slate-300 font-medium" />
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Dasar Hukum / Regulasi</label>
+                            <input v-model="configForm.legal_reference" type="text" class="w-full px-3 py-1.5 rounded-lg border border-slate-300" />
+                        </div>
+                    </div>
+
+                    <!-- Parameter List Inputs -->
+                    <div class="space-y-3 pt-2">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                            <span class="font-bold text-slate-800 text-xs">Daftar Variabel & Nilai Perhitungan</span>
+                            <span class="text-[11px] text-slate-400">Ubah angka di bawah sesuai peraturan baru</span>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <div 
+                                v-for="(val, key) in configForm.config_value" 
+                                :key="key"
+                                class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3"
+                            >
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5">
+                                        <label class="font-bold text-slate-800 text-xs truncate">
+                                            {{ paramLabels[key]?.label || key }}
+                                        </label>
+                                        <span class="text-[10px] text-slate-400 font-mono">({{ key }})</span>
+                                    </div>
+                                    <span v-if="paramLabels[key]?.desc" class="text-[10.5px] text-slate-500 block truncate">
+                                        {{ paramLabels[key].desc }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <div class="relative w-44">
+                                        <input 
+                                            v-model.number="configForm.config_value[key]" 
+                                            type="number" 
+                                            step="any"
+                                            class="w-full pl-2.5 pr-8 py-1.5 rounded-lg border border-slate-300 text-right font-bold text-slate-800 text-xs focus:ring-1 focus:ring-emerald-500"
+                                        />
+                                        <span 
+                                            class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 pointer-events-none"
+                                        >
+                                            {{ paramLabels[key]?.type === 'percent' ? '%' : (paramLabels[key]?.type === 'multiplier' ? 'x' : 'Rp') }}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        @click="removeParam(key)"
+                                        class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                                        title="Hapus variabel"
+                                    >
+                                        <Trash2 class="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tambah Variabel / Komponen Baru Form -->
+                    <div class="p-3 bg-emerald-50/50 border border-dashed border-emerald-300 rounded-lg space-y-2">
+                        <span class="font-bold text-emerald-900 text-xs flex items-center gap-1.5">
+                            <Plus class="w-3.5 h-3.5 text-emerald-700" />
+                            <span>Tambah Komponen / Variabel Perhitungan Baru:</span>
+                        </span>
+                        <div class="flex flex-col sm:flex-row items-center gap-2">
+                            <input 
+                                v-model="newParamKey" 
+                                type="text" 
+                                placeholder="Nama key (mis: tunjangan_khusus)" 
+                                class="flex-1 w-full px-2.5 py-1.5 rounded-lg border border-emerald-200 bg-white text-xs font-mono"
+                            />
+                            <input 
+                                v-model.number="newParamValue" 
+                                type="number" 
+                                placeholder="Nominal / Persentase" 
+                                class="w-full sm:w-44 px-2.5 py-1.5 rounded-lg border border-emerald-200 bg-white text-xs text-right font-bold"
+                            />
+                            <button
+                                type="button"
+                                @click="addNewParam"
+                                class="w-full sm:w-auto px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg shrink-0 transition-colors cursor-pointer"
+                            >
+                                + Tambahkan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Modal Actions -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-4 border-t border-slate-100 shrink-0 mt-2">
+                    <span class="text-[11px] text-slate-500">
+                        Perubahan akan langsung aktif di simulasi & dapat disinkronkan ke seluruh periode.
+                    </span>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button 
+                            type="button" 
+                            @click="isConfigModalOpen = false" 
+                            class="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 cursor-pointer"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            type="button" 
+                            @click="submitConfigForm(false)" 
+                            :disabled="configForm.processing"
+                            class="px-4 py-1.5 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700 cursor-pointer"
+                        >
+                            Simpan Perubahan
+                        </button>
+                        <button 
+                            type="button" 
+                            @click="submitConfigForm(true)" 
+                            :disabled="configForm.processing"
+                            class="px-4 py-1.5 rounded-lg bg-[#107c41] text-white font-bold hover:bg-[#0e6b37] cursor-pointer shadow-xs flex items-center gap-1.5"
+                            title="Simpan perubahan dan langsung sinkronkan ke semua penggajian tersimpan"
+                        >
+                            <RefreshCw class="w-3.5 h-3.5" />
+                            <span>Simpan & Langsung Sinkronkan</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </AppLayout>

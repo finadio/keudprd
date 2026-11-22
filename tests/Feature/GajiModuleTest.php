@@ -2,13 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Gaji\GajiBudgetAllocation;
-use App\Models\Gaji\GajiPayrollPeriod;
+use App\Models\Gaji\GajiConfig;
 use App\Models\Gaji\GajiRecipient;
 use App\Models\User;
-use App\Services\Gaji\GajiBudgetControlService;
 use App\Services\Gaji\GajiCalculatorService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class GajiModuleTest extends TestCase
@@ -105,5 +102,23 @@ class GajiModuleTest extends TestCase
             'period_year' => 2026,
             'period_month' => 11,
         ]);
+    }
+
+    public function test_can_update_config_and_sync_all(): void
+    {
+        $config = GajiConfig::where('config_key', 'dprd_rates_2026')->first();
+        if ($config) {
+            $response = $this->actingAs($this->admin)->put("/gaji/pengaturan/config/{$config->id}", [
+                'name' => 'Tarif Dasar Hak Keuangan DPRD 2026 (Updated)',
+                'legal_reference' => 'PP 18/2017 jo PP 1/2023',
+                'config_value' => $config->config_value,
+            ]);
+            $response->assertSessionHas('success');
+        }
+
+        $syncResponse = $this->actingAs($this->admin)->post('/gaji/pengaturan/sync-all', [
+            'year' => 2026,
+        ]);
+        $syncResponse->assertSessionHas('success');
     }
 }

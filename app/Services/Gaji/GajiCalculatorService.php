@@ -2,10 +2,49 @@
 
 namespace App\Services\Gaji;
 
+use App\Models\Gaji\GajiConfig;
 use App\Models\Gaji\GajiRecipient;
 
 class GajiCalculatorService
 {
+    protected ?array $dprdRates = null;
+
+    protected ?array $tppRates = null;
+
+    protected ?array $asnRates = null;
+
+    public function __construct()
+    {
+        $this->loadConfigs();
+    }
+
+    public function loadConfigs(): void
+    {
+        $this->dprdRates = GajiConfig::getValue('dprd_rates_2026') ?? [];
+        $this->tppRates = GajiConfig::getValue('tpp_banyumas_rates_2026') ?? [];
+        $this->asnRates = GajiConfig::getValue('asn_allowance_rates_2026') ?? [];
+    }
+
+    public function getDprdRate(string $key, float $default): float
+    {
+        return isset($this->dprdRates[$key]) ? (float) $this->dprdRates[$key] : $default;
+    }
+
+    public function getAsnRate(string $key, float $default): float
+    {
+        return isset($this->asnRates[$key]) ? (float) $this->asnRates[$key] : $default;
+    }
+
+    public function getTppClassRate(int|string $class, float $default): float
+    {
+        $k = 'class_'.$class;
+        if (isset($this->tppRates[$k])) {
+            return (float) $this->tppRates[$k];
+        }
+
+        return $default;
+    }
+
     /**
      * Tabel Gaji Pokok PNS (PP Nomor 5 Tahun 2024) [Sample grid Golongan & MKG Min-Max].
      */
@@ -84,73 +123,91 @@ class GajiCalculatorService
     protected function calculateDprd(GajiRecipient $r, bool $isResesMonth): array
     {
         // 1. Uang Representasi
-        $repGajiBupati = 2100000.0;
+        $repGajiBupati = $this->getDprdRate('uang_representasi_ketua', 2100000.0);
+        $pctWaka = $this->getDprdRate('pct_wakil_ketua', 80.0) / 100;
+        $pctAnggota = $this->getDprdRate('pct_anggota', 75.0) / 100;
+
         $uangRep = match ($r->sub_category) {
             'ketua_dprd' => $repGajiBupati,
-            'wakil_ketua_dprd' => $repGajiBupati * 0.80, // Rp 1.680.000
-            default => $repGajiBupati * 0.75,           // Rp 1.575.000
+            'wakil_ketua_dprd' => $repGajiBupati * $pctWaka,
+            default => $repGajiBupati * $pctAnggota,
         };
 
-        // 2. Uang Paket = 10% dari Uang Representasi
-        $uangPaket = $uangRep * 0.10;
+        // 2. Uang Paket = % dari Uang Representasi (default 10%)
+        $pctUangPaket = $this->getDprdRate('pct_uang_paket', 10.0) / 100;
+        $uangPaket = $uangRep * $pctUangPaket;
 
-        // 3. Tunjangan Jabatan = 145% dari Uang Representasi
-        $tunjJabatan = $uangRep * 1.45;
+        // 3. Tunjangan Jabatan = % dari Uang Representasi (default 145%)
+        $pctTunjJabatan = $this->getDprdRate('pct_tunj_jabatan', 145.0) / 100;
+        $tunjJabatan = $uangRep * $pctTunjJabatan;
 
-        // 4. Tunjangan Alat Kelengkapan Dewan (AKD) - dihitung dari Tunjangan Jabatan Ketua (Rp 3.045.000)
-        $tunjJabatanKetua = $repGajiBupati * 1.45; // Rp 3.045.000
+        // 4. Tunjangan Alat Kelengkapan Dewan (AKD) - dihitung dari Tunjangan Jabatan Ketua
+        $tunjJabatanKetua = $repGajiBupati * $pctTunjJabatan;
+        $pctAkdKetua = $this->getDprdRate('pct_akd_ketua', 7.5) / 100;
+        $pctAkdWakil = $this->getDprdRate('pct_akd_wakil', 5.0) / 100;
+        $pctAkdSekr = $this->getDprdRate('pct_akd_sekretaris', 4.0) / 100;
+        $pctAkdAnggota = $this->getDprdRate('pct_akd_anggota', 3.0) / 100;
+
         $tunjAkd = match ($r->akd_role) {
-            'ketua' => $tunjJabatanKetua * 0.075,      // 7.5% = Rp 228.375
-            'wakil_ketua' => $tunjJabatanKetua * 0.05, // 5.0% = Rp 152.250
-            'sekretaris' => $tunjJabatanKetua * 0.04,  // 4.0% = Rp 121.800
-            'anggota' => $tunjJabatanKetua * 0.03,     // 3.0% = Rp 91.350
+            'ketua' => $tunjJabatanKetua * $pctAkdKetua,
+            'wakil_ketua' => $tunjJabatanKetua * $pctAkdWakil,
+            'sekretaris' => $tunjJabatanKetua * $pctAkdSekr,
+            'anggota' => $tunjJabatanKetua * $pctAkdAnggota,
             default => 0.0,
         };
 
-        // 5. Tunjangan Komunikasi Intensif (TKI) = 7 x Uang Representasi Ketua (Banyumas Kemampuan Keuangan Tinggi)
-        $tunjTki = 7 * $repGajiBupati; // Rp 14.700.000
+        // 5. Tunjangan Komunikasi Intensif (TKI) = multiplier x Uang Representasi Ketua
+        $tkiMultiplier = (float) $this->getDprdRate('tki_multiplier', 7.0);
+        $tunjTki = $tkiMultiplier * $repGajiBupati;
 
         // 6. Tunjangan Perumahan (Tidak diberikan jika sudah dapat Rumah Negara)
         $tunjPerumahan = 0.0;
         if (! $r->has_official_residence) {
             $tunjPerumahan = match ($r->sub_category) {
-                'ketua_dprd' => 42625000.0,
-                'wakil_ketua_dprd' => 34650000.0,
-                default => 23650000.0,
+                'ketua_dprd' => $this->getDprdRate('housing_ketua', 42625000.0),
+                'wakil_ketua_dprd' => $this->getDprdRate('housing_wakil_ketua', 34650000.0),
+                default => $this->getDprdRate('housing_anggota', 23650000.0),
             };
         }
 
-        // 7. Tunjangan Transportasi (Pimpinan disediakan mobil dinas, Anggota Rp 13.500.000)
+        // 7. Tunjangan Transportasi (Pimpinan disediakan mobil dinas, Anggota tunjangan)
         $tunjTransport = 0.0;
         if (! $r->has_official_car) {
             $tunjTransport = match ($r->sub_category) {
-                'ketua_dprd', 'wakil_ketua_dprd' => 14500000.0,
-                default => 13500000.0,
+                'ketua_dprd', 'wakil_ketua_dprd' => $this->getDprdRate('transport_pimpinan', 14500000.0),
+                default => $this->getDprdRate('transport_anggota', 13500000.0),
             };
         }
 
         // 8. Tunjangan Keluarga & Beras (Mengikuti ketentuan PNS)
+        $pctSpouse = $this->getAsnRate('pct_spouse', 10.0) / 100;
+        $pctChild = $this->getAsnRate('pct_child', 2.0) / 100;
+        $ricePerPerson = $this->getAsnRate('rice_per_person', 72420.0);
+
         $tunjKeluarga = 0.0;
         if ($r->marital_status === 'married') {
-            $tunjKeluarga += ($uangRep * 0.10); // Istri/Suami 10%
+            $tunjKeluarga += ($uangRep * $pctSpouse);
         }
         $childCount = min(2, max(0, $r->children_count));
-        $tunjKeluarga += ($uangRep * 0.02 * $childCount); // Anak 2% max 2
+        $tunjKeluarga += ($uangRep * $pctChild * $childCount);
 
         $jiwa = 1 + ($r->marital_status === 'married' ? 1 : 0) + $childCount;
-        $tunjBeras = min(4, $jiwa) * 72420.0; // 10kg beras @ Rp 7.242 / kg
+        $tunjBeras = min(4, $jiwa) * $ricePerPerson;
 
-        // 9. Tunjangan Reses (jika periode bulan reses, Rp 14.700.000 per kegiatan)
-        $tunjReses = $isResesMonth ? (7 * $repGajiBupati) : 0.0;
+        // 9. Tunjangan Reses (jika periode bulan reses)
+        $resesPerEvent = $this->getDprdRate('reses_per_event', 14700000.0);
+        $tunjReses = $isResesMonth ? $resesPerEvent : 0.0;
 
         // Total Bruto
         $gross = $uangRep + $uangPaket + $tunjJabatan + $tunjAkd + $tunjTki +
                  $tunjPerumahan + $tunjTransport + $tunjKeluarga + $tunjBeras + $tunjReses;
 
-        // Potongan Pajak PPh 21 (Estimasi PPh 21 atas penghasilan pimpinan/anggota dewan)
-        // PPh 21 final untuk TKI & Tunjangan perumahan/transportasi sesuai ketentuan
-        $pph21 = ($uangRep + $tunjJabatan) * 0.15; // 15% PPh 21 tarif pasal 17
-        $bpjsKes = min(400000.0, $uangRep * 0.01);
+        // Potongan Pajak PPh 21 & BPJS
+        $pctPph21 = $this->getDprdRate('pct_pph21', 15.0) / 100;
+        $pctBpjs = $this->getDprdRate('pct_bpjs', 1.0) / 100;
+
+        $pph21 = ($uangRep + $tunjJabatan) * $pctPph21;
+        $bpjsKes = min(400000.0, $uangRep * $pctBpjs);
         $totalDeductions = $pph21 + $bpjsKes;
         $netto = $gross - $totalDeductions;
 
@@ -180,7 +237,7 @@ class GajiCalculatorService
             'net_amount' => $netto,
             'calculation_meta' => [
                 'legal' => 'PP 18/2017 jo PP 1/2023, Perda Banyumas 6/2017, Perbup 9/2024',
-                'uang_representasi_basis' => 'Gaji Pokok Bupati Rp 2.100.000',
+                'uang_representasi_basis' => 'Gaji Pokok Bupati Rp '.number_format($repGajiBupati, 0, ',', '.'),
                 'has_residence' => $r->has_official_residence,
                 'has_car' => $r->has_official_car,
                 'akd_role' => $r->akd_role,
@@ -194,6 +251,8 @@ class GajiCalculatorService
     protected function calculateAsn(GajiRecipient $r, float $prodPct, float $dispPct): array
     {
         // 1. Gaji Pokok
+        $defaultPppkParuhWaktu = $this->getAsnRate('pppk_paruh_waktu_default', 1500000.0);
+
         $gajiPokok = 0.0;
         if ($r->fixed_salary && $r->fixed_salary > 0) {
             $gajiPokok = (float) $r->fixed_salary;
@@ -202,24 +261,28 @@ class GajiCalculatorService
         } elseif ($r->sub_category === 'pppk_penuh_waktu') {
             $gajiPokok = $this->getPppkBasicSalary($r->grade, $r->mkg_years);
         } else {
-            // PPPK Paruh Waktu: Berdasarkan kesepakatan perjanjian kerja (default standar regional jika belum diisi)
-            $gajiPokok = $r->fixed_salary ?: 2200000.0;
+            // PPPK Paruh Waktu: Berdasarkan kesepakatan perjanjian kerja
+            $gajiPokok = $r->fixed_salary ?: $defaultPppkParuhWaktu;
         }
 
         // 2. Tunjangan Keluarga (PNS & PPPK Penuh Waktu)
+        $pctSpouse = $this->getAsnRate('pct_spouse', 10.0) / 100;
+        $pctChild = $this->getAsnRate('pct_child', 2.0) / 100;
+        $ricePerPerson = $this->getAsnRate('rice_per_person', 72420.0);
+
         $tunjKeluarga = 0.0;
         if ($r->sub_category !== 'pppk_paruh_waktu') {
             if ($r->marital_status === 'married') {
-                $tunjKeluarga += ($gajiPokok * 0.10); // Istri/suami 10%
+                $tunjKeluarga += ($gajiPokok * $pctSpouse);
             }
             $childCount = min(2, max(0, $r->children_count));
-            $tunjKeluarga += ($gajiPokok * 0.02 * $childCount); // Anak 2% max 2
+            $tunjKeluarga += ($gajiPokok * $pctChild * $childCount);
         }
 
-        // 3. Tunjangan Beras/Pangan (Rp 72.420 per jiwa, max 4 jiwa)
+        // 3. Tunjangan Beras/Pangan
         $childCount = min(2, max(0, $r->children_count));
         $jiwa = 1 + ($r->marital_status === 'married' ? 1 : 0) + $childCount;
-        $tunjBeras = ($r->sub_category !== 'pppk_paruh_waktu') ? (min(4, $jiwa) * 72420.0) : 0.0;
+        $tunjBeras = ($r->sub_category !== 'pppk_paruh_waktu') ? (min(4, $jiwa) * $ricePerPerson) : 0.0;
 
         // 4. Tunjangan Jabatan / Fungsional
         $tunjJabatan = 0.0;
@@ -249,13 +312,19 @@ class GajiCalculatorService
             $tppBase = $r->tpp_base_amount;
             if ($tppBase <= 0) {
                 if ($r->sub_category === 'pppk_penuh_waktu') {
-                    $tppBase = 1600000.0; // Perbup 104/2025: PPPK PW Flat Rp 1.600.000
+                    $tppBase = isset($this->tppRates['pppk_penuh_waktu'])
+                        ? (float) $this->tppRates['pppk_penuh_waktu']
+                        : 1600000.0;
                 } else {
-                    $tppBase = $this->tppClassRates[$r->job_class ?? 7] ?? 3300000.0;
+                    $defaultClassRate = $this->tppClassRates[$r->job_class ?? 7] ?? 3300000.0;
+                    $tppBase = $this->getTppClassRate($r->job_class ?? 7, $defaultClassRate);
                 }
             }
 
-            // Rumus Konversi Produktivitas (max 70%) & Disiplin (max 30%)
+            // Rumus Konversi Produktivitas & Disiplin
+            $tppProdWeight = $this->getAsnRate('tpp_prod_weight', 70.0) / 100;
+            $tppDispWeight = $this->getAsnRate('tpp_disp_weight', 30.0) / 100;
+
             $konversiProd = 95.0; // Jika capaian 81 - 90%
             if ($prodPct > 90) {
                 $konversiProd = 100.0;
@@ -269,7 +338,7 @@ class GajiCalculatorService
                 $konversiProd = 50.0;
             }
 
-            $faktorPengali = ((0.70 * ($konversiProd / 100)) + (0.30 * ($dispPct / 100)));
+            $faktorPengali = (($tppProdWeight * ($konversiProd / 100)) + ($tppDispWeight * ($dispPct / 100)));
             $tppAmount = round($tppBase * $faktorPengali, 0);
         }
 
@@ -277,8 +346,11 @@ class GajiCalculatorService
         $gross = $gajiPokok + $tunjKeluarga + $tunjBeras + $tunjJabatan + $tppAmount;
 
         // Potongan Wajib
+        $iwpPct = $this->getAsnRate('iwp_pct', 8.0) / 100;
+        $bpjsPct = $this->getAsnRate('bpjs_pct', 1.0) / 100;
+
         $iwp = ($r->sub_category !== 'pppk_paruh_waktu') ? ($gajiPokok + $tunjKeluarga) * 0.01 : 0.0;
-        $bpjs = ($gajiPokok + $tunjKeluarga) * 0.04; // Iuran BPJS 4% tanggungan
+        $bpjs = ($gajiPokok + $tunjKeluarga) * 0.04;
         $pph21 = 0.0;
         if (str_starts_with($r->grade ?? '', 'IV')) {
             $pph21 = ($gajiPokok + $tppAmount) * 0.15;

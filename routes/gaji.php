@@ -41,5 +41,6 @@ Route::prefix('gaji')->name('gaji.')->group(function () {
         Route::get('/', [GajiConfigController::class, 'index'])->name('index');
         Route::put('/allocation/{allocation}', [GajiConfigController::class, 'updateAllocation'])->name('allocation.update');
         Route::put('/config/{config}', [GajiConfigController::class, 'updateConfig'])->name('config.update');
+        Route::post('/sync-all', [GajiConfigController::class, 'syncAll'])->name('sync-all');
     });
 });

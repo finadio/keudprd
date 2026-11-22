@@ -59,8 +59,35 @@ class GajiInitialDataSeeder extends Seeder
                     'transport_anggota' => 13500000.0,
                     'transport_pimpinan' => 14500000.0,
                     'reses_per_event' => 14700000.0,
+                    'pct_akd_ketua' => 7.5,
+                    'pct_akd_wakil' => 5.0,
+                    'pct_akd_sekretaris' => 4.0,
+                    'pct_akd_anggota' => 3.0,
+                    'pct_pph21' => 15.0,
+                    'pct_bpjs' => 1.0,
                 ],
                 'legal_reference' => 'PP 18/2017 jo PP 1/2023, Perda Banyumas 6/2017, Perbup 9/2024',
+                'is_active' => true,
+            ]
+        );
+
+        GajiConfig::firstOrCreate(
+            ['config_key' => 'asn_allowance_rates_2026'],
+            [
+                'category' => 'asn',
+                'name' => 'Formula Komposisi Tunjangan & TPP ASN 2026',
+                'description' => 'Persentase tunjangan keluarga, beras, bobot produktivitas/disiplin TPP, dan standar PPPK Paruh Waktu',
+                'config_value' => [
+                    'pct_spouse' => 10.0,
+                    'pct_child' => 2.0,
+                    'rice_per_person' => 72420.0,
+                    'tpp_prod_weight' => 70.0,
+                    'tpp_disp_weight' => 30.0,
+                    'pppk_paruh_waktu_default' => 1500000.0,
+                    'iwp_pct' => 8.0,
+                    'bpjs_pct' => 1.0,
+                ],
+                'legal_reference' => 'PP 5/2024, Perpres 11/2024, Perbup Banyumas 104/2025',
                 'is_active' => true,
             ]
         );
