@@ -28,7 +28,8 @@ import {
     UserPlus,
     Shield,
     Key,
-    UserCog
+    UserCog,
+    Search
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -73,6 +74,68 @@ watch(() => page.url, (newUrl) => {
         const params = new URLSearchParams(search);
         activeTab.value = params.get('tab') || 'users';
     }
+});
+
+const roleFilter = ref('all');
+const userSearch = ref('');
+const pptkSearch = ref('');
+
+const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+};
+
+const filteredUsers = computed(() => {
+    let list = props.users || [];
+    if (roleFilter.value !== 'all') {
+        list = list.filter(u => {
+            const r = (u.role || '').toLowerCase().replace(/\s+/g, '');
+            if (roleFilter.value === 'superadmin') return r === 'superadmin' || r === 'admin';
+            return r === roleFilter.value;
+        });
+    }
+    if (userSearch.value.trim()) {
+        const q = userSearch.value.toLowerCase().trim();
+        list = list.filter(u => 
+            (u.name || '').toLowerCase().includes(q) ||
+            (u.username || '').toLowerCase().includes(q) ||
+            (u.email || '').toLowerCase().includes(q) ||
+            (u.role || '').toLowerCase().includes(q) ||
+            (u.pptk?.name || '').toLowerCase().includes(q) ||
+            (u.pptk?.display_name || '').toLowerCase().includes(q)
+        );
+    }
+    return list;
+});
+
+const userCountsByRole = computed(() => {
+    const list = props.users || [];
+    return {
+        all: list.length,
+        superadmin: list.filter(u => ['superadmin', 'admin'].includes((u.role || '').toLowerCase().replace(/\s+/g, ''))).length,
+        bendahara: list.filter(u => (u.role || '').toLowerCase().replace(/\s+/g, '') === 'bendahara').length,
+        operator: list.filter(u => (u.role || '').toLowerCase().replace(/\s+/g, '') === 'operator').length,
+        pptk: list.filter(u => (u.role || '').toLowerCase().replace(/\s+/g, '') === 'pptk').length,
+    };
+});
+
+const filteredPptks = computed(() => {
+    let list = props.pptks || [];
+    if (pptkSearch.value.trim()) {
+        const q = pptkSearch.value.toLowerCase().trim();
+        list = list.filter(p => 
+            (p.name || '').toLowerCase().includes(q) ||
+            (p.display_name || '').toLowerCase().includes(q) ||
+            (p.code || '').toLowerCase().includes(q) ||
+            (p.nip || '').toLowerCase().includes(q) ||
+            (p.sheet_name || '').toLowerCase().includes(q) ||
+            (p.subunit?.name || '').toLowerCase().includes(q) ||
+            (p.user?.username || '').toLowerCase().includes(q)
+        );
+    }
+    return list;
 });
 
 const form = ref({
@@ -744,10 +807,10 @@ const togglePptkActive = (pptk) => {
             </div>
 
             <!-- Tab 1: Manajemen Akun Pengguna & Hak Akses (Role) -->
-            <div v-show="activeTab === 'users'" class="space-y-4">
+            <div v-show="activeTab === 'users'" class="space-y-5">
                 <!-- Card: Manajemen Akun Pengguna & Hak Akses (Role) -->
-                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-                    <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-4 bg-slate-50/70 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5">
                             <UserCog class="w-5 h-5 text-emerald-800" />
                             <div>
@@ -760,9 +823,6 @@ const togglePptkActive = (pptk) => {
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-[11px] text-slate-500 font-medium">
-                                Total: <strong class="text-slate-800">{{ users?.length || 0 }}</strong> Akun Terdaftar
-                            </span>
                             <button 
                                 type="button"
                                 @click="openCreateUserModal()"
@@ -774,75 +834,171 @@ const togglePptkActive = (pptk) => {
                         </div>
                     </div>
 
-                    <!-- Role Guide Cards -->
-                    <div class="p-4 bg-slate-50/60 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div v-for="r in roles" :key="r.value" class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-1">
-                            <div class="flex items-center justify-between">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border" :class="r.color">
-                                    {{ r.label }}
+                    <!-- Role Filter Tabs & Quick Search -->
+                    <div class="px-5 py-3 border-b border-slate-200/80 bg-white flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <button
+                                type="button"
+                                @click="roleFilter = 'all'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                                :class="roleFilter === 'all' ? 'bg-[#04331a] text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                            >
+                                <span>Semua Akun</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold" :class="roleFilter === 'all' ? 'bg-emerald-800 text-emerald-100' : 'bg-slate-200 text-slate-600'">
+                                    {{ userCountsByRole.all }}
                                 </span>
-                                <span class="text-[10px] font-mono text-slate-400">role: {{ r.value }}</span>
-                            </div>
-                            <p class="text-[11px] text-slate-600 leading-snug pt-1">{{ r.description }}</p>
+                            </button>
+                            <button
+                                type="button"
+                                @click="roleFilter = 'superadmin'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                                :class="roleFilter === 'superadmin' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                            >
+                                <span>Super Admin</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold" :class="roleFilter === 'superadmin' ? 'bg-emerald-900 text-emerald-100' : 'bg-slate-200 text-slate-600'">
+                                    {{ userCountsByRole.superadmin }}
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                @click="roleFilter = 'bendahara'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                                :class="roleFilter === 'bendahara' ? 'bg-blue-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                            >
+                                <span>Bendahara</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold" :class="roleFilter === 'bendahara' ? 'bg-blue-900 text-blue-100' : 'bg-slate-200 text-slate-600'">
+                                    {{ userCountsByRole.bendahara }}
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                @click="roleFilter = 'operator'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                                :class="roleFilter === 'operator' ? 'bg-purple-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                            >
+                                <span>Operator</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold" :class="roleFilter === 'operator' ? 'bg-purple-900 text-purple-100' : 'bg-slate-200 text-slate-600'">
+                                    {{ userCountsByRole.operator }}
+                                </span>
+                            </button>
+                            <button
+                                type="button"
+                                @click="roleFilter = 'pptk'"
+                                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                                :class="roleFilter === 'pptk' ? 'bg-amber-700 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                            >
+                                <span>PPTK</span>
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold" :class="roleFilter === 'pptk' ? 'bg-amber-900 text-amber-100' : 'bg-slate-200 text-slate-600'">
+                                    {{ userCountsByRole.pptk }}
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- Search Input -->
+                        <div class="relative w-full sm:w-64">
+                            <Search class="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                            <input
+                                v-model="userSearch"
+                                type="text"
+                                placeholder="Cari nama, @username, role..."
+                                class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 bg-slate-50 focus:bg-white"
+                            />
                         </div>
                     </div>
 
-                    <!-- Users Table -->
+                    <!-- Spacious Modern Users Table -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs">
-                            <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <thead class="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200 text-[11px] uppercase tracking-wider">
                                 <tr>
-                                    <th class="px-3 py-2 text-center w-10">No</th>
-                                    <th class="px-3 py-2 text-left">Nama Pengguna</th>
-                                    <th class="px-3 py-2 text-left">Username Login</th>
-                                    <th class="px-3 py-2 text-left">Role / Hak Akses</th>
-                                    <th class="px-3 py-2 text-left">Terhubung PPTK</th>
-                                    <th class="px-3 py-2 text-left">Email Resmi</th>
-                                    <th class="px-3 py-2 text-center w-36">Aksi &amp; Sandi</th>
+                                    <th class="px-5 py-3.5 text-left">Pengguna &amp; Akun Login</th>
+                                    <th class="px-5 py-3.5 text-left">Role / Hak Akses</th>
+                                    <th class="px-5 py-3.5 text-left">Penugasan Unit / PPTK</th>
+                                    <th class="px-5 py-3.5 text-right">Aksi &amp; Keamanan</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                <tr v-for="(u, idx) in users" :key="u.id" class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
-                                    <td class="px-3 py-2 font-bold text-slate-900">
-                                        {{ u.name }}
-                                        <span v-if="u.id === $page.props.auth?.user?.id" class="ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                            Akun Anda
-                                        </span>
+                                <tr v-for="u in filteredUsers" :key="u.id" class="hover:bg-slate-50/80 transition-colors">
+                                    <!-- Kolom 1: Avatar + Nama + @username + Email -->
+                                    <td class="px-5 py-3.5">
+                                        <div class="flex items-center gap-3">
+                                            <div 
+                                                class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs"
+                                                :class="[
+                                                    u.role === 'superadmin' || u.role === 'admin' ? 'bg-emerald-100 text-emerald-800' :
+                                                    (u.role === 'bendahara' ? 'bg-blue-100 text-blue-800' :
+                                                    (u.role === 'pptk' ? 'bg-amber-100 text-amber-800' :
+                                                    'bg-purple-100 text-purple-800'))
+                                                ]"
+                                            >
+                                                {{ getInitials(u.name) }}
+                                            </div>
+                                            <div class="min-w-0">
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="font-bold text-slate-900 text-sm tracking-tight">{{ u.name }}</span>
+                                                    <span v-if="u.id === $page.props.auth?.user?.id" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                        Akun Anda
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                                                    <span class="font-mono font-semibold text-emerald-800 bg-emerald-50/80 px-1.5 py-0.2 rounded border border-emerald-200/60">
+                                                        @{{ u.username || '-' }}
+                                                    </span>
+                                                    <span class="text-slate-300">•</span>
+                                                    <span class="font-mono truncate max-w-xs text-slate-500">{{ u.email }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="px-3 py-2">
-                                        <span class="inline-flex items-center gap-1 font-mono font-bold text-emerald-900 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
-                                            @{{ u.username || '-' }}
-                                        </span>
+
+                                    <!-- Kolom 2: Role / Hak Akses -->
+                                    <td class="px-5 py-3.5">
+                                        <div class="space-y-1">
+                                            <span 
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider"
+                                                :class="[
+                                                    u.role === 'superadmin' || u.role === 'admin' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
+                                                    (u.role === 'bendahara' ? 'bg-blue-50 text-blue-800 border-blue-300' :
+                                                    (u.role === 'pptk' ? 'bg-amber-50 text-amber-800 border-amber-300' :
+                                                    'bg-purple-50 text-purple-800 border-purple-300'))
+                                                ]"
+                                            >
+                                                <ShieldCheck v-if="u.role === 'superadmin' || u.role === 'admin'" class="w-3.5 h-3.5" />
+                                                <Shield v-else class="w-3.5 h-3.5" />
+                                                <span>{{ u.role === 'superadmin' ? 'Super Admin' : (u.role === 'bendahara' ? 'Bendahara Pengeluaran' : (u.role === 'pptk' ? 'Pejabat PPTK' : 'Operator SPM/SP2D')) }}</span>
+                                            </span>
+                                            <div class="text-[10px] text-slate-500">
+                                                {{ u.role === 'superadmin' || u.role === 'admin' ? 'Akses penuh seluruh modul & kontrol sistem' : (u.role === 'bendahara' ? 'Akses penatausahaan keuangan & gaji' : (u.role === 'pptk' ? 'Akses terbatas modul Realisasi Pagu' : 'Input data BKU & SP2D')) }}
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="px-3 py-2">
-                                        <span 
-                                            class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border uppercase"
-                                            :class="[
-                                                u.role === 'superadmin' || u.role === 'admin' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
-                                                (u.role === 'bendahara' ? 'bg-blue-100 text-blue-800 border-blue-300' :
-                                                (u.role === 'pptk' ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                                                'bg-purple-100 text-purple-800 border-purple-300'))
-                                            ]"
-                                        >
-                                            {{ u.role }}
-                                        </span>
+
+                                    <!-- Kolom 3: Penugasan Unit / PPTK -->
+                                    <td class="px-5 py-3.5">
+                                        <div v-if="u.pptk" class="space-y-0.5">
+                                            <span class="inline-flex items-center gap-1.5 font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                                                <span class="w-2 h-2 rounded-full shrink-0" :style="{ backgroundColor: u.pptk.color_tag || '#04331a' }"></span>
+                                                <span>{{ u.pptk.display_name || u.pptk.name }}</span>
+                                            </span>
+                                            <div class="text-[10px] text-slate-500 pl-1">
+                                                Kode: <strong class="font-mono text-slate-700">{{ u.pptk.code }}</strong>
+                                                <span v-if="u.pptk.subunit?.name"> • {{ u.pptk.subunit.name }}</span>
+                                            </div>
+                                        </div>
+                                        <div v-else class="text-slate-500 text-[11px] flex items-center gap-1.5">
+                                            <Building2 class="w-3.5 h-3.5 text-slate-400" />
+                                            <span>Seluruh SKPD Sekretariat DPRD</span>
+                                        </div>
                                     </td>
-                                    <td class="px-3 py-2">
-                                        <span v-if="u.pptk" class="inline-flex items-center gap-1 font-medium text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                            <Users class="w-3 h-3 text-amber-700" />
-                                            {{ u.pptk.display_name || u.pptk.name }}
-                                        </span>
-                                        <span v-else class="text-slate-400 font-mono text-[11px]">- (Seluruh SKPD)</span>
-                                    </td>
-                                    <td class="px-3 py-2 text-slate-600 font-mono text-[11px]">{{ u.email }}</td>
-                                    <td class="px-3 py-2 text-center">
-                                        <div class="flex items-center justify-center gap-1">
+
+                                    <!-- Kolom 4: Aksi & Keamanan -->
+                                    <td class="px-5 py-3.5 text-right">
+                                        <div class="inline-flex items-center justify-end gap-1.5">
                                             <button 
                                                 type="button"
                                                 @click="openResetUserPasswordModal(u)"
-                                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
-                                                title="Reset Password Pengguna"
+                                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-all cursor-pointer shadow-2xs"
+                                                title="Reset password login akun ini"
                                             >
                                                 <Key class="w-3 h-3 text-slate-500" />
                                                 <span>Reset Sandi</span>
@@ -850,7 +1006,7 @@ const togglePptkActive = (pptk) => {
                                             <button 
                                                 type="button"
                                                 @click="openEditUserModal(u)"
-                                                class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
+                                                class="p-1.5 rounded-lg text-slate-600 hover:text-blue-700 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all cursor-pointer"
                                                 title="Edit Profil & Role"
                                             >
                                                 <Pencil class="w-3.5 h-3.5" />
@@ -859,12 +1015,17 @@ const togglePptkActive = (pptk) => {
                                                 v-if="u.id !== 1 && u.id !== $page.props.auth?.user?.id"
                                                 type="button"
                                                 @click="confirmDeleteUser(u)"
-                                                class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                                                class="p-1.5 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all cursor-pointer"
                                                 title="Hapus Akun Pengguna"
                                             >
                                                 <Trash2 class="w-3.5 h-3.5" />
                                             </button>
                                         </div>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredUsers.length === 0">
+                                    <td colspan="4" class="px-5 py-10 text-center text-slate-500">
+                                        Tidak ditemukan data pengguna yang cocok dengan kriteria pencarian / filter.
                                     </td>
                                 </tr>
                             </tbody>
@@ -873,8 +1034,8 @@ const togglePptkActive = (pptk) => {
                 </div>
 
                 <!-- Card: Keamanan Akun & Ganti Password Sendiri -->
-                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-50/70 border-b border-slate-200 flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <KeyRound class="w-4 h-4 text-rose-600" />
                             <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Ubah Password Akun Anda Sendiri</h2>
@@ -939,122 +1100,187 @@ const togglePptkActive = (pptk) => {
 
             <!-- Tab 2: Master PPTK Management -->
             <div v-show="activeTab === 'pptk'" class="space-y-4">
-                <!-- Card 4: Master PPTK Management -->
-                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-                <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                        <Users class="w-4 h-4 text-emerald-700" />
-                        <div>
-                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Daftar PPTK Sekretariat DPRD Banyumas</h2>
-                            <p class="text-[11px] text-slate-500">
-                                Tambah, ubah identitas pejabat/gelar, akun login, atau nonaktifkan PPTK ketika pergantian periode anggaran baru.
-                            </p>
+                <!-- Card: Master PPTK Management -->
+                <div class="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-4 bg-slate-50/70 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <Users class="w-5 h-5 text-emerald-800" />
+                            <div>
+                                <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">
+                                    Master Data PPTK Sekretariat DPRD Banyumas
+                                </h2>
+                                <p class="text-[11px] text-slate-500">
+                                    Kelola 9 Pejabat Pelaksana Teknis Kegiatan (PPTK), penautan akun login, nomor urut, dan status operasional pembukuan.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button 
+                                type="button"
+                                @click="openCreatePptkModal"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                            >
+                                <Plus class="w-3.5 h-3.5" />
+                                <span>Tambah PPTK Baru</span>
+                            </button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="text-[11px] text-slate-500 font-medium">
-                            Total: <strong class="text-slate-800">{{ pptks?.length || 0 }}</strong> ({{ pptks?.filter(p => p.is_active)?.length || 0 }} Aktif)
-                        </span>
-                        <button 
-                            type="button"
-                            @click="openCreatePptkModal"
-                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
-                        >
-                            <Plus class="w-3.5 h-3.5" />
-                            <span>Tambah PPTK Baru</span>
-                        </button>
+
+                    <!-- PPTK Summary & Quick Search -->
+                    <div class="px-5 py-3 border-b border-slate-200/80 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 text-xs text-slate-600">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold text-xs">
+                                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                                {{ pptks?.filter(p => p.is_active)?.length || 0 }} PPTK Aktif
+                            </span>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-slate-500">Total: <strong class="text-slate-800">{{ pptks?.length || 0 }}</strong> Pejabat</span>
+                        </div>
+
+                        <!-- Search PPTK -->
+                        <div class="relative w-full sm:w-64">
+                            <Search class="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                            <input
+                                v-model="pptkSearch"
+                                type="text"
+                                placeholder="Cari kode, nama PPTK, bagian..."
+                                class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 bg-slate-50 focus:bg-white"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Spacious 5-Column PPTK Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200 text-[11px] uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-5 py-3.5 text-left">Pejabat PPTK &amp; Subunit</th>
+                                    <th class="px-5 py-3.5 text-left">Akun Login Sistem</th>
+                                    <th class="px-5 py-3.5 text-left">Pembukuan BKU Kas</th>
+                                    <th class="px-5 py-3.5 text-center">Status</th>
+                                    <th class="px-5 py-3.5 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr 
+                                    v-for="p in filteredPptks" 
+                                    :key="p.id" 
+                                    :class="[
+                                        'hover:bg-slate-50/80 transition-colors',
+                                        !p.is_active ? 'bg-slate-50/60 opacity-60' : ''
+                                    ]"
+                                >
+                                    <!-- Kolom 1: Pejabat & Subunit (Color Bar + Code Badge + Nama + NIP & Subunit) -->
+                                    <td class="px-5 py-3.5">
+                                        <div class="flex items-start gap-3">
+                                            <div 
+                                                class="w-3.5 h-10 rounded-sm shrink-0 mt-0.5 shadow-2xs" 
+                                                :style="{ backgroundColor: p.color_tag || '#04331a' }"
+                                                :title="`Warna identitas sheet: ${p.color_tag}`"
+                                            ></div>
+                                            <div>
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    <span class="font-mono font-bold text-slate-800 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px]">
+                                                        {{ p.code }}
+                                                    </span>
+                                                    <span class="font-bold text-slate-900 text-sm tracking-tight">{{ p.display_name || p.name }}</span>
+                                                </div>
+                                                <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                                                    <span v-if="p.nip" class="font-mono">NIP: {{ p.nip }}</span>
+                                                    <span v-if="p.nip && p.subunit?.name" class="text-slate-300">•</span>
+                                                    <span v-if="p.subunit?.name" class="text-slate-600 font-medium">{{ p.subunit.name }}</span>
+                                                    <span class="text-slate-300">•</span>
+                                                    <span class="text-slate-400 text-[10px]">Urut #{{ p.sort_order }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Kolom 2: Akun Login Sistem -->
+                                    <td class="px-5 py-3.5">
+                                        <div v-if="p.user?.username">
+                                            <div class="inline-flex items-center gap-1.5 font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                                <span>@{{ p.user.username }}</span>
+                                            </div>
+                                            <div class="text-[10px] text-slate-500 mt-0.5">Role: {{ p.user.role || 'pptk' }}</div>
+                                        </div>
+                                        <div v-else>
+                                            <button 
+                                                type="button" 
+                                                @click="openCreateUserModal(p.id)"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 cursor-pointer transition-all shadow-2xs"
+                                                title="Buat Akun Login untuk PPTK ini"
+                                            >
+                                                <UserPlus class="w-3.5 h-3.5" />
+                                                <span>+ Buat Akun Login</span>
+                                            </button>
+                                        </div>
+                                    </td>
+
+                                    <!-- Kolom 3: Pembukuan BKU Kas -->
+                                    <td class="px-5 py-3.5">
+                                        <div class="space-y-0.5">
+                                            <Link 
+                                                v-if="p.is_active" 
+                                                :href="`/bku?tab=${p.sheet_name}`"
+                                                class="inline-flex items-center gap-1.5 font-mono font-semibold text-emerald-800 hover:text-emerald-950 hover:underline text-xs"
+                                            >
+                                                <FolderOpen class="w-3.5 h-3.5 text-emerald-700" />
+                                                <span>{{ p.sheet_name }}</span>
+                                            </Link>
+                                            <span v-else class="inline-flex items-center gap-1.5 font-mono text-slate-400 text-xs">
+                                                <FolderOpen class="w-3.5 h-3.5 text-slate-400" />
+                                                <span>{{ p.sheet_name }}</span>
+                                            </span>
+                                            <div class="text-[10px] text-slate-400">Sheet Buku Kas Umum</div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Kolom 4: Status Aktif / Nonaktif -->
+                                    <td class="px-5 py-3.5 text-center">
+                                        <button 
+                                            type="button" 
+                                            @click="togglePptkActive(p)"
+                                            :title="p.is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'"
+                                            class="px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-all border shadow-2xs"
+                                            :class="p.is_active ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'"
+                                        >
+                                            {{ p.is_active ? '● Aktif' : '○ Nonaktif' }}
+                                        </button>
+                                    </td>
+
+                                    <!-- Kolom 5: Aksi -->
+                                    <td class="px-5 py-3.5 text-right">
+                                        <div class="inline-flex items-center justify-end gap-1.5">
+                                            <button 
+                                                type="button"
+                                                @click="openEditPptkModal(p)"
+                                                class="p-1.5 rounded-lg text-slate-600 hover:text-blue-700 hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all cursor-pointer"
+                                                title="Edit Data PPTK"
+                                            >
+                                                <Pencil class="w-3.5 h-3.5" />
+                                            </button>
+                                            <button 
+                                                type="button"
+                                                @click="confirmDeletePptk(p)"
+                                                class="p-1.5 rounded-lg text-slate-400 hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all cursor-pointer"
+                                                title="Hapus PPTK"
+                                            >
+                                                <Trash2 class="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredPptks.length === 0">
+                                    <td colspan="5" class="px-5 py-10 text-center text-slate-500">
+                                        Tidak ditemukan data PPTK yang sesuai pencarian.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="px-3 py-2 text-center w-10">No</th>
-                                <th class="px-3 py-2 text-left">Kode</th>
-                                <th class="px-3 py-2 text-left">Nama PPTK</th>
-                                <th class="px-3 py-2 text-left">Akun Login</th>
-                                <th class="px-3 py-2 text-left">NIP</th>
-                                <th class="px-3 py-2 text-left">Bagian / Subunit</th>
-                                <th class="px-3 py-2 text-left">Sheet BKU</th>
-                                <th class="px-3 py-2 text-center w-16">Urut</th>
-                                <th class="px-3 py-2 text-center w-28">Status</th>
-                                <th class="px-3 py-2 text-center w-24">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr v-for="(p, idx) in pptks" :key="p.id" :class="['hover:bg-slate-50 transition-colors', !p.is_active ? 'bg-slate-50/60 opacity-60' : '']">
-                                <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
-                                <td class="px-3 py-2">
-                                    <span class="inline-flex items-center gap-1.5 font-mono font-bold text-slate-800 px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block shrink-0" :style="{ backgroundColor: p.color_tag || '#04331a' }"></span>
-                                        {{ p.code }}
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2 font-bold text-emerald-950">{{ p.display_name || p.name }}</td>
-                                <td class="px-3 py-2">
-                                    <span v-if="p.user?.username" class="inline-flex items-center gap-1 font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                        @{{ p.user.username }}
-                                    </span>
-                                    <button 
-                                        v-else 
-                                        type="button" 
-                                        @click="openCreateUserModal(p.id)"
-                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 cursor-pointer transition-colors"
-                                        title="Buat Akun Login untuk PPTK ini"
-                                    >
-                                        <UserPlus class="w-3 h-3" />
-                                        <span>+ Buat Akun</span>
-                                    </button>
-                                </td>
-                                <td class="px-3 py-2 font-mono text-slate-600">{{ p.nip || '-' }}</td>
-                                <td class="px-3 py-2 text-slate-600">{{ p.subunit?.name || '-' }}</td>
-                                <td class="px-3 py-2 font-mono text-blue-700 underline">
-                                    <Link v-if="p.is_active" :href="`/bku?tab=${p.sheet_name}`">{{ p.sheet_name }}</Link>
-                                    <span v-else class="text-slate-400 no-underline">{{ p.sheet_name }}</span>
-                                </td>
-                                <td class="px-3 py-2 text-center font-mono text-slate-600">{{ p.sort_order }}</td>
-                                <td class="px-3 py-2 text-center">
-                                    <button 
-                                        type="button" 
-                                        @click="togglePptkActive(p)"
-                                        :title="p.is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'"
-                                        class="px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors border"
-                                        :class="p.is_active ? 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200' : 'bg-slate-200 text-slate-700 border-slate-300 hover:bg-slate-300'"
-                                    >
-                                        {{ p.is_active ? '● Aktif' : '○ Nonaktif' }}
-                                    </button>
-                                </td>
-                                <td class="px-3 py-2 text-center">
-                                    <div class="flex items-center justify-center gap-1">
-                                        <button 
-                                            type="button"
-                                            @click="openEditPptkModal(p)"
-                                            class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
-                                            title="Edit PPTK"
-                                        >
-                                            <Pencil class="w-3.5 h-3.5" />
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            @click="confirmDeletePptk(p)"
-                                            class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
-                                            title="Hapus / Nonaktifkan PPTK"
-                                        >
-                                            <Trash2 class="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr v-if="!pptks || pptks.length === 0">
-                                <td colspan="10" class="px-3 py-6 text-center text-slate-500">
-                                    Belum ada data PPTK tersimpan. Klik tombol "+ Tambah PPTK Baru" di atas.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
             </div>
 
             <!-- Tab 5: Rekam Jejak Audit Keamanan (Audit Trail) -->

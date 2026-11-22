@@ -59,9 +59,7 @@ const toggleSidebar = () => {
 };
 
 const handleNavClick = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        sidebarOpen.value = false;
-    }
+    // Keep sidebar and accordion open when clicking sub-menu items so users can browse smoothly
 };
 
 const authUser = computed(() => page.props.auth?.user);
@@ -188,27 +186,71 @@ const isSettingRouteActive = computed(() => {
     return isCurrentRoute('pengaturan.*');
 });
 
-// Sub-menu accordions start collapsed on page refresh / initial load
-const isFinanceAccordionOpen = ref(false);
-const isPaguAccordionOpen = ref(false);
-const isGajiAccordionOpen = ref(false);
-const isSettingAccordionOpen = ref(false);
+// Sub-menu accordions: active section is open by default, and user toggles are remembered
+const isFinanceAccordionOpen = ref(
+    isFinanceRouteActive.value || 
+    (typeof window !== 'undefined' && localStorage.getItem('keudprd_acc_finance') === 'true')
+);
+const isPaguAccordionOpen = ref(
+    isPaguRouteActive.value || 
+    (typeof window !== 'undefined' && localStorage.getItem('keudprd_acc_pagu') === 'true')
+);
+const isGajiAccordionOpen = ref(
+    isGajiRouteActive.value || 
+    (typeof window !== 'undefined' && localStorage.getItem('keudprd_acc_gaji') === 'true')
+);
+const isSettingAccordionOpen = ref(
+    isSettingRouteActive.value || 
+    (typeof window !== 'undefined' && localStorage.getItem('keudprd_acc_setting') === 'true')
+);
 
 const toggleFinanceAccordion = () => {
     isFinanceAccordionOpen.value = !isFinanceAccordionOpen.value;
+    if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_finance', String(isFinanceAccordionOpen.value));
 };
 
 const togglePaguAccordion = () => {
     isPaguAccordionOpen.value = !isPaguAccordionOpen.value;
+    if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_pagu', String(isPaguAccordionOpen.value));
 };
 
 const toggleGajiAccordion = () => {
     isGajiAccordionOpen.value = !isGajiAccordionOpen.value;
+    if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_gaji', String(isGajiAccordionOpen.value));
 };
 
 const toggleSettingAccordion = () => {
     isSettingAccordionOpen.value = !isSettingAccordionOpen.value;
+    if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_setting', String(isSettingAccordionOpen.value));
 };
+
+watch(isFinanceRouteActive, (active) => {
+    if (active) {
+        isFinanceAccordionOpen.value = true;
+        if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_finance', 'true');
+    }
+});
+
+watch(isPaguRouteActive, (active) => {
+    if (active) {
+        isPaguAccordionOpen.value = true;
+        if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_pagu', 'true');
+    }
+});
+
+watch(isGajiRouteActive, (active) => {
+    if (active) {
+        isGajiAccordionOpen.value = true;
+        if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_gaji', 'true');
+    }
+});
+
+watch(isSettingRouteActive, (active) => {
+    if (active) {
+        isSettingAccordionOpen.value = true;
+        if (typeof window !== 'undefined') localStorage.setItem('keudprd_acc_setting', 'true');
+    }
+});
 
 const logout = () => {
     router.post('/logout');
