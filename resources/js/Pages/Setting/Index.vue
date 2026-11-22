@@ -977,7 +977,6 @@ const togglePptkActive = (pptk) => {
                                     <td class="px-5 py-3.5">
                                         <div v-if="u.pptk" class="space-y-0.5">
                                             <span class="inline-flex items-center gap-1.5 font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
-                                                <span class="w-2 h-2 rounded-full shrink-0" :style="{ backgroundColor: u.pptk.color_tag || '#04331a' }"></span>
                                                 <span>{{ u.pptk.display_name || u.pptk.name }}</span>
                                             </span>
                                             <div class="text-[10px] text-slate-500 pl-1">
@@ -1170,28 +1169,21 @@ const togglePptkActive = (pptk) => {
                                         !p.is_active ? 'bg-slate-50/60 opacity-60' : ''
                                     ]"
                                 >
-                                    <!-- Kolom 1: Pejabat & Subunit (Color Bar + Code Badge + Nama + NIP & Subunit) -->
+                                    <!-- Kolom 1: Pejabat & Subunit (Code Badge + Nama + NIP & Subunit) -->
                                     <td class="px-5 py-3.5">
-                                        <div class="flex items-start gap-3">
-                                            <div 
-                                                class="w-3.5 h-10 rounded-sm shrink-0 mt-0.5 shadow-2xs" 
-                                                :style="{ backgroundColor: p.color_tag || '#04331a' }"
-                                                :title="`Warna identitas sheet: ${p.color_tag}`"
-                                            ></div>
-                                            <div>
-                                                <div class="flex items-center gap-2 flex-wrap">
-                                                    <span class="font-mono font-bold text-slate-800 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px]">
-                                                        {{ p.code }}
-                                                    </span>
-                                                    <span class="font-bold text-slate-900 text-sm tracking-tight">{{ p.display_name || p.name }}</span>
-                                                </div>
-                                                <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
-                                                    <span v-if="p.nip" class="font-mono">NIP: {{ p.nip }}</span>
-                                                    <span v-if="p.nip && p.subunit?.name" class="text-slate-300">•</span>
-                                                    <span v-if="p.subunit?.name" class="text-slate-600 font-medium">{{ p.subunit.name }}</span>
-                                                    <span class="text-slate-300">•</span>
-                                                    <span class="text-slate-400 text-[10px]">Urut #{{ p.sort_order }}</span>
-                                                </div>
+                                        <div>
+                                            <div class="flex items-center gap-2 flex-wrap">
+                                                <span class="font-mono font-bold text-slate-800 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px]">
+                                                    {{ p.code }}
+                                                </span>
+                                                <span class="font-bold text-slate-900 text-sm tracking-tight">{{ p.display_name || p.name }}</span>
+                                            </div>
+                                            <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                                                <span v-if="p.nip" class="font-mono">NIP: {{ p.nip }}</span>
+                                                <span v-if="p.nip && p.subunit?.name" class="text-slate-300">•</span>
+                                                <span v-if="p.subunit?.name" class="text-slate-600 font-medium">{{ p.subunit.name }}</span>
+                                                <span class="text-slate-300">•</span>
+                                                <span class="text-slate-400 text-[10px]">Urut #{{ p.sort_order }}</span>
                                             </div>
                                         </div>
                                     </td>
