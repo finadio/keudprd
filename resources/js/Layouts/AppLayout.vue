@@ -33,7 +33,10 @@ import {
     Users,
     Calculator,
     FileText,
-    Sliders
+    Sliders,
+    UserCog,
+    Database,
+    History
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -123,12 +126,16 @@ const gajiNavItems = computed(() => {
     ];
 });
 
-const generalNavItems = computed(() => {
+const settingNavItems = computed(() => {
     if (isPptkUser.value) {
         return [];
     }
     return [
-        { name: 'Pengaturan & Master', href: '/pengaturan', routeName: 'pengaturan.*', icon: Settings },
+        { name: 'Pengguna & Role', href: '/pengaturan?tab=users', routePattern: 'pengaturan.users', icon: UserCog },
+        { name: 'Master Data PPTK', href: '/pengaturan?tab=pptk', routePattern: 'pengaturan.pptk', icon: Users },
+        { name: 'Identitas SKPD & Periode', href: '/pengaturan?tab=skpd', routePattern: 'pengaturan.skpd', icon: Building2 },
+        { name: 'Tahun Anggaran & Data', href: '/pengaturan?tab=database', routePattern: 'pengaturan.database', icon: Database },
+        { name: 'Audit Trail', href: '/pengaturan?tab=audit', routePattern: 'pengaturan.audit', icon: History },
     ];
 });
 
@@ -151,6 +158,11 @@ const isCurrentRoute = (pattern) => {
     if (pattern === 'gaji.laporan.*' && currentUrl.startsWith('/gaji/laporan')) return true;
     if (pattern === 'gaji.pengaturan.*' && currentUrl.startsWith('/gaji/pengaturan')) return true;
     if (pattern === 'gaji.*' && currentUrl.startsWith('/gaji')) return true;
+    if (pattern === 'pengaturan.users') return currentUrl.startsWith('/pengaturan') && (currentUrl.includes('tab=users') || (!currentUrl.includes('tab=')));
+    if (pattern === 'pengaturan.pptk') return currentUrl.startsWith('/pengaturan') && currentUrl.includes('tab=pptk');
+    if (pattern === 'pengaturan.skpd') return currentUrl.startsWith('/pengaturan') && currentUrl.includes('tab=skpd');
+    if (pattern === 'pengaturan.database') return currentUrl.startsWith('/pengaturan') && currentUrl.includes('tab=database');
+    if (pattern === 'pengaturan.audit') return currentUrl.startsWith('/pengaturan') && currentUrl.includes('tab=audit');
     if (pattern === 'pengaturan.*' && currentUrl.startsWith('/pengaturan')) return true;
     return false;
 };
@@ -170,6 +182,10 @@ const isPaguRouteActive = computed(() => {
 
 const isGajiRouteActive = computed(() => {
     return isCurrentRoute('gaji.*');
+});
+
+const isSettingRouteActive = computed(() => {
+    return isCurrentRoute('pengaturan.*');
 });
 
 const getInitialFinanceAccordionState = () => {
@@ -196,9 +212,18 @@ const getInitialGajiAccordionState = () => {
     return saved !== null ? saved === 'true' : true;
 };
 
+const getInitialSettingAccordionState = () => {
+    if (typeof window === 'undefined') return true;
+    if (isPptkUser.value) return false;
+    if (isSettingRouteActive.value) return true;
+    const saved = localStorage.getItem('keudprd_setting_acc_open');
+    return saved !== null ? saved === 'true' : true;
+};
+
 const isFinanceAccordionOpen = ref(getInitialFinanceAccordionState());
 const isPaguAccordionOpen = ref(getInitialPaguAccordionState());
 const isGajiAccordionOpen = ref(getInitialGajiAccordionState());
+const isSettingAccordionOpen = ref(getInitialSettingAccordionState());
 
 const toggleFinanceAccordion = () => {
     isFinanceAccordionOpen.value = !isFinanceAccordionOpen.value;
@@ -218,6 +243,13 @@ const toggleGajiAccordion = () => {
     isGajiAccordionOpen.value = !isGajiAccordionOpen.value;
     if (typeof window !== 'undefined') {
         localStorage.setItem('keudprd_gaji_acc_open', String(isGajiAccordionOpen.value));
+    }
+};
+
+const toggleSettingAccordion = () => {
+    isSettingAccordionOpen.value = !isSettingAccordionOpen.value;
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('keudprd_setting_acc_open', String(isSettingAccordionOpen.value));
     }
 };
 
@@ -244,6 +276,15 @@ watch(isGajiRouteActive, (active) => {
         isGajiAccordionOpen.value = true;
         if (typeof window !== 'undefined') {
             localStorage.setItem('keudprd_gaji_acc_open', 'true');
+        }
+    }
+}, { immediate: true });
+
+watch(isSettingRouteActive, (active) => {
+    if (active) {
+        isSettingAccordionOpen.value = true;
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('keudprd_setting_acc_open', 'true');
         }
     }
 }, { immediate: true });
@@ -580,23 +621,57 @@ const jumpToResult = (url) => {
                         </div>
                     </div>
 
-                    <!-- General Links (Pengaturan & Master) -->
-                    <div class="pt-2 border-t border-emerald-900/40 space-y-1">
-                        <Link
-                            v-for="item in generalNavItems"
-                            :key="item.name"
-                            :href="item.href"
-                            @click="handleNavClick"
+                    <!-- Parent Accordion: Pengaturan & Master Sistem -->
+                    <div v-if="!isPptkUser" class="space-y-1 pt-1 border-t border-emerald-900/40">
+                        <button
+                            type="button"
+                            @click="toggleSettingAccordion"
+                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg font-medium transition-all text-xs cursor-pointer select-none group"
                             :class="[
-                                'flex items-center gap-2.5 px-3 py-2.5 rounded-lg font-medium transition-all whitespace-nowrap',
-                                isCurrentRoute(item.routeName)
-                                    ? 'bg-[#107c41] text-white font-bold shadow-xs'
+                                isSettingRouteActive
+                                    ? 'bg-emerald-900/60 text-white font-semibold'
                                     : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
                             ]"
+                            title="Klik untuk membuka / menutup menu Pengaturan & Master"
                         >
-                            <component :is="item.icon" class="w-4 h-4 shrink-0" />
-                            <span>{{ item.name }}</span>
-                        </Link>
+                            <div class="flex items-center gap-2 min-w-0">
+                                <Settings class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
+                                <span class="truncate tracking-tight font-semibold text-[11px]" title="Pengaturan & Master">
+                                    Pengaturan &amp; Master
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
+                                    {{ settingNavItems.length }}
+                                </span>
+                                <ChevronDown 
+                                    class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
+                                    :class="{ '-rotate-90': !isSettingAccordionOpen }"
+                                />
+                            </div>
+                        </button>
+
+                        <!-- Accordion Submenu Links -->
+                        <div 
+                            v-show="isSettingAccordionOpen" 
+                            class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
+                        >
+                            <Link
+                                v-for="item in settingNavItems"
+                                :key="item.name"
+                                :href="item.href"
+                                @click="handleNavClick"
+                                :class="[
+                                    'flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap',
+                                    isCurrentRoute(item.routePattern)
+                                        ? 'bg-[#107c41] text-white font-bold shadow-xs'
+                                        : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                                ]"
+                            >
+                                <component :is="item.icon" class="w-4 h-4 shrink-0" />
+                                <span>{{ item.name }}</span>
+                            </Link>
+                        </div>
                     </div>
                 </nav>
 

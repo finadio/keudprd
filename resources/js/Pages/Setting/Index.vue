@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { ref, computed, watch } from 'vue';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import { 
     Settings, 
@@ -44,6 +44,35 @@ const props = defineProps({
     available_years: Array,
     year_summaries: Array,
     storage_stats: Object,
+});
+
+const page = usePage();
+const routeTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
+const activeTab = ref(routeTab || 'users');
+
+const tabs = computed(() => [
+    { id: 'users', label: 'Pengguna & Role', icon: UserCog, badge: props.users?.length || 0, desc: 'Kelola akun login staf, role hak akses, dan reset sandi' },
+    { id: 'pptk', label: 'Master Data PPTK', icon: Users, badge: props.pptks?.length || 0, desc: 'Data master 9 PPTK, subunit, dan akun login terkait' },
+    { id: 'skpd', label: 'Identitas SKPD & Periode', icon: Building2, desc: 'Nama instansi, Sekwan, Bendahara, NIP, dan penguncian buku' },
+    { id: 'database', label: 'Tahun Anggaran & Data', icon: Database, badge: `TA ${props.active_year || props.setting?.fiscal_year || 2026}`, desc: 'Manajemen multi-tahun anggaran dan kapasitas database' },
+    { id: 'audit', label: 'Audit Trail', icon: History, badge: props.audit_logs?.length || 0, desc: 'Rekam jejak aktivitas dan log audit sistem' },
+]);
+
+const setActiveTab = (tabId) => {
+    activeTab.value = tabId;
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', tabId);
+        window.history.replaceState({}, '', url.toString());
+    }
+};
+
+watch(() => page.url, (newUrl) => {
+    if (newUrl.includes('/pengaturan')) {
+        const search = newUrl.includes('?') ? newUrl.split('?')[1] : '';
+        const params = new URLSearchParams(search);
+        activeTab.value = params.get('tab') || 'users';
+    }
 });
 
 const form = ref({
@@ -410,8 +439,38 @@ const togglePptkActive = (pptk) => {
                 </div>
             </div>
 
-            <!-- Multi-Year Fiscal Switcher & Storage Capacity Guard -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Sub-Menu Nav Tabs (Segmented Sub-Menu) -->
+            <div class="bg-white border border-slate-200/90 rounded-2xl p-1.5 shadow-xs">
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                    <button
+                        v-for="t in tabs"
+                        :key="t.id"
+                        type="button"
+                        @click="setActiveTab(t.id)"
+                        :class="[
+                            'inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0',
+                            activeTab === t.id
+                                ? 'bg-[#04331a] text-white shadow-xs'
+                                : 'bg-transparent hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+                        ]"
+                    >
+                        <component :is="t.icon" class="w-4 h-4 shrink-0" :class="activeTab === t.id ? 'text-emerald-300' : 'text-slate-500'" />
+                        <span>{{ t.label }}</span>
+                        <span 
+                            v-if="t.badge !== undefined && t.badge !== null"
+                            :class="[
+                                'text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold shrink-0',
+                                activeTab === t.id ? 'bg-emerald-800 text-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'
+                            ]"
+                        >
+                            {{ t.badge }}
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab 4: Multi-Year Fiscal Switcher & Storage Capacity Guard -->
+            <div v-show="activeTab === 'database'" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- Card: Pergantian Tahun Anggaran & Arsip Tahun Lama -->
                 <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
                     <div class="px-5 py-3.5 bg-emerald-950 text-white flex items-center justify-between">
@@ -598,8 +657,8 @@ const togglePptkActive = (pptk) => {
                 </div>
             </div>
 
-            <!-- Tab / Cards Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Tab 3: Identitas SKPD & Penguncian Periode -->
+            <div v-show="activeTab === 'skpd'" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 
                 <!-- Card 1: Konfigurasi Identitas SKPD & Pejabat -->
                 <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
@@ -712,199 +771,204 @@ const togglePptkActive = (pptk) => {
 
             </div>
 
-            <!-- Card 3: Keamanan Akun & Ganti Password -->
-            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-                <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <KeyRound class="w-4 h-4 text-rose-600" />
-                        <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Keamanan Akun &amp; Ubah Password Login</h2>
+            <!-- Tab 1: Manajemen Akun Pengguna & Hak Akses (Role) -->
+            <div v-show="activeTab === 'users'" class="space-y-4">
+                <!-- Card: Manajemen Akun Pengguna & Hak Akses (Role) -->
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <UserCog class="w-5 h-5 text-emerald-800" />
+                            <div>
+                                <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">
+                                    Manajemen Akun Pengguna &amp; Hak Akses (Role)
+                                </h2>
+                                <p class="text-[11px] text-slate-500">
+                                    Kelola username login singkat, hak akses modul, ubah role pengguna, dan reset password login staf.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-[11px] text-slate-500 font-medium">
+                                Total: <strong class="text-slate-800">{{ users?.length || 0 }}</strong> Akun Terdaftar
+                            </span>
+                            <button 
+                                type="button"
+                                @click="openCreateUserModal()"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                            >
+                                <UserPlus class="w-3.5 h-3.5" />
+                                <span>Tambah Pengguna Baru</span>
+                            </button>
+                        </div>
                     </div>
-                    <span class="text-[11px] text-rose-700 font-semibold">Wajib diganti sebelum diakses publik</span>
+
+                    <!-- Role Guide Cards -->
+                    <div class="p-4 bg-slate-50/60 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div v-for="r in roles" :key="r.value" class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold border" :class="r.color">
+                                    {{ r.label }}
+                                </span>
+                                <span class="text-[10px] font-mono text-slate-400">role: {{ r.value }}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 leading-snug pt-1">{{ r.description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-3 py-2 text-center w-10">No</th>
+                                    <th class="px-3 py-2 text-left">Nama Pengguna</th>
+                                    <th class="px-3 py-2 text-left">Username Login</th>
+                                    <th class="px-3 py-2 text-left">Role / Hak Akses</th>
+                                    <th class="px-3 py-2 text-left">Terhubung PPTK</th>
+                                    <th class="px-3 py-2 text-left">Email Resmi</th>
+                                    <th class="px-3 py-2 text-center w-36">Aksi &amp; Sandi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr v-for="(u, idx) in users" :key="u.id" class="hover:bg-slate-50 transition-colors">
+                                    <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
+                                    <td class="px-3 py-2 font-bold text-slate-900">
+                                        {{ u.name }}
+                                        <span v-if="u.id === $page.props.auth?.user?.id" class="ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                            Akun Anda
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span class="inline-flex items-center gap-1 font-mono font-bold text-emerald-900 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+                                            @{{ u.username || '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span 
+                                            class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border uppercase"
+                                            :class="[
+                                                u.role === 'superadmin' || u.role === 'admin' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                                (u.role === 'bendahara' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                                (u.role === 'pptk' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                                'bg-purple-100 text-purple-800 border-purple-300'))
+                                            ]"
+                                        >
+                                            {{ u.role }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <span v-if="u.pptk" class="inline-flex items-center gap-1 font-medium text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                            <Users class="w-3 h-3 text-amber-700" />
+                                            {{ u.pptk.display_name || u.pptk.name }}
+                                        </span>
+                                        <span v-else class="text-slate-400 font-mono text-[11px]">- (Seluruh SKPD)</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-slate-600 font-mono text-[11px]">{{ u.email }}</td>
+                                    <td class="px-3 py-2 text-center">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <button 
+                                                type="button"
+                                                @click="openResetUserPasswordModal(u)"
+                                                class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+                                                title="Reset Password Pengguna"
+                                            >
+                                                <Key class="w-3 h-3 text-slate-500" />
+                                                <span>Reset Sandi</span>
+                                            </button>
+                                            <button 
+                                                type="button"
+                                                @click="openEditUserModal(u)"
+                                                class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
+                                                title="Edit Profil & Role"
+                                            >
+                                                <Pencil class="w-3.5 h-3.5" />
+                                            </button>
+                                            <button 
+                                                v-if="u.id !== 1 && u.id !== $page.props.auth?.user?.id"
+                                                type="button"
+                                                @click="confirmDeleteUser(u)"
+                                                class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                                                title="Hapus Akun Pengguna"
+                                            >
+                                                <Trash2 class="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <form @submit.prevent="submitPasswordChange" class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-4 gap-3.5 items-end text-xs">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Password Saat Ini</label>
-                        <input
-                            v-model="passwordForm.current_password"
-                            type="password"
-                            required
-                            autocomplete="current-password"
-                            placeholder="••••••••"
-                            class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
-                        />
-                        <p v-if="passwordForm.errors.current_password" class="mt-1 text-[11px] text-rose-600 font-medium">
-                            {{ passwordForm.errors.current_password }}
-                        </p>
+                <!-- Card: Keamanan Akun & Ganti Password Sendiri -->
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                    <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <KeyRound class="w-4 h-4 text-rose-600" />
+                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Ubah Password Akun Anda Sendiri</h2>
+                        </div>
+                        <span class="text-[11px] text-slate-500">Perbarui kata sandi akun login Anda yang sedang aktif</span>
                     </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Password Baru (Min. 8 Karakter)</label>
-                        <input
-                            v-model="passwordForm.password"
-                            type="password"
-                            required
-                            minlength="8"
-                            autocomplete="new-password"
-                            placeholder="Minimal 8 karakter"
-                            class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
-                        />
-                        <p v-if="passwordForm.errors.password" class="mt-1 text-[11px] text-rose-600 font-medium">
-                            {{ passwordForm.errors.password }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Konfirmasi Password Baru</label>
-                        <input
-                            v-model="passwordForm.password_confirmation"
-                            type="password"
-                            required
-                            minlength="8"
-                            autocomplete="new-password"
-                            placeholder="Ulangi password baru"
-                            class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
-                        />
-                    </div>
-                    <div>
-                        <button
-                            type="submit"
-                            :disabled="passwordForm.processing"
-                            class="w-full px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xs transition-colors cursor-pointer"
-                        >
-                            {{ passwordForm.processing ? 'Menyimpan...' : 'Simpan Password Baru' }}
-                        </button>
-                    </div>
-                </form>
-            </div>
 
-            <!-- Card: Manajemen Akun Pengguna & Hak Akses (Role) -->
-            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5">
-                        <UserCog class="w-5 h-5 text-emerald-800" />
+                    <form @submit.prevent="submitPasswordChange" class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-4 gap-3.5 items-end text-xs">
                         <div>
-                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">
-                                Manajemen Akun Pengguna &amp; Hak Akses (Role)
-                            </h2>
-                            <p class="text-[11px] text-slate-500">
-                                Kelola username login singkat, hak akses modul, ubah role pengguna, dan reset password login staf.
+                            <label class="block font-semibold text-slate-700 mb-1">Password Saat Ini</label>
+                            <input
+                                v-model="passwordForm.current_password"
+                                type="password"
+                                required
+                                autocomplete="current-password"
+                                placeholder="••••••••"
+                                class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                            />
+                            <p v-if="passwordForm.errors.current_password" class="mt-1 text-[11px] text-rose-600 font-medium">
+                                {{ passwordForm.errors.current_password }}
                             </p>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="text-[11px] text-slate-500 font-medium">
-                            Total: <strong class="text-slate-800">{{ users?.length || 0 }}</strong> Akun Terdaftar
-                        </span>
-                        <button 
-                            type="button"
-                            @click="openCreateUserModal()"
-                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
-                        >
-                            <UserPlus class="w-3.5 h-3.5" />
-                            <span>Tambah Pengguna Baru</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Role Guide Cards -->
-                <div class="p-4 bg-slate-50/60 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div v-for="r in roles" :key="r.value" class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-1">
-                        <div class="flex items-center justify-between">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold border" :class="r.color">
-                                {{ r.label }}
-                            </span>
-                            <span class="text-[10px] font-mono text-slate-400">role: {{ r.value }}</span>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Password Baru (Min. 8 Karakter)</label>
+                            <input
+                                v-model="passwordForm.password"
+                                type="password"
+                                required
+                                minlength="8"
+                                autocomplete="new-password"
+                                placeholder="Minimal 8 karakter"
+                                class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                            />
+                            <p v-if="passwordForm.errors.password" class="mt-1 text-[11px] text-rose-600 font-medium">
+                                {{ passwordForm.errors.password }}
+                            </p>
                         </div>
-                        <p class="text-[11px] text-slate-600 leading-snug pt-1">{{ r.description }}</p>
-                    </div>
-                </div>
-
-                <!-- Users Table -->
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="px-3 py-2 text-center w-10">No</th>
-                                <th class="px-3 py-2 text-left">Nama Pengguna</th>
-                                <th class="px-3 py-2 text-left">Username Login</th>
-                                <th class="px-3 py-2 text-left">Role / Hak Akses</th>
-                                <th class="px-3 py-2 text-left">Terhubung PPTK</th>
-                                <th class="px-3 py-2 text-left">Email Resmi</th>
-                                <th class="px-3 py-2 text-center w-36">Aksi &amp; Sandi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr v-for="(u, idx) in users" :key="u.id" class="hover:bg-slate-50 transition-colors">
-                                <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
-                                <td class="px-3 py-2 font-bold text-slate-900">
-                                    {{ u.name }}
-                                    <span v-if="u.id === $page.props.auth?.user?.id" class="ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                        Akun Anda
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2">
-                                    <span class="inline-flex items-center gap-1 font-mono font-bold text-emerald-900 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
-                                        @{{ u.username || '-' }}
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2">
-                                    <span 
-                                        class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border uppercase"
-                                        :class="[
-                                            u.role === 'superadmin' || u.role === 'admin' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
-                                            (u.role === 'bendahara' ? 'bg-blue-100 text-blue-800 border-blue-300' :
-                                            (u.role === 'pptk' ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                                            'bg-purple-100 text-purple-800 border-purple-300'))
-                                        ]"
-                                    >
-                                        {{ u.role }}
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2">
-                                    <span v-if="u.pptk" class="inline-flex items-center gap-1 font-medium text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                        <Users class="w-3 h-3 text-amber-700" />
-                                        {{ u.pptk.display_name || u.pptk.name }}
-                                    </span>
-                                    <span v-else class="text-slate-400 font-mono text-[11px]">- (Seluruh SKPD)</span>
-                                </td>
-                                <td class="px-3 py-2 text-slate-600 font-mono text-[11px]">{{ u.email }}</td>
-                                <td class="px-3 py-2 text-center">
-                                    <div class="flex items-center justify-center gap-1">
-                                        <button 
-                                            type="button"
-                                            @click="openResetUserPasswordModal(u)"
-                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
-                                            title="Reset Password Pengguna"
-                                        >
-                                            <Key class="w-3 h-3 text-slate-500" />
-                                            <span>Reset Sandi</span>
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            @click="openEditUserModal(u)"
-                                            class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
-                                            title="Edit Profil & Role"
-                                        >
-                                            <Pencil class="w-3.5 h-3.5" />
-                                        </button>
-                                        <button 
-                                            v-if="u.id !== 1 && u.id !== $page.props.auth?.user?.id"
-                                            type="button"
-                                            @click="confirmDeleteUser(u)"
-                                            class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
-                                            title="Hapus Akun Pengguna"
-                                        >
-                                            <Trash2 class="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Konfirmasi Password Baru</label>
+                            <input
+                                v-model="passwordForm.password_confirmation"
+                                type="password"
+                                required
+                                minlength="8"
+                                autocomplete="new-password"
+                                placeholder="Ulangi password baru"
+                                class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500"
+                            />
+                        </div>
+                        <div>
+                            <button
+                                type="submit"
+                                :disabled="passwordForm.processing"
+                                class="w-full px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-xs transition-colors cursor-pointer"
+                            >
+                                {{ passwordForm.processing ? 'Menyimpan...' : 'Simpan Password Baru' }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <!-- Card 4: Master PPTK Management -->
-            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+            <!-- Tab 2: Master PPTK Management -->
+            <div v-show="activeTab === 'pptk'" class="space-y-4">
+                <!-- Card 4: Master PPTK Management -->
+                <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
                 <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-2">
                         <Users class="w-4 h-4 text-emerald-700" />
@@ -1019,42 +1083,46 @@ const togglePptkActive = (pptk) => {
                     </table>
                 </div>
             </div>
+            </div>
 
-            <!-- Card 5: Audit Trail -->
-            <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
-                <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <History class="w-4 h-4 text-purple-600" />
-                        <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Rekam Jejak Audit Keamanan (*Audit Trail*)</h2>
+            <!-- Tab 5: Rekam Jejak Audit Keamanan (Audit Trail) -->
+            <div v-show="activeTab === 'audit'" class="space-y-4">
+                <!-- Card 5: Audit Trail -->
+                <div class="bg-white border border-slate-200 rounded shadow-sm overflow-hidden">
+                    <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <History class="w-4 h-4 text-purple-600" />
+                            <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Rekam Jejak Audit Keamanan (*Audit Trail*)</h2>
+                        </div>
+                        <span class="text-[11px] text-slate-500">Merekam setiap aksi pembuatan, koreksi, dan impor</span>
                     </div>
-                    <span class="text-[11px] text-slate-500">Merekam setiap aksi pembuatan, koreksi, dan impor</span>
-                </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
-                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="px-3 py-2 text-left">Waktu</th>
-                                <th class="px-3 py-2 text-left">Aksi</th>
-                                <th class="px-3 py-2 text-left">Entitas</th>
-                                <th class="px-3 py-2 text-left">Pengguna</th>
-                                <th class="px-3 py-2 text-left">IP Address</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr v-for="log in audit_logs" :key="log.id" class="hover:bg-slate-50">
-                                <td class="px-3 py-2 font-mono text-slate-600">{{ new Date(log.created_at).toLocaleString('id-ID') }}</td>
-                                <td class="px-3 py-2">
-                                    <span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold uppercase bg-slate-100 text-slate-800">
-                                        {{ log.action }}
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2 font-medium text-slate-800">{{ log.entity_type }} #{{ log.entity_id || '-' }}</td>
-                                <td class="px-3 py-2 text-slate-600">{{ log.user?.name || 'Sistem / Operator' }}</td>
-                                <td class="px-3 py-2 font-mono text-slate-500">{{ log.ip_address || '127.0.0.1' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="px-3 py-2 text-left">Waktu</th>
+                                    <th class="px-3 py-2 text-left">Aksi</th>
+                                    <th class="px-3 py-2 text-left">Entitas</th>
+                                    <th class="px-3 py-2 text-left">Pengguna</th>
+                                    <th class="px-3 py-2 text-left">IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr v-for="log in audit_logs" :key="log.id" class="hover:bg-slate-50">
+                                    <td class="px-3 py-2 font-mono text-slate-600">{{ new Date(log.created_at).toLocaleString('id-ID') }}</td>
+                                    <td class="px-3 py-2">
+                                        <span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold uppercase bg-slate-100 text-slate-800">
+                                            {{ log.action }}
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2 font-medium text-slate-800">{{ log.entity_type }} #{{ log.entity_id || '-' }}</td>
+                                    <td class="px-3 py-2 text-slate-600">{{ log.user?.name || 'Sistem / Operator' }}</td>
+                                    <td class="px-3 py-2 font-mono text-slate-500">{{ log.ip_address || '127.0.0.1' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
