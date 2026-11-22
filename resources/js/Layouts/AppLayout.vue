@@ -188,106 +188,27 @@ const isSettingRouteActive = computed(() => {
     return isCurrentRoute('pengaturan.*');
 });
 
-const getInitialFinanceAccordionState = () => {
-    if (typeof window === 'undefined') return true;
-    if (isPptkUser.value) return false;
-    if (isFinanceRouteActive.value) return true;
-    const saved = localStorage.getItem('keudprd_finance_acc_open');
-    return saved !== null ? saved === 'true' : true;
-};
-
-const getInitialPaguAccordionState = () => {
-    if (typeof window === 'undefined') return true;
-    if (isPptkUser.value) return true;
-    if (isPaguRouteActive.value) return true;
-    const saved = localStorage.getItem('keudprd_pagu_acc_open');
-    return saved !== null ? saved === 'true' : false;
-};
-
-const getInitialGajiAccordionState = () => {
-    if (typeof window === 'undefined') return true;
-    if (isPptkUser.value) return false;
-    if (isGajiRouteActive.value) return true;
-    const saved = localStorage.getItem('keudprd_gaji_acc_open');
-    return saved !== null ? saved === 'true' : true;
-};
-
-const getInitialSettingAccordionState = () => {
-    if (typeof window === 'undefined') return true;
-    if (isPptkUser.value) return false;
-    if (isSettingRouteActive.value) return true;
-    const saved = localStorage.getItem('keudprd_setting_acc_open');
-    return saved !== null ? saved === 'true' : true;
-};
-
-const isFinanceAccordionOpen = ref(getInitialFinanceAccordionState());
-const isPaguAccordionOpen = ref(getInitialPaguAccordionState());
-const isGajiAccordionOpen = ref(getInitialGajiAccordionState());
-const isSettingAccordionOpen = ref(getInitialSettingAccordionState());
+// Sub-menu accordions start collapsed on page refresh / initial load
+const isFinanceAccordionOpen = ref(false);
+const isPaguAccordionOpen = ref(false);
+const isGajiAccordionOpen = ref(false);
+const isSettingAccordionOpen = ref(false);
 
 const toggleFinanceAccordion = () => {
     isFinanceAccordionOpen.value = !isFinanceAccordionOpen.value;
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('keudprd_finance_acc_open', String(isFinanceAccordionOpen.value));
-    }
 };
 
 const togglePaguAccordion = () => {
     isPaguAccordionOpen.value = !isPaguAccordionOpen.value;
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('keudprd_pagu_acc_open', String(isPaguAccordionOpen.value));
-    }
 };
 
 const toggleGajiAccordion = () => {
     isGajiAccordionOpen.value = !isGajiAccordionOpen.value;
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('keudprd_gaji_acc_open', String(isGajiAccordionOpen.value));
-    }
 };
 
 const toggleSettingAccordion = () => {
     isSettingAccordionOpen.value = !isSettingAccordionOpen.value;
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('keudprd_setting_acc_open', String(isSettingAccordionOpen.value));
-    }
 };
-
-watch(isFinanceRouteActive, (active) => {
-    if (active) {
-        isFinanceAccordionOpen.value = true;
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('keudprd_finance_acc_open', 'true');
-        }
-    }
-}, { immediate: true });
-
-watch(isPaguRouteActive, (active) => {
-    if (active) {
-        isPaguAccordionOpen.value = true;
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('keudprd_pagu_acc_open', 'true');
-        }
-    }
-}, { immediate: true });
-
-watch(isGajiRouteActive, (active) => {
-    if (active) {
-        isGajiAccordionOpen.value = true;
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('keudprd_gaji_acc_open', 'true');
-        }
-    }
-}, { immediate: true });
-
-watch(isSettingRouteActive, (active) => {
-    if (active) {
-        isSettingAccordionOpen.value = true;
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('keudprd_setting_acc_open', 'true');
-        }
-    }
-}, { immediate: true });
 
 const logout = () => {
     router.post('/logout');

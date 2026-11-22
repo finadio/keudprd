@@ -421,10 +421,12 @@ const togglePptkActive = (pptk) => {
                 <div>
                     <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
                         <Settings class="w-6 h-6 text-slate-700" />
-                        Pengaturan Sistem &amp; Data Master Keuangan
+                        <span>Pengaturan &amp; Master</span>
+                        <span class="text-slate-300 font-normal">/</span>
+                        <span class="text-emerald-800 font-bold text-lg sm:text-xl">{{ tabs.find(t => t.id === activeTab)?.label || 'Pengguna & Role' }}</span>
                     </h1>
                     <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                        Kelola identitas instansi, pejabat berwenang (PA/Bendahara), master 9 PPTK, penguncian periode buku, dan rekam jejak audit (*audit trail*).
+                        {{ tabs.find(t => t.id === activeTab)?.desc || 'Kelola identitas instansi, pejabat berwenang (PA/Bendahara), master 9 PPTK, dan audit trail.' }}
                     </p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
@@ -436,36 +438,6 @@ const togglePptkActive = (pptk) => {
                         <Archive class="w-4 h-4 text-emerald-300" />
                         <span>Cadangkan ZIP (TA {{ active_year || form.fiscal_year || 2026 }})</span>
                     </a>
-                </div>
-            </div>
-
-            <!-- Sub-Menu Nav Tabs (Segmented Sub-Menu) -->
-            <div class="bg-white border border-slate-200/90 rounded-2xl p-1.5 shadow-xs">
-                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                    <button
-                        v-for="t in tabs"
-                        :key="t.id"
-                        type="button"
-                        @click="setActiveTab(t.id)"
-                        :class="[
-                            'inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0',
-                            activeTab === t.id
-                                ? 'bg-[#04331a] text-white shadow-xs'
-                                : 'bg-transparent hover:bg-slate-100 text-slate-700 hover:text-slate-900'
-                        ]"
-                    >
-                        <component :is="t.icon" class="w-4 h-4 shrink-0" :class="activeTab === t.id ? 'text-emerald-300' : 'text-slate-500'" />
-                        <span>{{ t.label }}</span>
-                        <span 
-                            v-if="t.badge !== undefined && t.badge !== null"
-                            :class="[
-                                'text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold shrink-0',
-                                activeTab === t.id ? 'bg-emerald-800 text-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'
-                            ]"
-                        >
-                            {{ t.badge }}
-                        </span>
-                    </button>
                 </div>
             </div>
 
