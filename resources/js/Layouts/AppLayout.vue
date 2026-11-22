@@ -28,7 +28,8 @@ import {
     PieChart,
     Receipt,
     FolderTree,
-    FileSpreadsheet
+    FileSpreadsheet,
+    Coins
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -83,6 +84,7 @@ const financeNavItems = computed(() => {
         { name: 'Dashboard', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
         { name: 'BKU Per PPTK', href: '/bku', routeName: 'bku.*', icon: BookOpen },
         { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
+        { name: 'Gaji & Tunjangan', href: '/gaji', routeName: 'gaji.*', icon: Coins },
         { name: 'Impor Transaksi', href: '/impor', routeName: 'impor.*', icon: UploadCloud },
         { name: 'Rekonsiliasi', href: '/rekonsiliasi', routeName: 'rekonsiliasi.*', icon: ArrowLeftRight },
         { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
@@ -119,6 +121,7 @@ const isCurrentRoute = (pattern) => {
     if (pattern === 'dashboard' && currentUrl.startsWith('/dashboard')) return true;
     if (pattern === 'bku.*' && currentUrl.startsWith('/bku')) return true;
     if (pattern === 'buku-bank.*' && currentUrl.startsWith('/buku-bank')) return true;
+    if (pattern === 'gaji.*' && currentUrl.startsWith('/gaji')) return true;
     if (pattern === 'impor.*' && currentUrl.startsWith('/impor')) return true;
     if (pattern === 'rekonsiliasi.*' && currentUrl.startsWith('/rekonsiliasi')) return true;
     if (pattern === 'laporan.*' && currentUrl.startsWith('/laporan')) return true;
@@ -135,6 +138,7 @@ const isFinanceRouteActive = computed(() => {
     return isCurrentRoute('dashboard') ||
         isCurrentRoute('bku.*') ||
         isCurrentRoute('buku-bank.*') ||
+        isCurrentRoute('gaji.*') ||
         isCurrentRoute('impor.*') ||
         isCurrentRoute('rekonsiliasi.*') ||
         isCurrentRoute('laporan.*');

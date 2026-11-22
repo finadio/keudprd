@@ -73,6 +73,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/backup-zip', [ReportController::class, 'downloadBackupZip'])->name('backup-zip');
             Route::post('/backup-email', [ReportController::class, 'emailBackupZip'])->name('backup-email');
         });
+
+        // Modul Perhitungan Gaji dan Tunjangan (DPRD & ASN)
+        require __DIR__.'/gaji.php';
     });
 
     // Pantauan Realisasi Pagu (Bisa diakses Admin & PPTK sesuai peran)
