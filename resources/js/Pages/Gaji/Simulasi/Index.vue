@@ -138,40 +138,6 @@ const filteredItems = computed(() => {
                         </button>
                     </div>
                 </div>
-
-                <!-- Navigation Tabs Submenu -->
-                <div class="flex items-center gap-1.5 mt-5 pt-4 border-t border-slate-100 overflow-x-auto text-xs">
-                    <Link
-                        href="/gaji"
-                        class="px-3.5 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all whitespace-nowrap"
-                    >
-                        Dashboard & Kontrol
-                    </Link>
-                    <Link
-                        href="/gaji/penerima"
-                        class="px-3.5 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all whitespace-nowrap"
-                    >
-                        Data Penerima (ASN & DPRD)
-                    </Link>
-                    <Link
-                        href="/gaji/simulasi"
-                        class="px-3.5 py-1.5 rounded-lg font-bold bg-[#107c41] text-white transition-all whitespace-nowrap"
-                    >
-                        Simulasi & Hitung Otomatis
-                    </Link>
-                    <Link
-                        href="/gaji/laporan"
-                        class="px-3.5 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all whitespace-nowrap"
-                    >
-                        Riwayat & Ekspor Laporan
-                    </Link>
-                    <Link
-                        href="/gaji/pengaturan"
-                        class="px-3.5 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all whitespace-nowrap"
-                    >
-                        Tarif Regulasi & Plafon
-                    </Link>
-                </div>
             </div>
 
             <!-- Simulation Parameters Controls Card -->
