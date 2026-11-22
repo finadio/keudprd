@@ -29,7 +29,11 @@ import {
     Receipt,
     FolderTree,
     FileSpreadsheet,
-    Coins
+    Coins,
+    Users,
+    Calculator,
+    FileText,
+    Sliders
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -84,7 +88,6 @@ const financeNavItems = computed(() => {
         { name: 'Dashboard', href: '/dashboard', routeName: 'dashboard', icon: LayoutDashboard },
         { name: 'BKU Per PPTK', href: '/bku', routeName: 'bku.*', icon: BookOpen },
         { name: 'Buku Bank', href: '/buku-bank', routeName: 'buku-bank.*', icon: Landmark },
-        { name: 'Gaji & Tunjangan', href: '/gaji', routeName: 'gaji.*', icon: Coins },
         { name: 'Impor Transaksi', href: '/impor', routeName: 'impor.*', icon: UploadCloud },
         { name: 'Rekonsiliasi', href: '/rekonsiliasi', routeName: 'rekonsiliasi.*', icon: ArrowLeftRight },
         { name: 'Laporan & Ekspor', href: '/laporan', routeName: 'laporan.*', icon: Printer },
@@ -107,6 +110,19 @@ const paguNavItems = computed(() => {
     ];
 });
 
+const gajiNavItems = computed(() => {
+    if (isPptkUser.value) {
+        return [];
+    }
+    return [
+        { name: 'Dashboard Kontrol', href: '/gaji', routeName: 'gaji.index', icon: LayoutDashboard },
+        { name: 'Data Penerima', href: '/gaji/penerima', routeName: 'gaji.penerima.*', icon: Users },
+        { name: 'Simulasi Pembayaran', href: '/gaji/simulasi', routeName: 'gaji.simulasi.*', icon: Calculator },
+        { name: 'Laporan & Slip PDF', href: '/gaji/laporan', routeName: 'gaji.laporan.*', icon: FileText },
+        { name: 'Pengaturan & Tarif', href: '/gaji/pengaturan', routeName: 'gaji.pengaturan.*', icon: Sliders },
+    ];
+});
+
 const generalNavItems = computed(() => {
     if (isPptkUser.value) {
         return [];
@@ -121,7 +137,6 @@ const isCurrentRoute = (pattern) => {
     if (pattern === 'dashboard' && currentUrl.startsWith('/dashboard')) return true;
     if (pattern === 'bku.*' && currentUrl.startsWith('/bku')) return true;
     if (pattern === 'buku-bank.*' && currentUrl.startsWith('/buku-bank')) return true;
-    if (pattern === 'gaji.*' && currentUrl.startsWith('/gaji')) return true;
     if (pattern === 'impor.*' && currentUrl.startsWith('/impor')) return true;
     if (pattern === 'rekonsiliasi.*' && currentUrl.startsWith('/rekonsiliasi')) return true;
     if (pattern === 'laporan.*' && currentUrl.startsWith('/laporan')) return true;
@@ -130,6 +145,12 @@ const isCurrentRoute = (pattern) => {
     if (pattern === 'pagu.activities' && currentUrl.startsWith('/pagu/subkegiatan')) return true;
     if (pattern === 'pagu.import' && currentUrl.startsWith('/pagu/impor')) return true;
     if (pattern === 'pagu.*' && currentUrl.startsWith('/pagu')) return true;
+    if (pattern === 'gaji.index' && (currentUrl === '/gaji' || currentUrl.startsWith('/gaji?'))) return true;
+    if (pattern === 'gaji.penerima.*' && currentUrl.startsWith('/gaji/penerima')) return true;
+    if (pattern === 'gaji.simulasi.*' && currentUrl.startsWith('/gaji/simulasi')) return true;
+    if (pattern === 'gaji.laporan.*' && currentUrl.startsWith('/gaji/laporan')) return true;
+    if (pattern === 'gaji.pengaturan.*' && currentUrl.startsWith('/gaji/pengaturan')) return true;
+    if (pattern === 'gaji.*' && currentUrl.startsWith('/gaji')) return true;
     if (pattern === 'pengaturan.*' && currentUrl.startsWith('/pengaturan')) return true;
     return false;
 };
@@ -138,7 +159,6 @@ const isFinanceRouteActive = computed(() => {
     return isCurrentRoute('dashboard') ||
         isCurrentRoute('bku.*') ||
         isCurrentRoute('buku-bank.*') ||
-        isCurrentRoute('gaji.*') ||
         isCurrentRoute('impor.*') ||
         isCurrentRoute('rekonsiliasi.*') ||
         isCurrentRoute('laporan.*');
@@ -146,6 +166,10 @@ const isFinanceRouteActive = computed(() => {
 
 const isPaguRouteActive = computed(() => {
     return isCurrentRoute('pagu.*');
+});
+
+const isGajiRouteActive = computed(() => {
+    return isCurrentRoute('gaji.*');
 });
 
 const getInitialFinanceAccordionState = () => {
@@ -164,8 +188,17 @@ const getInitialPaguAccordionState = () => {
     return saved !== null ? saved === 'true' : false;
 };
 
+const getInitialGajiAccordionState = () => {
+    if (typeof window === 'undefined') return true;
+    if (isPptkUser.value) return false;
+    if (isGajiRouteActive.value) return true;
+    const saved = localStorage.getItem('keudprd_gaji_acc_open');
+    return saved !== null ? saved === 'true' : true;
+};
+
 const isFinanceAccordionOpen = ref(getInitialFinanceAccordionState());
 const isPaguAccordionOpen = ref(getInitialPaguAccordionState());
+const isGajiAccordionOpen = ref(getInitialGajiAccordionState());
 
 const toggleFinanceAccordion = () => {
     isFinanceAccordionOpen.value = !isFinanceAccordionOpen.value;
@@ -178,6 +211,13 @@ const togglePaguAccordion = () => {
     isPaguAccordionOpen.value = !isPaguAccordionOpen.value;
     if (typeof window !== 'undefined') {
         localStorage.setItem('keudprd_pagu_acc_open', String(isPaguAccordionOpen.value));
+    }
+};
+
+const toggleGajiAccordion = () => {
+    isGajiAccordionOpen.value = !isGajiAccordionOpen.value;
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('keudprd_gaji_acc_open', String(isGajiAccordionOpen.value));
     }
 };
 
@@ -195,6 +235,15 @@ watch(isPaguRouteActive, (active) => {
         isPaguAccordionOpen.value = true;
         if (typeof window !== 'undefined') {
             localStorage.setItem('keudprd_pagu_acc_open', 'true');
+        }
+    }
+}, { immediate: true });
+
+watch(isGajiRouteActive, (active) => {
+    if (active) {
+        isGajiAccordionOpen.value = true;
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('keudprd_gaji_acc_open', 'true');
         }
     }
 }, { immediate: true });
@@ -462,6 +511,59 @@ const jumpToResult = (url) => {
                             </div>
                             <Link
                                 v-for="item in paguNavItems"
+                                :key="item.name"
+                                :href="item.href"
+                                @click="handleNavClick"
+                                :class="[
+                                    'flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap',
+                                    isCurrentRoute(item.routeName)
+                                        ? 'bg-[#107c41] text-white font-bold shadow-xs'
+                                        : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                                ]"
+                            >
+                                <component :is="item.icon" class="w-4 h-4 shrink-0" />
+                                <span>{{ item.name }}</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- Parent Accordion: Perhitungan Gaji & Tunjangan (Khusus Staf Keuangan) -->
+                    <div v-if="!isPptkUser" class="space-y-1">
+                        <button
+                            type="button"
+                            @click="toggleGajiAccordion"
+                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg font-medium transition-all text-xs cursor-pointer select-none group"
+                            :class="[
+                                isGajiRouteActive
+                                    ? 'bg-emerald-900/60 text-white font-semibold'
+                                    : 'text-emerald-100/75 hover:bg-emerald-900/40 hover:text-white'
+                            ]"
+                            title="Klik untuk membuka / menutup menu navigasi Gaji & Tunjangan"
+                        >
+                            <div class="flex items-center gap-2 min-w-0">
+                                <Coins class="w-4 h-4 shrink-0 text-emerald-300 group-hover:text-white transition-colors" />
+                                <span class="truncate tracking-tight font-semibold text-[11px]" title="Gaji & Tunjangan">
+                                    Gaji & Tunjangan
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <span class="text-[10px] px-1.5 py-0.2 bg-emerald-800/80 text-emerald-200 rounded font-sans font-bold">
+                                    {{ gajiNavItems.length }}
+                                </span>
+                                <ChevronDown 
+                                    class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200"
+                                    :class="{ '-rotate-90': !isGajiAccordionOpen }"
+                                />
+                            </div>
+                        </button>
+
+                        <!-- Accordion Submenu Links (Dashboard, Penerima, Simulasi, Laporan, Pengaturan) -->
+                        <div 
+                            v-show="isGajiAccordionOpen" 
+                            class="mt-1 space-y-1 pl-2.5 border-l-2 border-emerald-700/60 ml-3.5 transition-all"
+                        >
+                            <Link
+                                v-for="item in gajiNavItems"
                                 :key="item.name"
                                 :href="item.href"
                                 @click="handleNavClick"
