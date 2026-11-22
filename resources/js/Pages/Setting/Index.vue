@@ -23,7 +23,12 @@ import {
     X,
     AlertTriangle,
     CheckCircle2,
-    FolderOpen
+    FolderOpen,
+    UserCheck,
+    UserPlus,
+    Shield,
+    Key,
+    UserCog
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -32,6 +37,8 @@ const props = defineProps({
     subunits: Array,
     periods: Array,
     audit_logs: Array,
+    users: Array,
+    roles: Array,
     active_year: Number,
     default_year: Number,
     available_years: Array,
@@ -142,6 +149,119 @@ const formatRupiah = (val) => {
     return 'Rp ' + Number(val || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 };
 
+// Manajemen Akun Pengguna & Hak Akses (Role)
+const showUserModal = ref(false);
+const isEditingUser = ref(false);
+const showResetUserPasswordModal = ref(false);
+const showDeleteUserModal = ref(false);
+const userToDelete = ref(null);
+
+const userForm = useForm({
+    id: null,
+    name: '',
+    username: '',
+    email: '',
+    role: 'pptk',
+    pptk_id: '',
+    password: '',
+});
+
+const resetUserPasswordForm = useForm({
+    id: null,
+    username: '',
+    name: '',
+    password: '',
+    password_confirmation: '',
+});
+
+const openCreateUserModal = (defaultPptkId = null) => {
+    isEditingUser.value = false;
+    userForm.reset();
+    userForm.clearErrors();
+    userForm.id = null;
+    userForm.role = defaultPptkId ? 'pptk' : 'operator';
+    userForm.pptk_id = defaultPptkId || '';
+    if (defaultPptkId) {
+        const p = props.pptks?.find(item => item.id === defaultPptkId);
+        if (p) {
+            userForm.name = p.display_name || p.name;
+            const clean = (p.display_name || p.name).toLowerCase().replace(/[^a-z0-9]/g, '');
+            userForm.username = clean;
+            userForm.password = 'Pptk' + (clean ? clean.charAt(0).toUpperCase() + clean.slice(1) : 'Setwan') + '#2026';
+        }
+    }
+    showUserModal.value = true;
+};
+
+const openEditUserModal = (u) => {
+    isEditingUser.value = true;
+    userForm.clearErrors();
+    userForm.id = u.id;
+    userForm.name = u.name;
+    userForm.username = u.username || '';
+    userForm.email = u.email;
+    const r = (u.role || '').toLowerCase().replace(/\s+/g, '');
+    userForm.role = r === 'superadmin' || r === 'admin' ? 'superadmin' : (r === 'bendahara' ? 'bendahara' : (r === 'pptk' ? 'pptk' : 'operator'));
+    userForm.pptk_id = u.pptk_id || '';
+    userForm.password = '';
+    showUserModal.value = true;
+};
+
+const submitUserForm = () => {
+    if (isEditingUser.value && userForm.id) {
+        userForm.put(`/pengaturan/users/${userForm.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showUserModal.value = false;
+            },
+        });
+    } else {
+        userForm.post('/pengaturan/users', {
+            preserveScroll: true,
+            onSuccess: () => {
+                showUserModal.value = false;
+            },
+        });
+    }
+};
+
+const openResetUserPasswordModal = (u) => {
+    resetUserPasswordForm.reset();
+    resetUserPasswordForm.clearErrors();
+    resetUserPasswordForm.id = u.id;
+    resetUserPasswordForm.username = u.username || u.email;
+    resetUserPasswordForm.name = u.name;
+    resetUserPasswordForm.password = '';
+    resetUserPasswordForm.password_confirmation = '';
+    showResetUserPasswordModal.value = true;
+};
+
+const submitResetUserPassword = () => {
+    if (!resetUserPasswordForm.id) return;
+    resetUserPasswordForm.post(`/pengaturan/users/${resetUserPasswordForm.id}/reset-password`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showResetUserPasswordModal.value = false;
+        },
+    });
+};
+
+const confirmDeleteUser = (u) => {
+    userToDelete.value = u;
+    showDeleteUserModal.value = true;
+};
+
+const executeDeleteUser = () => {
+    if (!userToDelete.value) return;
+    router.delete(`/pengaturan/users/${userToDelete.value.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showDeleteUserModal.value = false;
+            userToDelete.value = null;
+        },
+    });
+};
+
 // Manajemen PPTK (Tambah, Edit, Hapus, Toggle Aktif)
 const showPptkModal = ref(false);
 const isEditingPptk = ref(false);
@@ -159,6 +279,9 @@ const pptkForm = useForm({
     color_tag: '#04331a',
     sort_order: 1,
     is_active: true,
+    create_login_account: true,
+    username: '',
+    password: '',
 });
 
 const openCreatePptkModal = () => {
@@ -174,6 +297,9 @@ const openCreatePptkModal = () => {
     pptkForm.color_tag = '#04331a';
     pptkForm.sort_order = (props.pptks?.length || 0) + 1;
     pptkForm.is_active = true;
+    pptkForm.create_login_account = true;
+    pptkForm.username = '';
+    pptkForm.password = '';
     pptkForm.subunit_id = props.subunits?.[0]?.id || '';
     showPptkModal.value = true;
 };
@@ -191,6 +317,9 @@ const openEditPptkModal = (pptk) => {
     pptkForm.color_tag = pptk.color_tag || '#04331a';
     pptkForm.sort_order = pptk.sort_order ?? 0;
     pptkForm.is_active = Boolean(pptk.is_active);
+    pptkForm.create_login_account = false;
+    pptkForm.username = '';
+    pptkForm.password = '';
     showPptkModal.value = true;
 };
 
@@ -202,6 +331,11 @@ const onDisplayNameInput = () => {
         }
         if (!pptkForm.code) {
             pptkForm.code = pptkForm.display_name.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+        }
+        if (pptkForm.create_login_account) {
+            const clean = pptkForm.display_name.toLowerCase().replace(/[^a-z0-9]/g, '');
+            pptkForm.username = clean;
+            pptkForm.password = 'Pptk' + (clean ? clean.charAt(0).toUpperCase() + clean.slice(1) : 'Setwan') + '#2026';
         }
     }
 };
@@ -642,6 +776,133 @@ const togglePptkActive = (pptk) => {
                 </form>
             </div>
 
+            <!-- Card: Manajemen Akun Pengguna & Hak Akses (Role) -->
+            <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+                <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <UserCog class="w-5 h-5 text-emerald-800" />
+                        <div>
+                            <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">
+                                Manajemen Akun Pengguna &amp; Hak Akses (Role)
+                            </h2>
+                            <p class="text-[11px] text-slate-500">
+                                Kelola username login singkat, hak akses modul, ubah role pengguna, dan reset password login staf.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-[11px] text-slate-500 font-medium">
+                            Total: <strong class="text-slate-800">{{ users?.length || 0 }}</strong> Akun Terdaftar
+                        </span>
+                        <button 
+                            type="button"
+                            @click="openCreateUserModal()"
+                            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#04331a] hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                        >
+                            <UserPlus class="w-3.5 h-3.5" />
+                            <span>Tambah Pengguna Baru</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Role Guide Cards -->
+                <div class="p-4 bg-slate-50/60 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div v-for="r in roles" :key="r.value" class="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold border" :class="r.color">
+                                {{ r.label }}
+                            </span>
+                            <span class="text-[10px] font-mono text-slate-400">role: {{ r.value }}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 leading-snug pt-1">{{ r.description }}</p>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="px-3 py-2 text-center w-10">No</th>
+                                <th class="px-3 py-2 text-left">Nama Pengguna</th>
+                                <th class="px-3 py-2 text-left">Username Login</th>
+                                <th class="px-3 py-2 text-left">Role / Hak Akses</th>
+                                <th class="px-3 py-2 text-left">Terhubung PPTK</th>
+                                <th class="px-3 py-2 text-left">Email Resmi</th>
+                                <th class="px-3 py-2 text-center w-36">Aksi &amp; Sandi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr v-for="(u, idx) in users" :key="u.id" class="hover:bg-slate-50 transition-colors">
+                                <td class="px-3 py-2 text-center font-mono text-slate-500">{{ idx + 1 }}</td>
+                                <td class="px-3 py-2 font-bold text-slate-900">
+                                    {{ u.name }}
+                                    <span v-if="u.id === $page.props.auth?.user?.id" class="ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                        Akun Anda
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <span class="inline-flex items-center gap-1 font-mono font-bold text-emerald-900 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+                                        @{{ u.username || '-' }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <span 
+                                        class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border uppercase"
+                                        :class="[
+                                            u.role === 'superadmin' || u.role === 'admin' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                            (u.role === 'bendahara' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                            (u.role === 'pptk' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                            'bg-purple-100 text-purple-800 border-purple-300'))
+                                        ]"
+                                    >
+                                        {{ u.role }}
+                                    </span>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <span v-if="u.pptk" class="inline-flex items-center gap-1 font-medium text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                        <Users class="w-3 h-3 text-amber-700" />
+                                        {{ u.pptk.display_name || u.pptk.name }}
+                                    </span>
+                                    <span v-else class="text-slate-400 font-mono text-[11px]">- (Seluruh SKPD)</span>
+                                </td>
+                                <td class="px-3 py-2 text-slate-600 font-mono text-[11px]">{{ u.email }}</td>
+                                <td class="px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button 
+                                            type="button"
+                                            @click="openResetUserPasswordModal(u)"
+                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
+                                            title="Reset Password Pengguna"
+                                        >
+                                            <Key class="w-3 h-3 text-slate-500" />
+                                            <span>Reset Sandi</span>
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            @click="openEditUserModal(u)"
+                                            class="p-1 rounded text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
+                                            title="Edit Profil & Role"
+                                        >
+                                            <Pencil class="w-3.5 h-3.5" />
+                                        </button>
+                                        <button 
+                                            v-if="u.id !== 1 && u.id !== $page.props.auth?.user?.id"
+                                            type="button"
+                                            @click="confirmDeleteUser(u)"
+                                            class="p-1 rounded text-slate-400 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                                            title="Hapus Akun Pengguna"
+                                        >
+                                            <Trash2 class="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Card 4: Master PPTK Management -->
             <div class="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
                 <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -650,7 +911,7 @@ const togglePptkActive = (pptk) => {
                         <div>
                             <h2 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Daftar PPTK Sekretariat DPRD Banyumas</h2>
                             <p class="text-[11px] text-slate-500">
-                                Tambah, ubah identitas pejabat/gelar, atau nonaktifkan PPTK ketika pergantian periode anggaran baru.
+                                Tambah, ubah identitas pejabat/gelar, akun login, atau nonaktifkan PPTK ketika pergantian periode anggaran baru.
                             </p>
                         </div>
                     </div>
@@ -676,6 +937,7 @@ const togglePptkActive = (pptk) => {
                                 <th class="px-3 py-2 text-center w-10">No</th>
                                 <th class="px-3 py-2 text-left">Kode</th>
                                 <th class="px-3 py-2 text-left">Nama PPTK</th>
+                                <th class="px-3 py-2 text-left">Akun Login</th>
                                 <th class="px-3 py-2 text-left">NIP</th>
                                 <th class="px-3 py-2 text-left">Bagian / Subunit</th>
                                 <th class="px-3 py-2 text-left">Sheet BKU</th>
@@ -694,6 +956,21 @@ const togglePptkActive = (pptk) => {
                                     </span>
                                 </td>
                                 <td class="px-3 py-2 font-bold text-emerald-950">{{ p.display_name || p.name }}</td>
+                                <td class="px-3 py-2">
+                                    <span v-if="p.user?.username" class="inline-flex items-center gap-1 font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                        @{{ p.user.username }}
+                                    </span>
+                                    <button 
+                                        v-else 
+                                        type="button" 
+                                        @click="openCreateUserModal(p.id)"
+                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 cursor-pointer transition-colors"
+                                        title="Buat Akun Login untuk PPTK ini"
+                                    >
+                                        <UserPlus class="w-3 h-3" />
+                                        <span>+ Buat Akun</span>
+                                    </button>
+                                </td>
                                 <td class="px-3 py-2 font-mono text-slate-600">{{ p.nip || '-' }}</td>
                                 <td class="px-3 py-2 text-slate-600">{{ p.subunit?.name || '-' }}</td>
                                 <td class="px-3 py-2 font-mono text-blue-700 underline">
@@ -734,7 +1011,7 @@ const togglePptkActive = (pptk) => {
                                 </td>
                             </tr>
                             <tr v-if="!pptks || pptks.length === 0">
-                                <td colspan="9" class="px-3 py-6 text-center text-slate-500">
+                                <td colspan="10" class="px-3 py-6 text-center text-slate-500">
                                     Belum ada data PPTK tersimpan. Klik tombol "+ Tambah PPTK Baru" di atas.
                                 </td>
                             </tr>
@@ -928,6 +1205,51 @@ const togglePptkActive = (pptk) => {
                                     <span class="font-semibold text-slate-700">Status Aktif (Tampil di Periode Berjalan)</span>
                                 </label>
                             </div>
+
+                            <!-- Akun Login Otomatis PPTK -->
+                            <div v-if="!isEditingPptk" class="sm:col-span-2 p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2.5">
+                                <label class="flex items-center gap-2 cursor-pointer font-bold text-emerald-950 text-xs">
+                                    <input 
+                                        v-model="pptkForm.create_login_account" 
+                                        type="checkbox" 
+                                        class="rounded border-emerald-400 text-emerald-700 focus:ring-emerald-500 w-4 h-4" 
+                                    />
+                                    <span>Otomatis Buat Akun Login untuk PPTK ini</span>
+                                </label>
+                                <p class="text-[11px] text-emerald-800">
+                                    Pejabat PPTK dapat langsung login ke sistem untuk memantau pagu dan sheet BKU kegiatannya.
+                                </p>
+
+                                <div v-if="pptkForm.create_login_account" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                    <div>
+                                        <label class="block font-semibold text-emerald-950 mb-1 text-[11px]">
+                                            Username Login Singkat <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <span class="absolute left-2.5 top-1.5 text-slate-400 font-mono text-xs">@</span>
+                                            <input 
+                                                v-model="pptkForm.username" 
+                                                type="text" 
+                                                placeholder="mis: sugeng" 
+                                                class="w-full pl-6 pr-2.5 py-1.5 font-mono text-xs border border-emerald-300 rounded bg-white focus:ring-1 focus:ring-emerald-700 outline-none" 
+                                            />
+                                        </div>
+                                        <span class="text-[10px] text-slate-500">Username singkat untuk login</span>
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold text-emerald-950 mb-1 text-[11px]">
+                                            Password Login Awal
+                                        </label>
+                                        <input 
+                                            v-model="pptkForm.password" 
+                                            type="text" 
+                                            placeholder="PptkSugeng#2026" 
+                                            class="w-full px-2.5 py-1.5 font-mono text-xs border border-emerald-300 rounded bg-white focus:ring-1 focus:ring-emerald-700 outline-none" 
+                                        />
+                                        <span class="text-[10px] text-slate-500">Password default aman</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Action Buttons -->
@@ -1086,6 +1408,289 @@ const togglePptkActive = (pptk) => {
                 </div>
             </div>
 
+            <!-- Modal Tambah / Edit Pengguna & Role -->
+            <div 
+                v-if="showUserModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-5 py-3.5 bg-[#04331a] text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <UserPlus v-if="!isEditingUser" class="w-4 h-4 text-emerald-300" />
+                            <UserCog v-else class="w-4 h-4 text-emerald-300" />
+                            <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wide">
+                                {{ isEditingUser ? 'Ubah Pengguna & Hak Akses (Role)' : 'Tambah Pengguna Baru' }}
+                            </h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showUserModal = false"
+                            class="text-emerald-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <form @submit.prevent="submitUserForm" class="p-5 space-y-3.5 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Nama Lengkap Pengguna <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="userForm.name" 
+                                type="text" 
+                                required
+                                placeholder="misal: Irna Setiawati / Budi Santoso"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                            />
+                            <div v-if="userForm.errors.name" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.name }}</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Username Login <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2 text-slate-400 font-mono text-xs">@</span>
+                                    <input 
+                                        v-model="userForm.username" 
+                                        type="text" 
+                                        required
+                                        placeholder="mis: irna / bendahara"
+                                        class="w-full pl-7 pr-3 py-2 font-mono border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                                    />
+                                </div>
+                                <span class="text-[10px] text-slate-400">Username singkat untuk login</span>
+                                <div v-if="userForm.errors.username" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.username }}</div>
+                            </div>
+
+                            <div>
+                                <label class="block font-semibold text-slate-700 mb-1">
+                                    Email Resmi
+                                </label>
+                                <input 
+                                    v-model="userForm.email" 
+                                    type="email" 
+                                    placeholder="nama@dprd.banyumaskab.go.id"
+                                    class="w-full px-3 py-2 font-mono border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                                />
+                                <span class="text-[10px] text-slate-400">Opsional (otomatis jika kosong)</span>
+                                <div v-if="userForm.errors.email" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.email }}</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Hak Akses / Role <span class="text-red-500">*</span>
+                            </label>
+                            <select 
+                                v-model="userForm.role"
+                                required
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-emerald-500 outline-none font-semibold text-slate-800"
+                            >
+                                <option value="superadmin">Super Admin (Akses Penuh Seluruh Modul &amp; Pengaturan)</option>
+                                <option value="bendahara">Bendahara Pengeluaran (BKU, Bank, Rekonsiliasi, Gaji, Pagu)</option>
+                                <option value="operator">Operator Pembukuan (Input Harian BKU &amp; Rekonsiliasi)</option>
+                                <option value="pptk">PPTK (Khusus Pantauan Realisasi Pagu &amp; BKU Terkait)</option>
+                            </select>
+                            <div v-if="userForm.errors.role" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.role }}</div>
+                        </div>
+
+                        <!-- Jika role PPTK, pilih PPTK terhubung -->
+                        <div v-if="userForm.role === 'pptk'" class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl space-y-1.5">
+                            <label class="block font-bold text-amber-950 text-xs">
+                                Terhubung dengan PPTK Siapa? <span class="text-red-500">*</span>
+                            </label>
+                            <select 
+                                v-model="userForm.pptk_id"
+                                class="w-full px-3 py-2 border border-amber-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-amber-500 outline-none font-medium"
+                            >
+                                <option value="">-- Pilih Nama PPTK --</option>
+                                <option v-for="p in pptks" :key="p.id" :value="p.id">
+                                    {{ p.display_name || p.name }} ({{ p.code }}) - {{ p.subunit?.name || 'Sekretariat' }}
+                                </option>
+                            </select>
+                            <p class="text-[10px] text-amber-800">
+                                Akun ini hanya akan melihat dan memfilter data pagu &amp; transaksi BKU milik PPTK ini.
+                            </p>
+                        </div>
+
+                        <div v-if="!isEditingUser">
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Password Login Awal <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="userForm.password" 
+                                type="text" 
+                                required
+                                minlength="8"
+                                placeholder="Minimal 8 karakter, misal: PptkIrna#2026"
+                                class="w-full px-3 py-2 font-mono border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                            />
+                            <div v-if="userForm.errors.password" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.password }}</div>
+                        </div>
+
+                        <div v-else>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Password Baru (Kosongkan jika tidak ingin mengubah)
+                            </label>
+                            <input 
+                                v-model="userForm.password" 
+                                type="text" 
+                                minlength="8"
+                                placeholder="Biarkan kosong jika tidak diubah"
+                                class="w-full px-3 py-2 font-mono border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                            />
+                            <div v-if="userForm.errors.password" class="text-red-600 text-[10px] mt-0.5">{{ userForm.errors.password }}</div>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showUserModal = false"
+                                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-colors cursor-pointer text-xs"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="submit" 
+                                :disabled="userForm.processing"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 bg-[#04331a] hover:bg-emerald-800 disabled:opacity-50 text-white rounded-xl font-bold transition-colors cursor-pointer shadow-xs text-xs"
+                            >
+                                <Save class="w-3.5 h-3.5" />
+                                <span>{{ userForm.processing ? 'Menyimpan...' : (isEditingUser ? 'Perbarui Pengguna' : 'Simpan Pengguna') }}</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Reset Password Pengguna oleh Admin -->
+            <div 
+                v-if="showResetUserPasswordModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <Key class="w-4 h-4 text-amber-300" />
+                            <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wide">
+                                Reset Password @{{ resetUserPasswordForm.username }}
+                            </h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showResetUserPasswordModal = false"
+                            class="text-slate-300 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <form @submit.prevent="submitResetUserPassword" class="p-5 space-y-3.5 text-xs">
+                        <p class="text-slate-600 text-xs">
+                            Masukkan password baru untuk akun pengguna <strong>{{ resetUserPasswordForm.name }}</strong> (<code>@{{ resetUserPasswordForm.username }}</code>):
+                        </p>
+
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Password Baru (Min. 8 Karakter) <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="resetUserPasswordForm.password" 
+                                type="text" 
+                                required
+                                minlength="8"
+                                placeholder="Masukkan password baru"
+                                class="w-full px-3 py-2 font-mono border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                            />
+                            <div v-if="resetUserPasswordForm.errors.password" class="text-red-600 text-[10px] mt-0.5">{{ resetUserPasswordForm.errors.password }}</div>
+                        </div>
+
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">
+                                Konfirmasi Password Baru <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                v-model="resetUserPasswordForm.password_confirmation" 
+                                type="text" 
+                                required
+                                minlength="8"
+                                placeholder="Ulangi password baru"
+                                class="w-full px-3 py-2 font-mono border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                            />
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showResetUserPasswordModal = false"
+                                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-colors cursor-pointer text-xs"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="submit" 
+                                :disabled="resetUserPasswordForm.processing"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl font-bold transition-colors cursor-pointer shadow-xs text-xs"
+                            >
+                                <Check class="w-3.5 h-3.5" />
+                                <span>{{ resetUserPasswordForm.processing ? 'Menyimpan...' : 'Perbarui Password' }}</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Konfirmasi Hapus Akun Pengguna -->
+            <div 
+                v-if="showDeleteUserModal && userToDelete" 
+                class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            >
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div class="px-5 py-3.5 bg-red-800 text-white flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <AlertTriangle class="w-4 h-4 text-amber-300" />
+                            <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wide">Konfirmasi Hapus Akun</h3>
+                        </div>
+                        <button 
+                            type="button" 
+                            @click="showDeleteUserModal = false"
+                            class="text-red-200 hover:text-white transition-colors cursor-pointer"
+                        >
+                            <X class="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div class="p-5 space-y-3.5 text-xs">
+                        <p class="text-slate-700 leading-relaxed">
+                            Apakah Anda yakin ingin menghapus akun pengguna <strong class="text-slate-900 font-bold">"{{ userToDelete.name }}"</strong> (<code>@{{ userToDelete.username }}</code>) dengan role <span class="uppercase font-bold text-red-700">{{ userToDelete.role }}</span>?
+                        </p>
+                        <p class="text-slate-500 text-[11px]">
+                            Pengguna ini tidak akan dapat login lagi ke sistem. Riwayat pembukuan dan audit trail sebelumnya tetap tersimpan rapi di sistem.
+                        </p>
+
+                        <div class="pt-2 flex items-center justify-end gap-2">
+                            <button 
+                                type="button" 
+                                @click="showDeleteUserModal = false"
+                                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold transition-colors cursor-pointer text-xs"
+                            >
+                                Batal
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="executeDeleteUser"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-xl font-bold transition-colors cursor-pointer shadow-xs text-xs"
+                            >
+                                <Trash2 class="w-3.5 h-3.5" />
+                                <span>Hapus Akun</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </AppLayout>
 </template>

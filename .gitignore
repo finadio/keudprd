@@ -26,6 +26,8 @@
 /bootstrap/cache/*.php
 /database/database.sqlite
 /storage/app/backups/*.zip
+/storage/backups/
+BKU_Per_PPTK_Terbaru.xlsx
 /storage/framework/cache/data/*
 /storage/framework/sessions/*
 /storage/framework/views/*.php

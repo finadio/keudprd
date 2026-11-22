@@ -25,7 +25,9 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@dprd.banyumaskab.go.id'],
             [
                 'name' => 'Administrator Keuangan',
-                'password' => Hash::make('password'),
+                'username' => 'admin',
+                'role' => 'superadmin',
+                'password' => Hash::make('AdminSetwan#2026'),
             ]
         );
 
@@ -33,7 +35,9 @@ class DatabaseSeeder extends Seeder
             ['email' => 'bendahara@dprd.banyumaskab.go.id'],
             [
                 'name' => 'INDAH SETIYOWATI, A.Md.AB.',
-                'password' => Hash::make('password'),
+                'username' => 'bendahara',
+                'role' => 'bendahara',
+                'password' => Hash::make('BdhSetwan#2026'),
             ]
         );
 
@@ -41,7 +45,9 @@ class DatabaseSeeder extends Seeder
             ['email' => 'operator@dprd.banyumaskab.go.id'],
             [
                 'name' => 'Operator Pembukuan',
-                'password' => Hash::make('password'),
+                'username' => 'operator',
+                'role' => 'operator',
+                'password' => Hash::make('OprSetwan#2026'),
             ]
         );
 
@@ -166,17 +172,45 @@ class DatabaseSeeder extends Seeder
         }
 
         // 4.1 Create User Account for each PPTK (Role: pptk, View-Only)
+        $shortUsernames = [
+            'IRNA' => 'irna',
+            'AUL_ETY' => 'ety',
+            'GAYA' => 'gaya',
+            'RATMAN' => 'ratman',
+            'AUL_RINA' => 'rina',
+            'SIGIT' => 'sigit',
+            'SGNG_SYESA' => 'syesa',
+            'SGNG_EMI' => 'emi',
+            'SRI_L' => 'sri',
+        ];
+
         foreach (Pptk::all() as $p) {
             $slug = strtolower(str_replace(['_', ' ', '/'], '-', $p->code));
-            User::firstOrCreate(
-                ['email' => "pptk.{$slug}@dprd.banyumaskab.go.id"],
-                [
+            $shortU = $shortUsernames[$p->code] ?? $slug;
+            $passU = 'Pptk'.ucfirst($shortU).'#2026';
+
+            $user = User::where('email', "pptk.{$slug}@dprd.banyumaskab.go.id")
+                ->orWhere('pptk_id', $p->id)
+                ->first();
+
+            if ($user) {
+                $user->update([
                     'name' => $p->name ?: $p->display_name,
-                    'password' => Hash::make('password'),
+                    'username' => $shortU,
+                    'password' => Hash::make($passU),
                     'role' => 'pptk',
                     'pptk_id' => $p->id,
-                ]
-            );
+                ]);
+            } else {
+                User::create([
+                    'name' => $p->name ?: $p->display_name,
+                    'username' => $shortU,
+                    'email' => "pptk.{$slug}@dprd.banyumaskab.go.id",
+                    'password' => Hash::make($passU),
+                    'role' => 'pptk',
+                    'pptk_id' => $p->id,
+                ]);
+            }
         }
 
         // 4.2 Seed SIPD Fungsional Activities if excel exists

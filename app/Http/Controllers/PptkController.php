@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class PptkController extends Controller
@@ -29,18 +30,21 @@ class PptkController extends Controller
             'color_tag' => 'nullable|string|max:20',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'nullable|boolean',
+            'create_login_account' => 'nullable|boolean',
+            'username' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9_\-\.]+$/|unique:users,username',
+            'password' => 'nullable|string|min:8',
         ]);
 
-        $name = trim($validated['display_name'] ?? $validated['name'] ?? '');
+        $name = trim(($validated['display_name'] ?? null) ?: ($validated['name'] ?? ''));
         if (empty($name)) {
             return redirect()->back()->withErrors(['display_name' => 'Nama PPTK wajib diisi.']);
         }
-        $validated['display_name'] = $validated['display_name'] ?: $name;
-        $validated['name'] = $validated['name'] ?: $name;
+        $validated['display_name'] = ! empty($validated['display_name']) ? $validated['display_name'] : $name;
+        $validated['name'] = ! empty($validated['name']) ? $validated['name'] : $name;
 
         // Auto-generate code if not provided
         if (empty($validated['code'])) {
-            $baseCode = strtoupper(Str::slug($validated['display_name'] ?: $validated['name'], '_'));
+            $baseCode = strtoupper(Str::slug($validated['display_name'], '_'));
             $candidate = $baseCode;
             $counter = 1;
             while (Pptk::where('code', $candidate)->exists()) {
@@ -70,11 +74,47 @@ class PptkController extends Controller
 
         $validated['is_active'] = isset($validated['is_active']) ? (bool) $validated['is_active'] : true;
 
+        $createAccount = ! empty($validated['create_login_account']) || ! empty($validated['username']);
+        $customUsername = $validated['username'] ?? null;
+        $customPassword = $validated['password'] ?? null;
+
+        unset($validated['create_login_account'], $validated['username'], $validated['password']);
+
         $pptk = Pptk::create($validated);
 
         AuditLog::log('create', 'Pptk', $pptk->id, null, $pptk->toArray());
 
-        return redirect()->back()->with('success', "PPTK baru '{$pptk->display_name}' ({$pptk->name}) berhasil ditambahkan!");
+        $accountMsg = '';
+        if ($createAccount) {
+            $baseUsername = $customUsername ? strtolower(trim($customUsername)) : strtolower(preg_replace('/[^a-zA-Z0-9]/', '', Str::slug($pptk->display_name, '')));
+            $candidateUser = $baseUsername ?: 'pptk'.rand(100, 999);
+            $uCounter = 1;
+            while (User::where('username', $candidateUser)->exists()) {
+                $candidateUser = "{$baseUsername}{$uCounter}";
+                $uCounter++;
+            }
+
+            $plainPass = $customPassword ?: 'Pptk'.ucfirst($candidateUser).'#2026';
+            $user = User::create([
+                'name' => $pptk->display_name,
+                'username' => $candidateUser,
+                'email' => "pptk.{$candidateUser}@dprd.banyumaskab.go.id",
+                'role' => 'pptk',
+                'password' => Hash::make($plainPass),
+                'pptk_id' => $pptk->id,
+            ]);
+
+            AuditLog::log('create', 'User', $user->id, null, [
+                'name' => $user->name,
+                'username' => $user->username,
+                'role' => 'pptk',
+                'pptk_id' => $pptk->id,
+            ]);
+
+            $accountMsg = " Akun login dibuat: Username '{$candidateUser}', Password: '{$plainPass}'.";
+        }
+
+        return redirect()->back()->with('success', "PPTK baru '{$pptk->display_name}' ({$pptk->name}) berhasil ditambahkan!{$accountMsg}");
     }
 
     /**
@@ -94,9 +134,9 @@ class PptkController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $name = trim($validated['display_name'] ?? $validated['name'] ?? $pptk->display_name ?? $pptk->name);
-        $validated['display_name'] = $validated['display_name'] ?: $name;
-        $validated['name'] = $validated['name'] ?: $name;
+        $name = trim(($validated['display_name'] ?? null) ?: (($validated['name'] ?? null) ?: ($pptk->display_name ?: $pptk->name)));
+        $validated['display_name'] = ! empty($validated['display_name']) ? $validated['display_name'] : $name;
+        $validated['name'] = ! empty($validated['name']) ? $validated['name'] : $name;
 
         $validated['code'] = strtoupper(trim($validated['code']));
         $validated['is_active'] = isset($validated['is_active']) ? (bool) $validated['is_active'] : $pptk->is_active;

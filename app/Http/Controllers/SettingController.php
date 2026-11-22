@@ -11,6 +11,7 @@ use App\Models\PaguRealization;
 use App\Models\Pptk;
 use App\Models\Subunit;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Services\BackupExportService;
 use App\Services\FiscalYearContext;
 use Illuminate\Http\RedirectResponse;
@@ -37,7 +38,7 @@ class SettingController extends Controller
 
         $setting = MasterSetting::where('fiscal_year', $activeYear)->latest()->first()
             ?? MasterSetting::current();
-        $pptks = Pptk::with('subunit')->orderBy('sort_order')->get();
+        $pptks = Pptk::with(['subunit', 'user'])->orderBy('sort_order')->get();
         $subunits = Subunit::orderBy('id')->get();
         $periods = AccountingPeriod::where('fiscal_year', $activeYear)->orderBy('month')->get();
         $auditLogs = AuditLog::with('user')->latest('id')->take(25)->get();
@@ -46,12 +47,42 @@ class SettingController extends Controller
         $yearSummaries = $this->buildYearSummaries($availableYears);
         $storageStats = $this->buildStorageStats($activeYear);
 
+        $users = User::with('pptk')->orderBy('id')->get();
+        $roles = [
+            [
+                'value' => 'superadmin',
+                'label' => 'Super Admin',
+                'description' => 'Akses penuh ke seluruh sistem, audit log, konfigurasi SKPD, dan manajemen pengguna/role.',
+                'color' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
+            ],
+            [
+                'value' => 'bendahara',
+                'label' => 'Bendahara Pengeluaran',
+                'description' => 'Akses penuh ke BKU, Buku Bank, Rekonsiliasi, Gaji & Tunjangan, serta Pantauan Pagu.',
+                'color' => 'bg-blue-100 text-blue-800 border-blue-300',
+            ],
+            [
+                'value' => 'operator',
+                'label' => 'Operator Pembukuan',
+                'description' => 'Akses input transaksi harian BKU, upload bukti bank, dan rekonsiliasi.',
+                'color' => 'bg-purple-100 text-purple-800 border-purple-300',
+            ],
+            [
+                'value' => 'pptk',
+                'label' => 'PPTK',
+                'description' => 'Akses terbatas hanya untuk melihat data Pantauan Realisasi Pagu dan sheet BKU kegiatannya.',
+                'color' => 'bg-amber-100 text-amber-800 border-amber-300',
+            ],
+        ];
+
         return Inertia::render('Setting/Index', [
             'setting' => $setting,
             'pptks' => $pptks,
             'subunits' => $subunits,
             'periods' => $periods,
             'audit_logs' => $auditLogs,
+            'users' => $users,
+            'roles' => $roles,
             'active_year' => $activeYear,
             'default_year' => FiscalYearContext::defaultYear(),
             'available_years' => $availableYears,
@@ -465,5 +496,119 @@ class SettingController extends Controller
             'backup_size_mb' => round($backupBytes / 1024 / 1024, 2),
             'backup_keep_limit' => 5,
         ];
+    }
+
+    /**
+     * Store a newly created user.
+     */
+    public function storeUser(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:50|regex:/^[a-zA-Z0-9_\-\.]+$/|unique:users,username',
+            'email' => 'nullable|email|max:255|unique:users,email',
+            'role' => 'required|string|in:superadmin,bendahara,operator,pptk',
+            'password' => 'required|string|min:8',
+            'pptk_id' => 'nullable|exists:pptks,id',
+        ]);
+
+        $username = strtolower(trim($validated['username']));
+        $email = ! empty($validated['email']) ? strtolower(trim($validated['email'])) : "{$username}@dprd.banyumaskab.go.id";
+
+        $user = User::create([
+            'name' => trim($validated['name']),
+            'username' => $username,
+            'email' => $email,
+            'role' => $validated['role'],
+            'password' => Hash::make($validated['password']),
+            'pptk_id' => $validated['role'] === 'pptk' ? $validated['pptk_id'] : null,
+        ]);
+
+        AuditLog::log('create', 'User', $user->id, null, [
+            'name' => $user->name,
+            'username' => $user->username,
+            'email' => $user->email,
+            'role' => $user->role,
+            'pptk_id' => $user->pptk_id,
+        ]);
+
+        return back()->with('success', "Akun pengguna '@{$user->username}' ({$user->name}) dengan role '{$user->role}' berhasil dibuat!");
+    }
+
+    /**
+     * Update user details and role.
+     */
+    public function updateUser(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:50|regex:/^[a-zA-Z0-9_\-\.]+$/|unique:users,username,'.$user->id,
+            'email' => 'nullable|email|max:255|unique:users,email,'.$user->id,
+            'role' => 'required|string|in:superadmin,bendahara,operator,pptk',
+            'pptk_id' => 'nullable|exists:pptks,id',
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $oldData = $user->only(['name', 'username', 'email', 'role', 'pptk_id']);
+
+        $username = strtolower(trim($validated['username']));
+        $email = ! empty($validated['email']) ? strtolower(trim($validated['email'])) : ($user->email ?: "{$username}@dprd.banyumaskab.go.id");
+
+        $updateData = [
+            'name' => trim($validated['name']),
+            'username' => $username,
+            'email' => $email,
+            'role' => $validated['role'],
+            'pptk_id' => $validated['role'] === 'pptk' ? ($validated['pptk_id'] ?? null) : null,
+        ];
+
+        if (! empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($updateData);
+
+        AuditLog::log('update', 'User', $user->id, $oldData, $user->only(['name', 'username', 'email', 'role', 'pptk_id']));
+
+        return back()->with('success', "Data akun '@{$user->username}' berhasil diperbarui!");
+    }
+
+    /**
+     * Reset user password by admin.
+     */
+    public function resetUserPassword(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        AuditLog::log('reset_password', 'User', $user->id, null, ['user_id' => $user->id, 'username' => $user->username]);
+
+        return back()->with('success', "Password akun '@{$user->username}' ({$user->name}) berhasil diperbarui!");
+    }
+
+    /**
+     * Delete user account.
+     */
+    public function deleteUser(User $user): RedirectResponse
+    {
+        if (auth()->id() === $user->id) {
+            return back()->withErrors(['user' => 'Anda tidak dapat menghapus akun Anda sendiri yang sedang digunakan saat ini.']);
+        }
+
+        if ($user->id === 1) {
+            return back()->withErrors(['user' => 'Akun Super Admin utama sistem tidak boleh dihapus.']);
+        }
+
+        $userData = $user->only(['name', 'username', 'email', 'role']);
+        $user->delete();
+
+        AuditLog::log('delete', 'User', $user->id, $userData, null);
+
+        return back()->with('success', "Akun pengguna '@{$userData['username']}' berhasil dihapus.");
     }
 }

@@ -43,6 +43,7 @@ class AuthProtectionTest extends TestCase
     {
         $user = User::first();
         $this->assertNotNull($user);
+        $user->update(['password' => Hash::make('password')]);
 
         // Wrong current password is rejected
         $this->actingAs($user)

@@ -120,6 +120,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/pptk/{pptk}', [PptkController::class, 'destroy'])->name('pptk.destroy');
         Route::post('/pptk/{pptk}/toggle-active', [PptkController::class, 'toggleActive'])->name('pptk.toggle-active');
 
+        // Manajemen Akun Pengguna & Role
+        Route::post('/users', [SettingController::class, 'storeUser'])->name('users.store');
+        Route::put('/users/{user}', [SettingController::class, 'updateUser'])->name('users.update');
+        Route::post('/users/{user}/reset-password', [SettingController::class, 'resetUserPassword'])->name('users.reset-password');
+        Route::delete('/users/{user}', [SettingController::class, 'deleteUser'])->name('users.destroy');
+
         // Manajemen Multi-Tahun Anggaran (Aktivasi & Penghapusan Bersih)
         Route::post('/tahun/{year}/jadikan-aktif', [SettingController::class, 'setActiveFiscalYear'])->name('set-active-year');
         Route::delete('/tahun/{year}', [SettingController::class, 'deleteFiscalYear'])->name('delete-year');

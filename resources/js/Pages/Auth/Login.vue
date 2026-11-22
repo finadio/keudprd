@@ -4,6 +4,7 @@ import {
     LogIn, 
     Lock, 
     Mail, 
+    User,
     ArrowLeft 
 } from 'lucide-vue-next';
 
@@ -82,18 +83,18 @@ const submit = () => {
                 <form @submit.prevent="submit" class="mt-8 space-y-5">
                     <div>
                         <label for="email" class="block font-bold text-slate-800 text-xs sm:text-sm mb-2">
-                            Alamat Email Kedinasan
+                            Username atau Email Kedinasan
                         </label>
                         <div class="relative">
-                            <Mail class="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                            <User class="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                             <input
                                 id="email"
                                 v-model="form.email"
-                                type="email"
+                                type="text"
                                 required
                                 autofocus
                                 autocomplete="username"
-                                placeholder="nama@dprd.banyumaskab.go.id"
+                                placeholder="Username (mis: admin, bendahara, irna) atau email"
                                 class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:bg-white focus:border-transparent transition-all"
                             />
                         </div>
