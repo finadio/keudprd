@@ -76,9 +76,12 @@ echo "🕒 Tanggal/Waktu     : $(date '+%Y-%m-%d %H:%M:%S')"
 echo "===================================================================="
 
 # ------------------------------------------------------------------------------
-# 2. Verifikasi File .env
+# 2. Verifikasi File .env & Pembersihan Cache Dev
 # ------------------------------------------------------------------------------
-echo "🔍 [1/8] Memeriksa konfigurasi environment (.env)..."
+echo "🔍 [1/8] Memeriksa konfigurasi environment (.env) & membersihkan cache lama..."
+# Hapus cache bootstrap lama (sering terbawa dari zip/dev lokal sehingga memicu Class not found)
+rm -f bootstrap/cache/packages.php bootstrap/cache/services.php bootstrap/cache/config.php bootstrap/cache/routes*.php 2>/dev/null || true
+
 if [ ! -f ".env" ]; then
     if [ -f ".env.production" ]; then
         echo "   📄 Menyalin .env.production ke .env..."
@@ -139,7 +142,8 @@ elif command -v $COMPOSER_BIN >/dev/null 2>&1; then
     $COMPOSER_BIN install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts --ignore-platform-reqs || \
     echo "   ⚠️ Composer install dibatasi pada hosting ini, melanjutkan proses..."
 
-    # Jalankan package discovery secara native via PHP CLI (aman tanpa proc_open)
+    # Hapus manifest lama dan jalankan package discovery bersih
+    rm -f bootstrap/cache/packages.php bootstrap/cache/services.php 2>/dev/null || true
     $PHP_BIN artisan package:discover --ansi 2>/dev/null || true
 else
     echo "   ⚠️ $COMPOSER_BIN tidak ditemukan di PATH sistem. Melewati composer install."
